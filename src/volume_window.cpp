@@ -7,7 +7,7 @@
 // Tato konstanta predstavuje world-space velkost mojich volumetrickych dat,
 // resp. work-size velkost bounding box-u okolo tychto mojich volumetrickych dat
 #define PROXY_GEOM_SIZE 256.0f //100.0f
-#define NUM_PROXY_QUADS 109 //256 //109 //100
+#define NUM_PROXY_QUADS 300 //256    //109 //218 //109 //256 //109 //100
 #define OGL_DEBUG
 
 struct Point2D
@@ -129,13 +129,13 @@ void VolumeWindow::render(void)
   const qreal retinaScale = devicePixelRatio();
   glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // vypnutie depth testu a zapnutie blendovania
-  glDisable(GL_DEPTH_TEST);
+  //glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  //glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // aktivovanie shader programu
   m_program.bind();
@@ -184,7 +184,7 @@ void VolumeWindow::render(void)
   glUseProgram(0);
 
   // vratenie blendovania a depth testov do povodneho stavu
-  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
 }
 
