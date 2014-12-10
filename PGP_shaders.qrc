@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>src/opengl/volume_renderer.vert</file>
+        <file>src/opengl/volume_renderer.frag</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>data/head256x256x109_8bit_chan.raw</file>
+    </qresource>
+</RCC>
