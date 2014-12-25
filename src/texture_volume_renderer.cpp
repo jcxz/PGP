@@ -1,13 +1,10 @@
-#include "volume_window.h"
+#include "texture_volume_renderer.h"
 #include "ogl.h"
-
-#include <QtGui/QScreen>
-#include <QtGui/QMouseEvent>
 
 // Tato konstanta predstavuje world-space velkost mojich volumetrickych dat,
 // resp. work-size velkost bounding box-u okolo tychto mojich volumetrickych dat
 #define PROXY_GEOM_SIZE 256.0f //100.0f
-#define NUM_PROXY_QUADS 300 //256    //109 //218 //109 //256 //109 //100
+#define NUM_PROXY_QUADS 300    //256    //109 //218 //109 //256 //109 //100
 #define OGL_DEBUG
 
 struct Point2D
@@ -22,45 +19,14 @@ struct Vertex
 };
 
 
-VolumeWindow::VolumeWindow(QWindow *parent)
-  : OpenGLWindow(parent)
-  , m_vao(0)
-  , m_attr_pos(0)
-  , m_attr_tex_coords(0)
-  , m_program(this)
-  , m_tex_vol_data()
-  , m_tex_transfer_func(0)
-  , m_logger(this)
-  , m_mouse_start()
-  , m_angle_x(0.0f)
-  , m_angle_y(0.0f)
-  , m_dist_z(-10.0f)
-  , m_depth_data(0.0f)
-{
-  QSurfaceFormat format;
-
-  // asks for a OpenGL 4.3 debug context using the Core profile
-  format.setMajorVersion(3);
-  format.setMinorVersion(3);
-  format.setProfile(QSurfaceFormat::CoreProfile);
-#ifdef OGL_DEBUG
-  format.setOption(QSurfaceFormat::DebugContext);
-#endif
-  format.setSamples(16);
-
-  setFormat(format);
-  resize(640, 480);
-}
-
-
-VolumeWindow::~VolumeWindow(void)
+TextureVolumeRenderer::~TextureVolumeRenderer(void)
 {
   OGLF->glDeleteVertexArrays(1, &m_vao);
   glDeleteTextures(1, &m_tex_transfer_func);
 }
 
 
-void VolumeWindow::genTransferFunc(void)
+void TextureVolumeRenderer::genTransferFunc(void)
 {
   glGenTextures(1, &m_tex_transfer_func);
   glBindTexture(GL_TEXTURE_1D, m_tex_transfer_func);
@@ -100,10 +66,20 @@ void VolumeWindow::genTransferFunc(void)
 }
 
 
-void VolumeWindow::initialize(void)
+bool TextureVolumeRenderer::reset(void)
 {
+  // shader pre bounding box
+  m_prog_bbox.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/wire_box.vert");
+  m_prog_bbox.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/src/opengl/wire_box.frag");
+  m_prog_bbox.link();
+
+  m_prog_bbox.bind();
+  m_prog_bbox.setUniformValue("col", QVector3D(1.0f, 0.0f, 0.0f));
+  m_prog_bbox.setUniformValue("dimensions", QVector3D(1.0f, 1.0f, 1.0f));
+  m_prog_bbox.release();
+
   // kompilacia shaderov
-  m_program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/src/opengl/texture_volume_renderer.vert");
+  m_program.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/texture_volume_renderer.vert");
   m_program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/src/opengl/texture_volume_renderer.frag");
   m_program.link();
 
@@ -114,7 +90,7 @@ void VolumeWindow::initialize(void)
   m_program.bind();
   m_program.setUniformValue("num_instances", (GLfloat) NUM_PROXY_QUADS);
   m_program.setUniformValue("num_instances_inv", 1.0f / ((GLfloat) NUM_PROXY_QUADS));
-  glUseProgram(0);
+  OGLF->glUseProgram(0);
 
   // vytvorenie a nabindovanie vertex array object (v core profile je vyzadovany)
   OGLF->glGenVertexArrays(1, &m_vao);
@@ -134,7 +110,6 @@ void VolumeWindow::initialize(void)
 
   // nastavenie atributov
   OGLF->glEnableVertexAttribArray(m_attr_pos);
-  //OGLF->glEnableVertexAttribArray(0);
   OGLF->glVertexAttribPointer(m_attr_pos, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) 0);
 
   OGLF->glEnableVertexAttribArray(m_attr_tex_coords);
@@ -147,37 +122,110 @@ void VolumeWindow::initialize(void)
   if (!m_tex_vol_data.loadFromRaw(":/data/head256x256x109_8bit_chan.raw", 256, 256, 109))
   {
     qWarning("failed to load default volumetric data");
+    return false;
   }
 
-  // debugovanie
-#ifdef OGL_DEBUG
-  if (!m_logger.initialize())
-  {
-    qWarning("Failed to initialize debug logger");
-    return;
-  }
-
-  connect(&m_logger, SIGNAL(messageLogged(const QOpenGLDebugMessage & )),
-          this, SLOT(handleLoggedMessage(const QOpenGLDebugMessage & )),
-          Qt::DirectConnection);
-
-  m_logger.startLogging(QOpenGLDebugLogger::SynchronousLogging);
-  m_logger.enableMessages();
-#endif
+  return true;
 }
 
 
-void VolumeWindow::render(void)
+void TextureVolumeRenderer::renderBBox(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation)
 {
-  const qreal retinaScale = devicePixelRatio();
-  glViewport(0, 0, width() * retinaScale, height() * retinaScale);
+  m_prog_bbox.bind();
 
+  QMatrix4x4 mv;
+
+  mv.translate(0.0f, 0.0f, -1.0f);
+  mv.rotate(rotation);
+  mv.scale(scale);
+
+  m_prog_bbox.setUniformValue("proj", m_proj);
+  m_prog_bbox.setUniformValue("mv", mv);
+
+  glDrawArrays(GL_LINES, 0, 24);
+
+  m_prog_bbox.release();
+}
+
+
+void TextureVolumeRenderer::render(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation)
+{
+#if 1
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  renderBBox(rotation, scale, translation);
+
+#if 1
+  // vypnutie depth testu a zapnutie blendovania
+  glDepthMask(GL_FALSE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // aktivovanie shader programu
+  m_program.bind();
+
+  // nastavenie rotacie
+  QMatrix4x4 tex_matrix;
+
+  // presunutie sa naspat do povodnej polohy
+  tex_matrix.translate(0.5f, 0.5f, 0.5f);
+
+  // normalizacia proxy geometrie podla velkosti volumetrickych dat
+  // Toto je potrebne, pretoze moje volumetricke data nemusia mat
+  // kazdej dimenzii rovnaky pocet voxelov
+  tex_matrix.scale(//-PROXY_GEOM_SIZE / float(m_tex_vol_data.width()),
+                    PROXY_GEOM_SIZE / float(m_tex_vol_data.width()),
+                   -PROXY_GEOM_SIZE / float(m_tex_vol_data.height()),
+                    PROXY_GEOM_SIZE / float(m_tex_vol_data.depth()));
+                   //-PROXY_GEOM_SIZE / float(m_tex_vol_data.depth()));
+
+  // rotacia s datami
+  //tex_matrix.rotate(rotation);
+  QMatrix4x4 rot;
+  rot.rotate(rotation);
+
+  tex_matrix *= rot.inverted();
+
+  // presunutie sa do stredu volumetrickych dat
+  tex_matrix.translate(-0.5f, -0.5f, -0.5f);
+
+  QMatrix4x4 mvp_matrix;
+  mvp_matrix *= m_proj;
+  mvp_matrix.translate(0.0f, 0.0f, -1.0f);
+  mvp_matrix.scale(scale);
+
+  m_program.setUniformValue("mvp_matrix", mvp_matrix);
+  m_program.setUniformValue("tex_matrix", tex_matrix);
+
+  // nastavenie textur
+  OGLF->glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_3D, m_tex_vol_data.id());
+
+  m_program.setUniformValue("tex_data", 0);
+
+  OGLF->glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_1D, m_tex_transfer_func);
+
+  m_program.setUniformValue("tex_transfer_func", 1);
+
+  // vykreslenie proxy geometrie
+  OGLF->glBindVertexArray(m_vao);
+  OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, NUM_PROXY_QUADS);
+  OGLF->glBindVertexArray(0);
+
+  // deaktivovanie shader programu
+  OGLF->glUseProgram(0);
+
+  // vratenie blendovania a depth testov do povodneho stavu
+  glDisable(GL_BLEND);
+  glDepthMask(GL_TRUE);
+#endif
+#elif 0
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // vypnutie depth testu a zapnutie blendovania
   //glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
-  //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // aktivovanie shader programu
@@ -197,28 +245,35 @@ void VolumeWindow::render(void)
                    PROXY_GEOM_SIZE / float(m_tex_vol_data.depth()));
 
   // rotacia s datami
-  tex_matrix.rotate(m_angle_x, 1, 0, 0);
-  tex_matrix.rotate(m_angle_y, 0, 1, 0);
+  tex_matrix.rotate(rotation);
 
   // presunutie sa naspat do povodnej polohy
   tex_matrix.translate(-0.5f, -0.5f, -0.5f);
 
-  tex_matrix.translate(0.0f, 0.0f, m_depth_data);
+  //tex_matrix.translate(0.0f, 0.0f, m_depth_data);
+  //tex_matrix.scale(scale);
+
+  //QMatrix4x4 mvp_matrix;
+  //mvp_matrix.perspective(30.0f, (float) width() / (float) height(), 0.1f, 100.0f);
+  //mvp_matrix.translate(0.0f, 0.0f, m_dist_z);
 
   QMatrix4x4 mvp_matrix;
-  mvp_matrix.perspective(30.0f, (float) width() / (float) height(), 0.1f, 100.0f);
-  mvp_matrix.translate(0.0f, 0.0f, m_dist_z);
+  //mvp_matrix *= m_proj;
+  mvp_matrix.scale(scale);
+  //mvp_matrix.translate(0.0f, 0.0f, scale.z() * -2.0f);//-10.0f);
 
   m_program.setUniformValue("mvp_matrix", mvp_matrix);
+  //m_program.setUniformValue("mvp_matrix", mvp);
+  //m_program.setUniformValue("mvp_matrix", m_proj);
   m_program.setUniformValue("tex_matrix", tex_matrix);
 
   // nastavenie textur
-  glActiveTexture(GL_TEXTURE0);
+  OGLF->glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_3D, m_tex_vol_data.id());
 
   m_program.setUniformValue("tex_data", 0);
 
-  glActiveTexture(GL_TEXTURE1);
+  OGLF->glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_1D, m_tex_transfer_func);
 
   m_program.setUniformValue("tex_transfer_func", 1);
@@ -229,63 +284,10 @@ void VolumeWindow::render(void)
   OGLF->glBindVertexArray(0);
 
   // deaktivovanie shader programu
-  glUseProgram(0);
+  OGLF->glUseProgram(0);
 
   // vratenie blendovania a depth testov do povodneho stavu
   //glEnable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
-}
-
-
-void VolumeWindow::handleLoggedMessage(const QOpenGLDebugMessage & msg)
-{
-  qDebug() << msg;
-}
-
-
-void VolumeWindow::mousePressEvent(QMouseEvent *event)
-{
-  m_mouse_start = event->pos();
-  renderLater();
-  return OpenGLWindow::mousePressEvent(event);
-}
-
-
-void VolumeWindow::mouseMoveEvent(QMouseEvent *event)
-{
-  if (event->buttons() == Qt::LeftButton)
-  {
-    m_angle_y += (event->pos().x() - m_mouse_start.x()) * 0.05f;
-    m_angle_x += (event->pos().y() - m_mouse_start.y()) * 0.05f;
-    renderLater();
-  }
-  else if (event->buttons() == Qt::RightButton)
-  {
-    m_dist_z += (event->pos().y() - m_mouse_start.y()) * -0.01f;
-    if (m_dist_z > 0.0f) m_dist_z = 0.0f;
-    else if (m_dist_z < -20.0f) m_dist_z = -20.0f;
-    renderLater();
-  }
-  else if (event->buttons() == Qt::MidButton)
-  {
-    if ((event->pos().y() - m_mouse_start.y()) > 0.0f)
-    {
-      m_depth_data += 0.01f;
-      if (m_depth_data > 0.0f) m_depth_data = 0.0f;
-    }
-    else
-    {
-      m_depth_data -= 0.01f;
-      if (m_depth_data < -1.0f) m_depth_data = -1.0f;
-    }
-    renderLater();
-  }
-
-  qDebug() << __PRETTY_FUNCTION__
-           << "m_angle_x=" << m_angle_x
-           << ", m_angle_y=" << m_angle_y
-           << ", m_dist_z=" << m_dist_z
-           << ", m_depth_data=" << m_depth_data;
-
-  return OpenGLWindow::mouseMoveEvent(event);
+#endif
 }

@@ -104,7 +104,8 @@ void OpenGLWindow::renderNow(void)
   if (needsInitialize)
   {
     initializeOpenGLFunctions();
-    ogl::initOGLFunctions(m_context);
+    OGLF->initializeOpenGLFunctions();
+    //ogl::initOGLFunctions(m_context);
     initialize();
   }
 

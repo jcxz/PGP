@@ -27,12 +27,16 @@ class VolumeWindow : public OpenGLWindow
     virtual void mouseMoveEvent(QMouseEvent *event) override;
 
   private:
+    void genTransferFunc(void);
+
+  private:
     GLuint m_vao;
     GLuint m_vbo;
     GLuint m_attr_pos;
     GLuint m_attr_tex_coords;
     QOpenGLShaderProgram m_program;
     Texture3D m_tex_vol_data;
+    GLuint m_tex_transfer_func;
     QOpenGLDebugLogger m_logger;
     QPoint m_mouse_start;
     float m_angle_x;

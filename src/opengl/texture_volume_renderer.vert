@@ -8,6 +8,7 @@ out vec3 tex_coords;
 uniform mat4 mvp_matrix;
 uniform mat4 tex_matrix;
 uniform float num_instances;
+uniform float num_instances_inv;
 
 
 void main(void)
@@ -33,7 +34,8 @@ void main(void)
   //tex_coords = (tex_matrix * vec4(tex_coords_in, mix(0.0f, 1.0f, t), 1.0f)).xyz;
 
   /* od zadnej steny k prednej */
-  float t = float(num_instances - gl_InstanceID) / float(num_instances);
+  //float t = float(num_instances - gl_InstanceID) / float(num_instances);
+  float t = float(num_instances - gl_InstanceID) * float(num_instances_inv);
   gl_Position = mvp_matrix * vec4(pos, mix(1.0f, -1.0f, t), 1.0f);
   tex_coords = (tex_matrix * vec4(tex_coords_in, mix(1.0f, 0.0f, t), 1.0f)).xyz;
 }

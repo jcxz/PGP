@@ -32,7 +32,7 @@ bool Texture3D::loadFromRaw(const char *filename, int width, int height, int dep
   GLuint id = 0;
   glGenTextures(1, &id);
 
-  glBindTexture( GL_TEXTURE_3D, id);
+  glBindTexture(GL_TEXTURE_3D, id);
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);

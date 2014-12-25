@@ -1,20 +1,25 @@
 #ifndef OGL_H
 #define OGL_H
 
-//#include <QtGui/QOpenGLFunctions_4_3_Core>
-#include <QtGui/QOpenGLFunctions_3_3_Core>
+#include <QOpenGLContext>
+#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
 #include <cassert>
 
 
-namespace ogl {
+inline QOpenGLFunctions_3_3_Core *get_ogl_functions(void)
+{
+  QOpenGLContext *ctx = QOpenGLContext::currentContext();
+  assert(ctx != nullptr);
 
-//extern QOpenGLFunctions_4_3_Core *g_ogl_funcs;
-extern QOpenGLFunctions_3_3_Core *g_ogl_funcs;
+  QOpenGLFunctions_3_3_Core *f = ctx->versionFunctions<QOpenGLFunctions_3_3_Core>();
+  assert(f != nullptr);
 
-bool initOGLFunctions(QOpenGLContext *ctx);
+  f->initializeOpenGLFunctions();
 
-} // End of ogl namespace
+  return f;
+}
 
-#define OGLF (assert(ogl::g_ogl_funcs != nullptr), ogl::g_ogl_funcs)
+#define OGLF (get_ogl_functions())
 
 #endif // OGL_H
