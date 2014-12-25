@@ -26,8 +26,6 @@ HEADERS += \
     src/volume_renderer.h \
     src/debug_volume_renderer.h \
     src/texture_volume_renderer.h \
-    src/opengl_window.h \
-    src/volume_window.h \
     src/volume_viewer.h \
     src/main_window.h
 
@@ -37,8 +35,6 @@ SOURCES += \
     src/texture3d.cpp \
     src/debug_volume_renderer.cpp \
     src/texture_volume_renderer.cpp \
-    src/opengl_window.cpp \
-    src/volume_window.cpp \
     src/volume_viewer.cpp \
     src/main_window.cpp \
     src/main.cpp

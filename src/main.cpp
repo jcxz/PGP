@@ -1,5 +1,4 @@
 #include "main_window.h"
-#include "volume_window.h"
 
 #include <QApplication>
 #include <QSurfaceFormat>
@@ -19,7 +18,6 @@ int main(int argc, char *argv[])
   QSurfaceFormat::setDefaultFormat(format);
 
   MainWindow w;
-  //VolumeWindow w;
   w.show();
 
   return app.exec();
