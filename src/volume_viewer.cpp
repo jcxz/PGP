@@ -4,6 +4,7 @@
 #include "texture_volume_renderer.h"
 
 #include <QWheelEvent>
+#include <QKeyEvent>
 #include <QMatrix4x4>
 
 
@@ -54,7 +55,7 @@ void VolumeViewer::initializeGL(void)
 
 void VolumeViewer::paintGL(void)
 {
-  qDebug() << __PRETTY_FUNCTION__;
+  //qDebug() << __PRETTY_FUNCTION__;
 
   // vypocet transformacnej matice
   /*
@@ -88,7 +89,8 @@ void VolumeViewer::paintGL(void)
 
   m_renderer->render(m_track_ball.getRotation(),
                      QVector3D(m_scale, m_scale, m_scale),
-                     QVector3D(0.0f, 0.0f, 0.0f));
+                     QVector3D(0.0f, 0.0f, 0.0f),
+                     m_peel_depth);
 }
 
 
@@ -97,6 +99,27 @@ void VolumeViewer::resizeGL(int w, int h)
   qDebug() << __PRETTY_FUNCTION__;
   glViewport(0, 0, w, h);
   m_renderer->setPerspectiveProjection(w, h);
+}
+
+
+void VolumeViewer::keyPressEvent(QKeyEvent *event)
+{
+  qDebug() << __PRETTY_FUNCTION__;
+
+  if (event->key() == Qt::Key_Shift)
+    m_shift_pressed = true;
+  else
+    m_shift_pressed = false;
+
+  return QOpenGLWidget::keyPressEvent(event);
+}
+
+
+void VolumeViewer::keyReleaseEvent(QKeyEvent *event)
+{
+  qDebug() << __PRETTY_FUNCTION__;
+  m_shift_pressed = false;
+  return QOpenGLWidget::keyReleaseEvent(event);
 }
 
 
@@ -128,15 +151,27 @@ void VolumeViewer::mouseMoveEvent(QMouseEvent *event)
 
 void VolumeViewer::wheelEvent(QWheelEvent *event)
 {
-  m_scale += float(event->delta()) * 0.0001f;
+  float delta = float(event->delta()) * 0.0001f;
 
-  //if (m_scale >= 5.0f) m_scale = 5.0f;
-  //else if (m_scale <= 0.0f) m_scale = 0.0f;
+  if (m_shift_pressed)
+  {
+    m_peel_depth += delta;
 
-  if (m_scale >= 2.0f) m_scale = 2.0f;
-  else if (m_scale <= 0.000001f) m_scale = 0.000001f;
+    if (m_peel_depth >= 2.0f) m_peel_depth = 2.0f;
+    else if (m_peel_depth <= 0.0f) m_peel_depth = 0.0f;
+  }
+  else
+  {
+    m_scale += delta;
 
-  qDebug() << "scale=" << m_scale;
+    //if (m_scale >= 5.0f) m_scale = 5.0f;
+    //else if (m_scale <= 0.0f) m_scale = 0.0f;
+
+    if (m_scale >= 2.0f) m_scale = 2.0f;
+    else if (m_scale <= 0.000001f) m_scale = 0.000001f;
+  }
+
+  qDebug() << "scale=" << m_scale << ", peel_depth=" << m_peel_depth;
 
   update();
 

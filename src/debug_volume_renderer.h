@@ -25,7 +25,12 @@ class DebugVolumeRenderer : public VolumeRenderer
     }
 
     virtual bool reset(void) override;
-    virtual void render(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation) override;
+
+  protected:
+    virtual void render_impl(const QQuaternion & rotation,
+                             const QVector3D & scale,
+                             const QVector3D & translation,
+                             const float /* peel_depth */) override;
 
   protected:
     QOpenGLShaderProgram m_prog;

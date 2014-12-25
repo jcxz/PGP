@@ -32,8 +32,13 @@ class VolumeViewer : public QOpenGLWidget
       , m_renderer(nullptr)
       , m_scale(0.15f) //1.0f)
       , m_track_ball()
+      , m_peel_depth(0.0f)
+      , m_shift_pressed(false)
       , m_logger()
-    { }
+    {
+      // aby fungovala keyPressEvent
+      setFocusPolicy(Qt::ClickFocus);
+    }
 
     void setRenderer(RendererType type);
 
@@ -44,6 +49,9 @@ class VolumeViewer : public QOpenGLWidget
     virtual void initializeGL(void) override;
     virtual void paintGL(void) override;
     virtual void resizeGL(int w, int h) override;
+
+    virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void keyReleaseEvent(QKeyEvent *event) override;
 
     virtual void mousePressEvent(QMouseEvent *event) override;
     //virtual void mouseReleaseEvent(QMouseEvent *event) override;
@@ -56,6 +64,8 @@ class VolumeViewer : public QOpenGLWidget
     std::unique_ptr<VolumeRenderer> m_renderer;
     float m_scale;
     TrackBall m_track_ball;
+    float m_peel_depth;
+    bool m_shift_pressed;
     Logger m_logger;
 };
 

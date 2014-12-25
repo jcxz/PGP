@@ -26,8 +26,19 @@ class VolumeRenderer
 
     void setVolumeData(VolumeData *data) { m_data = data; }
 
+    void render(const QQuaternion & rotation,
+                const QVector3D & scale,
+                const QVector3D & translation,
+                const float peel_depth = 0.0f)
+    { return render_impl(rotation, scale, translation, peel_depth); }
+
     virtual bool reset(void) = 0;
-    virtual void render(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation) = 0;
+
+  protected:
+    virtual void render_impl(const QQuaternion & rotation,
+                             const QVector3D & scale,
+                             const QVector3D & translation,
+                             const float peel_depth) = 0;
 
   protected:
     QMatrix4x4 m_proj;

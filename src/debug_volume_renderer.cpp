@@ -107,7 +107,10 @@ bool DebugVolumeRenderer::reset(void)
 }
 
 
-void DebugVolumeRenderer::render(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation)
+void DebugVolumeRenderer::render_impl(const QQuaternion & rotation,
+                                      const QVector3D & scale,
+                                      const QVector3D & translation,
+                                      const float /* peel_depth */)
 {
   QMatrix4x4 mv;
 

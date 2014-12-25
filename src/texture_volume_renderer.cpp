@@ -4,7 +4,7 @@
 // Tato konstanta predstavuje world-space velkost mojich volumetrickych dat,
 // resp. work-size velkost bounding box-u okolo tychto mojich volumetrickych dat
 #define PROXY_GEOM_SIZE 256.0f //100.0f
-#define NUM_PROXY_QUADS 300    //256    //109 //218 //109 //256 //109 //100
+#define NUM_PROXY_QUADS 300    //256    //109 //218 //100
 #define OGL_DEBUG
 
 struct Point2D
@@ -84,8 +84,8 @@ bool TextureVolumeRenderer::reset(void)
   m_program.link();
 
   // atributy a uniformne premenne
-  m_attr_pos = m_program.attributeLocation("pos");
-  m_attr_tex_coords = m_program.attributeLocation("tex_coords_in");
+  GLuint attr_pos = m_program.attributeLocation("pos");
+  GLuint attr_tex_coords = m_program.attributeLocation("tex_coords_in");
 
   m_program.bind();
   m_program.setUniformValue("num_instances", (GLfloat) NUM_PROXY_QUADS);
@@ -109,11 +109,11 @@ bool TextureVolumeRenderer::reset(void)
   OGLF->glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
 
   // nastavenie atributov
-  OGLF->glEnableVertexAttribArray(m_attr_pos);
-  OGLF->glVertexAttribPointer(m_attr_pos, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) 0);
+  OGLF->glEnableVertexAttribArray(attr_pos);
+  OGLF->glVertexAttribPointer(attr_pos, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) 0);
 
-  OGLF->glEnableVertexAttribArray(m_attr_tex_coords);
-  OGLF->glVertexAttribPointer(m_attr_tex_coords, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) sizeof(Point2D));
+  OGLF->glEnableVertexAttribArray(attr_tex_coords);
+  OGLF->glVertexAttribPointer(attr_tex_coords, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) sizeof(Point2D));
 
   // Odbindovanie vertex array
   OGLF->glBindVertexArray(0);
@@ -135,6 +135,7 @@ void TextureVolumeRenderer::renderBBox(const QQuaternion & rotation, const QVect
 
   QMatrix4x4 mv;
 
+  mv.translate(translation);
   mv.translate(0.0f, 0.0f, -1.0f);
   mv.rotate(rotation);
   mv.scale(scale);
@@ -148,9 +149,11 @@ void TextureVolumeRenderer::renderBBox(const QQuaternion & rotation, const QVect
 }
 
 
-void TextureVolumeRenderer::render(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation)
+void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
+                                        const QVector3D & scale,
+                                        const QVector3D & translation,
+                                        const float peel_depth)
 {
-#if 1
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   renderBBox(rotation, scale, translation);
@@ -189,8 +192,12 @@ void TextureVolumeRenderer::render(const QQuaternion & rotation, const QVector3D
   // presunutie sa do stredu volumetrickych dat
   tex_matrix.translate(-0.5f, -0.5f, -0.5f);
 
+  // posun do vnutra dat
+  tex_matrix.translate(0.0f, 0.0f, -peel_depth);
+
   QMatrix4x4 mvp_matrix;
   mvp_matrix *= m_proj;
+  mvp_matrix.translate(translation);
   mvp_matrix.translate(0.0f, 0.0f, -1.0f);
   mvp_matrix.scale(scale);
 
@@ -219,75 +226,5 @@ void TextureVolumeRenderer::render(const QQuaternion & rotation, const QVector3D
   // vratenie blendovania a depth testov do povodneho stavu
   glDisable(GL_BLEND);
   glDepthMask(GL_TRUE);
-#endif
-#elif 0
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  // vypnutie depth testu a zapnutie blendovania
-  //glDisable(GL_DEPTH_TEST);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-  // aktivovanie shader programu
-  m_program.bind();
-
-  // nastavenie rotacie
-  QMatrix4x4 tex_matrix;
-
-  // presunutie sa do stredu volumetrickych dat
-  tex_matrix.translate(0.5f, 0.5f, 0.5f);
-
-  // normalizacia proxy geometrie podla velkosti volumetrickych dat
-  // Toto je potrebne, pretoze moje volumetricke data nemusia mat
-  // kazdej dimenzii rovnaky pocet voxelov
-  tex_matrix.scale(PROXY_GEOM_SIZE / float(m_tex_vol_data.width()),
-                   PROXY_GEOM_SIZE / float(m_tex_vol_data.height()),
-                   PROXY_GEOM_SIZE / float(m_tex_vol_data.depth()));
-
-  // rotacia s datami
-  tex_matrix.rotate(rotation);
-
-  // presunutie sa naspat do povodnej polohy
-  tex_matrix.translate(-0.5f, -0.5f, -0.5f);
-
-  //tex_matrix.translate(0.0f, 0.0f, m_depth_data);
-  //tex_matrix.scale(scale);
-
-  //QMatrix4x4 mvp_matrix;
-  //mvp_matrix.perspective(30.0f, (float) width() / (float) height(), 0.1f, 100.0f);
-  //mvp_matrix.translate(0.0f, 0.0f, m_dist_z);
-
-  QMatrix4x4 mvp_matrix;
-  //mvp_matrix *= m_proj;
-  mvp_matrix.scale(scale);
-  //mvp_matrix.translate(0.0f, 0.0f, scale.z() * -2.0f);//-10.0f);
-
-  m_program.setUniformValue("mvp_matrix", mvp_matrix);
-  //m_program.setUniformValue("mvp_matrix", mvp);
-  //m_program.setUniformValue("mvp_matrix", m_proj);
-  m_program.setUniformValue("tex_matrix", tex_matrix);
-
-  // nastavenie textur
-  OGLF->glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_3D, m_tex_vol_data.id());
-
-  m_program.setUniformValue("tex_data", 0);
-
-  OGLF->glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_1D, m_tex_transfer_func);
-
-  m_program.setUniformValue("tex_transfer_func", 1);
-
-  // vykreslenie proxy geometrie
-  OGLF->glBindVertexArray(m_vao);
-  OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, NUM_PROXY_QUADS);
-  OGLF->glBindVertexArray(0);
-
-  // deaktivovanie shader programu
-  OGLF->glUseProgram(0);
-
-  // vratenie blendovania a depth testov do povodneho stavu
-  //glEnable(GL_DEPTH_TEST);
-  glDisable(GL_BLEND);
 #endif
 }
