@@ -5,6 +5,8 @@
 #include "volume_data.h"
 
 #include <QOpenGLShaderProgram>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLBuffer>
 
 
 class TextureVolumeRenderer : public VolumeRenderer
@@ -12,14 +14,15 @@ class TextureVolumeRenderer : public VolumeRenderer
   public:
     TextureVolumeRenderer(void)
       : VolumeRenderer()
-      , m_vao(0)
-      , m_vbo(0)
+      , m_vao()
+      , m_vbo(QOpenGLBuffer::VertexBuffer)
       , m_program()
       , m_prog_bbox()
-      , m_tex_transfer_func(0)
-    { }
-
-    ~TextureVolumeRenderer(void);
+    {
+      // tento prikaz v skutocnosti ani nie je potrebny,
+      // pretoze StaticDraw je pre QOpenGLBuffer defaultny
+      m_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    }
 
     virtual bool reset(void) override;
 
@@ -31,14 +34,12 @@ class TextureVolumeRenderer : public VolumeRenderer
 
   private:
     void renderBBox(const QQuaternion &rotation, const QVector3D &scale, const QVector3D &translation);
-    void genTransferFunc(void);
 
   private:
-    GLuint m_vao;
-    GLuint m_vbo;
+    QOpenGLVertexArrayObject m_vao;
+    QOpenGLBuffer m_vbo;
     QOpenGLShaderProgram m_program;
     QOpenGLShaderProgram m_prog_bbox;
-    GLuint m_tex_transfer_func;
 };
 
 #endif // TEXTURE_VOLUME_RENDERER_H

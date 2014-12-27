@@ -4,7 +4,7 @@
 // Tato konstanta predstavuje world-space velkost mojich volumetrickych dat,
 // resp. work-size velkost bounding box-u okolo tychto mojich volumetrickych dat
 #define PROXY_GEOM_SIZE 256.0f //100.0f
-#define NUM_PROXY_QUADS 300    //256    //109 //218 //100
+#define NUM_PROXY_QUADS 300    //256 //109 //218 //100
 #define OGL_DEBUG
 
 struct Point2D
@@ -19,52 +19,6 @@ struct Vertex
 };
 
 
-TextureVolumeRenderer::~TextureVolumeRenderer(void)
-{
-  OGLF->glDeleteVertexArrays(1, &m_vao);
-  glDeleteTextures(1, &m_tex_transfer_func);
-}
-
-
-void TextureVolumeRenderer::genTransferFunc(void)
-{
-  const int width = 256;
-#if 0
-  unsigned char (*pixels)[4] = new unsigned char[width][4];
-
-  for (int i = 0; i < width; ++i)
-  {
-    pixels[i][0] = 255;
-    pixels[i][1] = 0;
-    pixels[i][2] = 0;
-    pixels[i][3] = 255;
-  }
-#else
-  unsigned char *pixels = new unsigned char[width * 4];
-
-  for (int i = 0; i < width; i += 4)
-  {
-    pixels[i + 0] = 255;
-    pixels[i + 1] = 0; //255;
-    pixels[i + 2] = 0; //255;
-    pixels[i + 3] = i;
-  }
-#endif
-
-  glGenTextures(1, &m_tex_transfer_func);
-  glBindTexture(GL_TEXTURE_1D, m_tex_transfer_func);
-
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-  glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
-  glBindTexture(GL_TEXTURE_1D, 0);
-
-  delete [] pixels;
-}
-
 
 bool TextureVolumeRenderer::reset(void)
 {
@@ -76,25 +30,22 @@ bool TextureVolumeRenderer::reset(void)
   m_prog_bbox.bind();
   m_prog_bbox.setUniformValue("col", QVector3D(1.0f, 0.0f, 0.0f));
   m_prog_bbox.setUniformValue("dimensions", QVector3D(1.0f, 1.0f, 1.0f));
-  m_prog_bbox.release();
 
-  // kompilacia shaderov
+  // shader pre kreslenie volumetrickych dat
   m_program.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/texture_volume_renderer.vert");
   m_program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/src/opengl/texture_volume_renderer.frag");
   m_program.link();
 
-  // atributy a uniformne premenne
-  GLuint attr_pos = m_program.attributeLocation("pos");
-  GLuint attr_tex_coords = m_program.attributeLocation("tex_coords_in");
-
   m_program.bind();
   m_program.setUniformValue("num_instances", (GLfloat) NUM_PROXY_QUADS);
   m_program.setUniformValue("num_instances_inv", 1.0f / ((GLfloat) NUM_PROXY_QUADS));
+
+  // Odbindovanie shader programov
   OGLF->glUseProgram(0);
 
   // vytvorenie a nabindovanie vertex array object (v core profile je vyzadovany)
-  OGLF->glGenVertexArrays(1, &m_vao);
-  OGLF->glBindVertexArray(m_vao);
+  m_vao.create();
+  m_vao.bind();
 
   // Vytvorenie bufferu pre screen space quad
   Vertex quad[] = {
@@ -104,11 +55,14 @@ bool TextureVolumeRenderer::reset(void)
     { {  1.0f, -1.0f }, { 1.0f, 0.0f } }
   };
 
-  OGLF->glGenBuffers(1, &m_vbo);
-  OGLF->glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-  OGLF->glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+  m_vbo.create();
+  m_vbo.bind();
+  m_vbo.allocate(quad, sizeof(quad));
 
   // nastavenie atributov
+  GLuint attr_pos = m_program.attributeLocation("pos");
+  GLuint attr_tex_coords = m_program.attributeLocation("tex_coords_in");
+
   OGLF->glEnableVertexAttribArray(attr_pos);
   OGLF->glVertexAttribPointer(attr_pos, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) 0);
 
@@ -117,15 +71,6 @@ bool TextureVolumeRenderer::reset(void)
 
   // Odbindovanie vertex array
   OGLF->glBindVertexArray(0);
-
-  // Nacitanie volumetrickych data do 3D textury
-  /*
-  if (!m_tex_vol_data.loadFromRaw(":/data/head256x256x109_8bit_chan.raw", 256, 256, 109))
-  {
-    qWarning("failed to load default volumetric data");
-    return false;
-  }
-  */
 
   return true;
 }
@@ -166,7 +111,6 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   renderBBox(rotation, scale, translation);
 
-#if 1
   // vypnutie depth testu a zapnutie blendovania
   glDepthMask(GL_FALSE);
   glEnable(GL_BLEND);
@@ -219,14 +163,13 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   m_program.setUniformValue("tex_data", 0);
 
   OGLF->glActiveTexture(GL_TEXTURE1);
-  //glBindTexture(GL_TEXTURE_1D, m_tex_transfer_func);
   //m_transfer_func.bind();
   glBindTexture(GL_TEXTURE_1D, m_transfer_func.textureId());
 
   m_program.setUniformValue("tex_transfer_func", 1);
 
   // vykreslenie proxy geometrie
-  OGLF->glBindVertexArray(m_vao);
+  m_vao.bind();
   OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, NUM_PROXY_QUADS);
   OGLF->glBindVertexArray(0);
 
@@ -236,5 +179,4 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   // vratenie blendovania a depth testov do povodneho stavu
   glDisable(GL_BLEND);
   glDepthMask(GL_TRUE);
-#endif
 }
