@@ -22,22 +22,27 @@ HEADERS += \
     src/ogl.h \
     src/logger.h \
     src/trackball.h \
-    src/texture3d.h \
     src/volume_renderer.h \
     src/debug_volume_renderer.h \
     src/texture_volume_renderer.h \
     src/volume_viewer.h \
-    src/main_window.h
+    src/main_window.h \
+    src/volume_data.h \
+    src/transfer_function_editor.h \
+    src/transfer_function.h
 
 SOURCES += \
     src/logger.cpp \
     src/trackball.cpp \
-    src/texture3d.cpp \
+    src/volume_renderer.cpp \
     src/debug_volume_renderer.cpp \
     src/texture_volume_renderer.cpp \
     src/volume_viewer.cpp \
     src/main_window.cpp \
-    src/main.cpp
+    src/main.cpp \
+    src/volume_data.cpp \
+    src/transfer_function_editor.cpp \
+    src/transfer_function.cpp
 
 FORMS += \
     src/main_window.ui

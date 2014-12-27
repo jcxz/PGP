@@ -16,7 +16,9 @@ void main(void)
   //fragColor = c * vec4(0.5f, 0.5f, 0.5f, 0.5f); //fragColor = c * vec4(0.5f, 0.5f, 0.5f, 1.0f);
   //fragColor = c * vec4(1.0f, 0.0f, 0.0f, 0.5f);
 
-  fragColor = vec4(c.a * vec3(10.0f, 10.5f, 10.5f), c.a);
+  //fragColor = vec4(c.a * vec3(10.0f, 10.5f, 10.5f), c.a);
+  //fragColor = vec4(c.a * texture1D(tex_transfer_func, c.a).xyz, c.a);
+  fragColor = texture1D(tex_transfer_func, c.a);
 
   //fragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }

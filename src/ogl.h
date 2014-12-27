@@ -7,6 +7,8 @@
 #include <cassert>
 
 
+namespace ogl_helpers {
+
 inline QOpenGLFunctions_3_3_Core *get_ogl_functions(void)
 {
   QOpenGLContext *ctx = QOpenGLContext::currentContext();
@@ -20,6 +22,10 @@ inline QOpenGLFunctions_3_3_Core *get_ogl_functions(void)
   return f;
 }
 
-#define OGLF (get_ogl_functions())
+inline bool init(void) { return get_ogl_functions() != nullptr; }
+
+}
+
+#define OGLF (ogl_helpers::get_ogl_functions())
 
 #endif // OGL_H

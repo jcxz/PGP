@@ -9,6 +9,34 @@
 
 
 
+bool VolumeViewer::openRawFile(const QString & filename, int width, int height, int depth)
+{
+  if (!m_volume_data.loadFromRaw(filename, width, height, depth))
+  {
+    qWarning() << "Failed to open file" << filename;
+    return false;
+  }
+
+  m_renderer->setVolumeData(&m_volume_data);
+
+  return true;
+}
+
+
+bool VolumeViewer::openFile(const QString & filename)
+{
+  if (!m_volume_data.load(filename))
+  {
+    qWarning() << "Failed to open file" << filename;
+    return false;
+  }
+
+  m_renderer->setVolumeData(&m_volume_data);
+
+  return true;
+}
+
+
 void VolumeViewer::setRenderer(RendererType type)
 {
   switch (type)
@@ -36,6 +64,15 @@ void VolumeViewer::toggleRenderer(void)
 }
 
 
+void VolumeViewer::setTransferFunction(const TransferFunction *transfer_func)
+{
+  qDebug() << __PRETTY_FUNCTION__;
+  m_transfer_func = transfer_func;
+  m_transfer_func_changed = true;
+  update();
+}
+
+
 void VolumeViewer::initializeGL(void)
 {
   qDebug() << __PRETTY_FUNCTION__;
@@ -48,8 +85,6 @@ void VolumeViewer::initializeGL(void)
 
   // nastavenie rendereru
   setRenderer(m_renderer_type);
-  //m_renderer.reset(new DebugVolumeRenderer);
-  //m_renderer.reset(new TextureVolumeRenderer);
 }
 
 
@@ -73,8 +108,20 @@ void VolumeViewer::paintGL(void)
   m_renderer->render(mvp);
   */
 
-  // inicializacia rendereru (renderer treba inicializovat az vtedy
-  // ak uz existuje platny OpenGL kontext a navyse sa da medzi renderermi prepinat ...
+  // nacitanie volumetrickych dat (treba nacitavat az ked mam aktivny OpenGL kontext)
+  if (!m_volume_filename.isNull())
+  {
+    if (!m_volume_data.loadFromRaw(m_volume_filename, 256, 256, 109))
+    {
+      qWarning() << "Failed to load volume data";
+    }
+
+    m_volume_filename = QString();
+  }
+
+  // inicializacia rendereru (renderer treba inicializovat az vtedy ked uz
+  // existuje platny OpenGL kontext.
+  // A navyse medzi renderermi sa da aj prepinat ...)
   if (m_renderer_changed)
   {
     if (!m_renderer->reset())
@@ -83,8 +130,15 @@ void VolumeViewer::paintGL(void)
     }
 
     m_renderer->setPerspectiveProjection(width(), height());
+    m_renderer->setVolumeData(&m_volume_data);
 
     m_renderer_changed = false;
+  }
+
+  if (m_transfer_func_changed)
+  {
+    m_renderer->uploadTransferFunction(*m_transfer_func);
+    m_transfer_func_changed = false;
   }
 
   m_renderer->render(m_track_ball.getRotation(),
@@ -163,9 +217,6 @@ void VolumeViewer::wheelEvent(QWheelEvent *event)
   else
   {
     m_scale += delta;
-
-    //if (m_scale >= 5.0f) m_scale = 5.0f;
-    //else if (m_scale <= 0.0f) m_scale = 0.0f;
 
     if (m_scale >= 2.0f) m_scale = 2.0f;
     else if (m_scale <= 0.000001f) m_scale = 0.000001f;

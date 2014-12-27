@@ -1,27 +1,28 @@
-#ifndef TEXTURE3D_H
-#define TEXTURE3D_H
+#ifndef VOLUME_DATA_H
+#define VOLUME_DATA_H
 
-#include <QtGui/QOpenGLFunctions>
+#include <QOpenGLFunctions>
 
 
-class Texture3D
+class VolumeData
 {
   public:
-    Texture3D(void)
+    VolumeData(void)
       : m_id(0)
       , m_width(0)
       , m_height(0)
       , m_depth(0)
     { }
 
-    ~Texture3D(void) { }
+    ~VolumeData(void) { }
 
     unsigned int id(void) const { return m_id; }
     int width(void) const { return m_width; }
     int height(void) const { return m_height; }
     int depth(void) const { return m_depth; }
 
-    bool loadFromRaw(const char *filename, int width, int height, int depth);
+    bool load(const QString & filename);
+    bool loadFromRaw(const QString & filename, int width, int height, int depth);
 
   private:
     unsigned int m_id;
@@ -30,4 +31,4 @@ class Texture3D
     int m_depth;
 };
 
-#endif // TEXTURE3D_H
+#endif // VOLUME_DATA_H

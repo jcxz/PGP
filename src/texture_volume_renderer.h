@@ -2,7 +2,7 @@
 #define TEXTURE_VOLUME_RENDERER_H
 
 #include "volume_renderer.h"
-#include "texture3d.h"
+#include "volume_data.h"
 
 #include <QOpenGLShaderProgram>
 
@@ -16,9 +16,7 @@ class TextureVolumeRenderer : public VolumeRenderer
       , m_vbo(0)
       , m_program()
       , m_prog_bbox()
-      , m_tex_vol_data()
       , m_tex_transfer_func(0)
-      , m_depth_data(0.0f)
     { }
 
     ~TextureVolumeRenderer(void);
@@ -40,9 +38,7 @@ class TextureVolumeRenderer : public VolumeRenderer
     GLuint m_vbo;
     QOpenGLShaderProgram m_program;
     QOpenGLShaderProgram m_prog_bbox;
-    Texture3D m_tex_vol_data;
     GLuint m_tex_transfer_func;
-    float m_depth_data;
 };
 
 #endif // TEXTURE_VOLUME_RENDERER_H

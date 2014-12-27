@@ -28,13 +28,6 @@ TextureVolumeRenderer::~TextureVolumeRenderer(void)
 
 void TextureVolumeRenderer::genTransferFunc(void)
 {
-  glGenTextures(1, &m_tex_transfer_func);
-  glBindTexture(GL_TEXTURE_1D, m_tex_transfer_func);
-
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
   const int width = 256;
 #if 0
   unsigned char (*pixels)[4] = new unsigned char[width][4];
@@ -52,17 +45,24 @@ void TextureVolumeRenderer::genTransferFunc(void)
   for (int i = 0; i < width; i += 4)
   {
     pixels[i + 0] = 255;
-    pixels[i + 1] = 255;
-    pixels[i + 2] = 255;
+    pixels[i + 1] = 0; //255;
+    pixels[i + 2] = 0; //255;
     pixels[i + 3] = i;
   }
 #endif
 
+  glGenTextures(1, &m_tex_transfer_func);
+  glBindTexture(GL_TEXTURE_1D, m_tex_transfer_func);
+
+  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
   glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
-  delete [] pixels;
-
   glBindTexture(GL_TEXTURE_1D, 0);
+
+  delete [] pixels;
 }
 
 
@@ -119,11 +119,13 @@ bool TextureVolumeRenderer::reset(void)
   OGLF->glBindVertexArray(0);
 
   // Nacitanie volumetrickych data do 3D textury
+  /*
   if (!m_tex_vol_data.loadFromRaw(":/data/head256x256x109_8bit_chan.raw", 256, 256, 109))
   {
     qWarning("failed to load default volumetric data");
     return false;
   }
+  */
 
   return true;
 }
@@ -156,6 +158,12 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  if (m_data == nullptr)
+  {
+    qWarning() << "Not rendering because NO volume data is set";
+    return;
+  }
+
   renderBBox(rotation, scale, translation);
 
 #if 1
@@ -177,9 +185,9 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   // Toto je potrebne, pretoze moje volumetricke data nemusia mat
   // kazdej dimenzii rovnaky pocet voxelov
   tex_matrix.scale(//-PROXY_GEOM_SIZE / float(m_tex_vol_data.width()),
-                    PROXY_GEOM_SIZE / float(m_tex_vol_data.width()),
-                   -PROXY_GEOM_SIZE / float(m_tex_vol_data.height()),
-                    PROXY_GEOM_SIZE / float(m_tex_vol_data.depth()));
+                    PROXY_GEOM_SIZE / float(m_data->width()),
+                   -PROXY_GEOM_SIZE / float(m_data->height()),
+                    PROXY_GEOM_SIZE / float(m_data->depth()));
                    //-PROXY_GEOM_SIZE / float(m_tex_vol_data.depth()));
 
   // rotacia s datami
@@ -206,12 +214,14 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   // nastavenie textur
   OGLF->glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_3D, m_tex_vol_data.id());
+  glBindTexture(GL_TEXTURE_3D, m_data->id());
 
   m_program.setUniformValue("tex_data", 0);
 
   OGLF->glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_1D, m_tex_transfer_func);
+  //glBindTexture(GL_TEXTURE_1D, m_tex_transfer_func);
+  //m_transfer_func.bind();
+  glBindTexture(GL_TEXTURE_1D, m_transfer_func.textureId());
 
   m_program.setUniformValue("tex_transfer_func", 1);
 

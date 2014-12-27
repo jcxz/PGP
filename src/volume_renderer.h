@@ -2,8 +2,10 @@
 #define VOLUME_RENDERER_H
 
 #include <QMatrix4x4>
+#include <QOpenGLTexture>
 
 class VolumeData;
+class TransferFunction;
 class QQuaternion;
 class QVector3D;
 
@@ -13,6 +15,7 @@ class VolumeRenderer
     VolumeRenderer(void)
       : m_proj()
       , m_data(nullptr)
+      , m_transfer_func(QOpenGLTexture::Target1D)
     { }
 
     virtual ~VolumeRenderer(void) { }
@@ -25,6 +28,8 @@ class VolumeRenderer
     }
 
     void setVolumeData(VolumeData *data) { m_data = data; }
+
+    bool uploadTransferFunction(const TransferFunction & transfer_func);
 
     void render(const QQuaternion & rotation,
                 const QVector3D & scale,
@@ -43,6 +48,7 @@ class VolumeRenderer
   protected:
     QMatrix4x4 m_proj;
     VolumeData *m_data;
+    QOpenGLTexture m_transfer_func;
 };
 
 #endif // VOLUME_RENDERER_H

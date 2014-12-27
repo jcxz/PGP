@@ -4,12 +4,14 @@
 #include "logger.h"
 #include "trackball.h"
 #include "volume_renderer.h"
+#include "volume_data.h"
 
 #include <QOpenGLWidget>
 #include <memory>
 
 
 class VolumeRenderer;
+class TransferFunction;
 
 class VolumeViewer : public QOpenGLWidget
 {
@@ -34,16 +36,22 @@ class VolumeViewer : public QOpenGLWidget
       , m_track_ball()
       , m_peel_depth(0.0f)
       , m_shift_pressed(false)
+      , m_volume_filename()
+      , m_volume_data()
+      , m_transfer_func(nullptr)
+      , m_transfer_func_changed(false)
       , m_logger()
     {
       // aby fungovala keyPressEvent
       setFocusPolicy(Qt::ClickFocus);
     }
 
+    void setFile(const QString & filename) { m_volume_filename = filename; }
     void setRenderer(RendererType type);
 
   public slots:
     void toggleRenderer(void);
+    void setTransferFunction(const TransferFunction *transfer_func);
 
   protected:
     virtual void initializeGL(void) override;
@@ -59,13 +67,25 @@ class VolumeViewer : public QOpenGLWidget
     virtual void wheelEvent(QWheelEvent *event) override;
 
   private:
+    bool openRawFile(const QString & filename, int width, int height, int depth);
+    bool openFile(const QString & filename);
+
+  private:
     RendererType m_renderer_type;
     bool m_renderer_changed;
     std::unique_ptr<VolumeRenderer> m_renderer;
+
     float m_scale;
     TrackBall m_track_ball;
     float m_peel_depth;
     bool m_shift_pressed;
+
+    QString m_volume_filename;
+    VolumeData m_volume_data;
+
+    const TransferFunction *m_transfer_func;
+    bool m_transfer_func_changed;
+
     Logger m_logger;
 };
 

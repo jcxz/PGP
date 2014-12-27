@@ -1,17 +1,23 @@
-#include "texture3d.h"
+#include "volume_data.h"
 #include "ogl.h"
 
 #include <QFile>
-#include <iostream>
+#include <QDebug>
 
 
 
-bool Texture3D::loadFromRaw(const char *filename, int width, int height, int depth)
+bool VolumeData::load(const QString & filename)
+{
+  return false;
+}
+
+
+bool VolumeData::loadFromRaw(const QString & filename, int width, int height, int depth)
 {
   QFile f(filename);
   if (!f.open(QFile::ReadOnly))
   {
-    std::cerr << "Failed to open file" << filename << std::endl;
+    qCritical() << "Failed to open file" << filename;
     return false;
   }
 
@@ -53,7 +59,7 @@ bool Texture3D::loadFromRaw(const char *filename, int width, int height, int dep
   m_width = width;
   m_height = height;
 
-  delete[] p_rgba;
+  delete [] p_rgba;
 
   return true;
 }

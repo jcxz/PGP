@@ -1,4 +1,5 @@
 #include "main_window.h"
+#include "ogl.h"
 
 #include <QApplication>
 #include <QSurfaceFormat>

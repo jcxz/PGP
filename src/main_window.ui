@@ -14,40 +14,47 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="VolumeViewer" name="volumeViewer" native="true"/>
-    </item>
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
       <item>
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>Load Model</string>
-        </property>
-       </widget>
+       <widget class="VolumeViewer" name="volumeViewer" native="true"/>
       </item>
       <item>
-       <widget class="QPushButton" name="pbToggleRenderer">
-        <property name="text">
-         <string>Toggle Renderer</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Load Model</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbToggleRenderer">
+          <property name="text">
+           <string>Toggle Renderer</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="TransferFunctionEditor" name="transferFuncEditor" native="true"/>
     </item>
    </layout>
   </widget>
@@ -77,6 +84,12 @@
    <class>VolumeViewer</class>
    <extends>QWidget</extends>
    <header>volume_viewer.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TransferFunctionEditor</class>
+   <extends>QWidget</extends>
+   <header>transfer_function_editor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
