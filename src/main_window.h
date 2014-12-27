@@ -14,6 +14,12 @@ class MainWindow : public QMainWindow
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow(void);
 
+  private slots:
+    void handleLoadModel(void);
+
+  protected:
+    virtual void showEvent(QShowEvent *event) override;
+
   private:
     Ui::MainWindow *ui;
 };

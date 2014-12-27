@@ -9,11 +9,25 @@
 
 
 
-bool VolumeViewer::openRawFile(const QString & filename, int width, int height, int depth)
+VolumeViewer::~VolumeViewer(void)
 {
-  if (!m_volume_data.loadFromRaw(filename, width, height, depth))
+  makeCurrent();  // aby ked budem deletovat renderer bol aktivny nejaky kontext
+}
+
+
+bool VolumeViewer::openRawFile(const QString & filename, int width, int height, int depth, int bit_depth)
+{
+  if (context() == nullptr)
   {
-    qWarning() << "Failed to open file" << filename;
+    qWarning() << "OpenGL context is not yet initialized";
+    return false;
+  }
+
+  makeCurrent(); // ak nahodou este nie je OpenGL kontext aktivny
+
+  if (!m_volume_data.loadFromRaw(filename, width, height, depth, bit_depth))
+  {
+    qWarning() << "Failed to load model from raw file" << filename;
     return false;
   }
 
@@ -25,9 +39,17 @@ bool VolumeViewer::openRawFile(const QString & filename, int width, int height, 
 
 bool VolumeViewer::openFile(const QString & filename)
 {
+  if (context() == nullptr)
+  {
+    qWarning() << "OpenGL context is not yet initialized";
+    return false;
+  }
+
+  makeCurrent(); // ak nahodou este nie je OpenGL kontext aktivny
+
   if (!m_volume_data.load(filename))
   {
-    qWarning() << "Failed to open file" << filename;
+    qWarning() << "Failed to load model from file" << filename;
     return false;
   }
 
@@ -64,12 +86,13 @@ void VolumeViewer::toggleRenderer(void)
 }
 
 
-void VolumeViewer::setTransferFunction(const TransferFunction *transfer_func)
+bool VolumeViewer::setTransferFunction(const TransferFunction & transfer_func)
 {
   qDebug() << __PRETTY_FUNCTION__;
-  m_transfer_func = transfer_func;
+  m_transfer_func = &transfer_func;
   m_transfer_func_changed = true;
   update();
+  return true;
 }
 
 
@@ -90,35 +113,6 @@ void VolumeViewer::initializeGL(void)
 
 void VolumeViewer::paintGL(void)
 {
-  //qDebug() << __PRETTY_FUNCTION__;
-
-  // vypocet transformacnej matice
-  /*
-  QMatrix4x4 mvp;
-
-  mvp.perspective(30.0f, float(width()) / float(height()), 0.01f, 1000.0f);
-  mvp.translate(0.0f, 0.0f, -1.0f);
-  mvp.rotate(m_track_ball.getRotation());
-  mvp.scale(m_scale);
-
-  qDebug() << "width=" << width() << ", height=" << height() << ", " << (((float) width()) / ((float) height()));
-  qDebug() << "mvp=" << mvp;
-
-  // renderovanie
-  m_renderer->render(mvp);
-  */
-
-  // nacitanie volumetrickych dat (treba nacitavat az ked mam aktivny OpenGL kontext)
-  if (!m_volume_filename.isNull())
-  {
-    if (!m_volume_data.loadFromRaw(m_volume_filename, 256, 256, 109))
-    {
-      qWarning() << "Failed to load volume data";
-    }
-
-    m_volume_filename = QString();
-  }
-
   // inicializacia rendereru (renderer treba inicializovat az vtedy ked uz
   // existuje platny OpenGL kontext.
   // A navyse medzi renderermi sa da aj prepinat ...)

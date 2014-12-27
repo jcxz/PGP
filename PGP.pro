@@ -29,7 +29,9 @@ HEADERS += \
     src/main_window.h \
     src/volume_data.h \
     src/transfer_function_editor.h \
-    src/transfer_function.h
+    src/transfer_function.h \
+    src/thirdparty/codebase.h \
+    src/thirdparty/ddsbase.h
 
 SOURCES += \
     src/logger.cpp \
@@ -42,7 +44,8 @@ SOURCES += \
     src/main.cpp \
     src/volume_data.cpp \
     src/transfer_function_editor.cpp \
-    src/transfer_function.cpp
+    src/transfer_function.cpp \
+    src/thirdparty/ddsbase.cpp
 
 FORMS += \
     src/main_window.ui

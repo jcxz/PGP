@@ -32,11 +32,10 @@ class VolumeViewer : public QOpenGLWidget
       , m_renderer_type(TextureRenderer)
       , m_renderer_changed(false)
       , m_renderer(nullptr)
-      , m_scale(0.15f) //1.0f)
+      , m_scale(0.15f)
       , m_track_ball()
       , m_peel_depth(0.0f)
       , m_shift_pressed(false)
-      , m_volume_filename()
       , m_volume_data()
       , m_transfer_func(nullptr)
       , m_transfer_func_changed(false)
@@ -46,12 +45,16 @@ class VolumeViewer : public QOpenGLWidget
       setFocusPolicy(Qt::ClickFocus);
     }
 
-    void setFile(const QString & filename) { m_volume_filename = filename; }
+    ~VolumeViewer(void);
+
+    bool openRawFile(const QString & filename, int width, int height, int depth, int bit_depth);
+    bool openFile(const QString & filename);
+
     void setRenderer(RendererType type);
 
   public slots:
     void toggleRenderer(void);
-    void setTransferFunction(const TransferFunction *transfer_func);
+    bool setTransferFunction(const TransferFunction & transfer_func);
 
   protected:
     virtual void initializeGL(void) override;
@@ -67,10 +70,6 @@ class VolumeViewer : public QOpenGLWidget
     virtual void wheelEvent(QWheelEvent *event) override;
 
   private:
-    bool openRawFile(const QString & filename, int width, int height, int depth);
-    bool openFile(const QString & filename);
-
-  private:
     RendererType m_renderer_type;
     bool m_renderer_changed;
     std::unique_ptr<VolumeRenderer> m_renderer;
@@ -80,7 +79,6 @@ class VolumeViewer : public QOpenGLWidget
     float m_peel_depth;
     bool m_shift_pressed;
 
-    QString m_volume_filename;
     VolumeData m_volume_data;
 
     const TransferFunction *m_transfer_func;

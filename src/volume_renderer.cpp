@@ -1,22 +1,26 @@
 #include "volume_renderer.h"
 #include "transfer_function.h"
+#include "volume_data.h"
 
 
 
 bool VolumeRenderer::uploadTransferFunction(const TransferFunction & transfer_func)
 {
-  const int width = 256;
+  int width = m_data->maxIntensity();// 256;
+  //const int width = 256;
+
+  if (width > 16384) width = 16384;
 
   unsigned char *pixels = new unsigned char[width * 4];
 
   for (int i = 0; i < width; ++i)
   {
-    QColor c = transfer_func.color(i);
+    QColor c = transfer_func.color(i, width);
 
     pixels[i * 4 + 0] = c.red();
     pixels[i * 4 + 1] = c.green();
     pixels[i * 4 + 2] = c.blue();
-    pixels[i * 4 + 3] = (int) (transfer_func.opacity(i) * 255.0f);
+    pixels[i * 4 + 3] = (int) (transfer_func.opacity(i, width) * width);//255.0f);
   }
 
   if (!m_transfer_func.create())

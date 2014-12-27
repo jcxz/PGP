@@ -28,7 +28,7 @@ class TransferFunctionEditor : public QWidget
     }
 
   signals:
-    void transferFunctionChanged(const TransferFunction *func);
+    void transferFunctionChanged(const TransferFunction & func);
 
   public slots:
 

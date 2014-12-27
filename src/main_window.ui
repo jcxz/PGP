@@ -23,7 +23,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="pbLoadModel">
           <property name="text">
            <string>Load Model</string>
           </property>
