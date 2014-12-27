@@ -6,43 +6,27 @@
 #include <QDebug>
 
 
+
 namespace {
 
-constexpr int POINT_RENDER_RADIUS = 2;
-constexpr int POINT_SEARCH_RADIUS = 4;
-
-} // End of private namespace
-
-
-/*
-TransferFunctionEditor::TransferPoint *TransferFunctionEditor::findPointAt(QPoint mouse_pos)
+void drawPoint(QPainter & painter, QPoint pt, int r, const QColor & c)
 {
-  qDebug() << "Mouse pos: " << mouse_pos;
+  QPen pen(c);
+  pen.setWidth(5);
 
-  for (TransferPoint & pt : m_transfer_points)
-  {
-    QPoint pos = pt.position();
-    if ((abs(pos.x() - mouse_pos.x()) <= POINT_SEARCH_RADIUS) &&
-        (abs(pos.y() - mouse_pos.y()) <= POINT_SEARCH_RADIUS))
-    {
-      qDebug() << "pos=" << pos;
-      return &pt;
-    }
-  }
+  QBrush brush(c);
 
-  return nullptr;
+  painter.setPen(pen);
+  painter.setBrush(brush);
+
+  painter.drawEllipse(pt, r, r);
 }
-*/
+
+}
 
 
 void TransferFunctionEditor::paintEvent(QPaintEvent *event)
 {
-  //if (m_transfer_points.isEmpty())
-  //{
-  //  qDebug() << "Not drawing: No transfer control points were set";
-  //  return;
-  //}
-
   QPainter painter;
 
   painter.begin(this);
@@ -51,14 +35,25 @@ void TransferFunctionEditor::paintEvent(QPaintEvent *event)
   painter.setRenderHint(QPainter::Antialiasing);
   painter.setRenderHint(QPainter::HighQualityAntialiasing);
 
-  //QBrush old_brush = painter.brush();
   //QPen old_pen = painter.pen();
+  QBrush old_brush = painter.brush();
+
+  QPen pen;
+  QBrush brush;
+
+  // nakreslenie pozdia
+  pen.setColor(QColor(Qt::white));
+  brush.setColor(QColor(255, 255, 255, 128));
+  brush.setStyle(Qt::SolidPattern);
+  painter.setPen(pen);
+  painter.setBrush(brush);
+  painter.drawRect(rect());
 
   // nakreslenie krivky medzi kontrolnymi bodmi transfer funkcie
-  QPen pen(QColor(Qt::red));
+  pen.setColor(QColor(Qt::red));
   pen.setWidth(2);
-
   painter.setPen(pen);
+  painter.setBrush(old_brush);
 
   const TransferFunction::tContainer & cpts = m_transfer_func.controlPoints();
 
@@ -73,19 +68,17 @@ void TransferFunctionEditor::paintEvent(QPaintEvent *event)
   {
     const TransferControlPoint & p = cpts[i];
 
-    QPen pen(p.color());
-    pen.setWidth(5);
+    // nakresli podsvietenie pre vybrany kontrolny bod
+    if (i == m_cur_tcp_idx)
+    {
+      //QColor c(p.color());
+      //c.setAlphaF(0.25f);
+      QColor c(128, 128, 128, 128);
+      drawPoint(painter, fromTCP(p.position()), POINT_SELECT_RADIUS, c); //QColor(Qt::black));
+    }
 
-    QBrush brush(p.color());
-
-    painter.setPen(pen);
-    painter.setBrush(brush);
-    //painter.drawPoint(p.position());
-    painter.drawEllipse(fromTCP(p.position()), POINT_RENDER_RADIUS, POINT_RENDER_RADIUS);
+    drawPoint(painter, fromTCP(p.position()), POINT_RENDER_RADIUS, p.color());
   }
-
-  //painter.setPen(old_pen);
-  //painter.setBrush(old_brush);
 
   painter.end();
 }
@@ -93,18 +86,19 @@ void TransferFunctionEditor::paintEvent(QPaintEvent *event)
 
 void TransferFunctionEditor::mousePressEvent(QMouseEvent *event)
 {
-  m_cur_pt = m_transfer_func.findByPosition(toTCP(event->pos()),
-                                            toTCP(QPoint(POINT_SEARCH_RADIUS,
-                                                         POINT_SEARCH_RADIUS)));
+  m_cur_tcp_idx = m_transfer_func.findByPosition(toTCP(event->pos()),
+                                                 scaleToTCP(POINT_SEARCH_RADIUS,
+                                                            POINT_SEARCH_RADIUS));
+
   return QWidget::mousePressEvent(event);
 }
 
 
 void TransferFunctionEditor::mouseMoveEvent(QMouseEvent *event)
 {
-  if (m_cur_pt != nullptr)
+  if (m_cur_tcp_idx != TransferFunction::INVALID_TCP_INDEX)
   {
-    m_cur_pt->setPosition(toTCP(event->pos()));
+    m_transfer_func.setTCPPosition(m_cur_tcp_idx, toTCP(event->pos()));
     update();
     emit transferFunctionChanged(m_transfer_func);
 

@@ -8,27 +8,86 @@ QDebug operator<<(QDebug debug, const TransferControlPoint & tcp)
 }
 
 
-TransferControlPoint *TransferFunction::findByPosition(QPointF mouse_pos, QPointF tolerance)
+void TransferFunction::setTCPPosition(int idx, QPointF pos)
 {
-  for (TransferControlPoint & pt : m_transfer_points)
+  qDebug() << __PRETTY_FUNCTION__;
+
+  if (!isValid())
   {
-    QPointF pos = pt.position();
+    qWarning() << "setTCPPosition: Transfer function is invalid";
+    return;
+  }
+
+  TransferControlPoint & pt_prev = getTCP(idx - 1);
+  TransferControlPoint & pt = getTCP(idx);
+  TransferControlPoint & pt_next = getTCP(idx + 1);
+
+  if (pos.y() > 1.0f) pos.setY(1.0f);
+  if (pos.y() < 0.0f) pos.setY(0.0f);
+
+  if (idx <= 0)
+  {
+    pos.setX(m_transfer_points.first().position().x());
+  }
+  else if (idx >= (m_transfer_points.size() - 1))
+  {
+    pos.setX(m_transfer_points.last().position().x());
+  }
+  else
+  {
+    if (pos.x() < pt_prev.position().x()) pos.setX(pt_prev.position().x());
+    if (pos.x() > pt_next.position().x()) pos.setX(pt_next.position().x());
+  }
+
+  pt.setPosition(pos);
+}
+
+
+void TransferFunction::setTCPColor(int idx, const QColor & col)
+{
+  if ((idx >= 0) && (idx < m_transfer_points.size()))
+  {
+    m_transfer_points[idx].setColor(col);
+  }
+}
+
+
+void TransferFunction::removeTCP(int idx)
+{
+  if ((idx > 0) && (idx < (m_transfer_points.size() - 1)))
+  {
+    m_transfer_points.remove(idx);
+  }
+}
+
+
+int TransferFunction::findByPosition(QPointF mouse_pos, QPointF tolerance)
+{
+  qDebug() << __PRETTY_FUNCTION__;
+
+  for (int i = 0; i < m_transfer_points.size(); ++i)
+  {
+    QPointF pos = m_transfer_points[i].position();
+    qDebug() << "mouse_pos=" << mouse_pos << ", pos=" << pos << ", tolerance=" << tolerance;
     if ((fabs(pos.x() - mouse_pos.x()) <= tolerance.x()) &&
         (fabs(pos.y() - mouse_pos.y()) <= tolerance.y()))
     {
-      return &pt;
+      return i;
     }
   }
 
-  return nullptr;
+  return INVALID_TCP_INDEX;
 }
 
 
 float TransferFunction::calcT(float idx, const TransferControlPoint * & cp1, const TransferControlPoint * & cp2) const
 {
   // find upper boundary
-  cp1 = &m_cp_left_border;
-  for (int i = 0; i < m_transfer_points.size(); ++i)
+  //cp1 = &m_cp_left_border;
+  //for (int i = 0; i < m_transfer_points.size(); ++i)
+
+  cp1 = &m_transfer_points[0];
+  for (int i = 1; i < m_transfer_points.size(); ++i)
   {
     QPointF pos = m_transfer_points[i].position();
     if (idx >= pos.x())
@@ -39,8 +98,11 @@ float TransferFunction::calcT(float idx, const TransferControlPoint * & cp1, con
   }
 
   // find lower boundary
-  cp2 = &m_cp_right_border;
-  for (int i = 0; i < m_transfer_points.size(); ++i)
+  //cp2 = &m_cp_right_border;
+  //for (int i = 0; i < m_transfer_points.size(); ++i)
+
+  cp2 = &m_transfer_points.last();
+  for (int i = 0; i < (m_transfer_points.size() - 1); ++i)
   {
     QPointF pos = m_transfer_points[i].position();
     if (idx <= pos.x())
