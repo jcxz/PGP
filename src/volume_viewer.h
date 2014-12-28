@@ -47,6 +47,8 @@ class VolumeViewer : public QOpenGLWidget
 
     ~VolumeViewer(void);
 
+    const VolumeData & volumeData(void) const { return m_volume_data; }
+
     bool openRawFile(const QString & filename, int width, int height, int depth, int bit_depth);
     bool openFile(const QString & filename);
 

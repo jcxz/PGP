@@ -6,6 +6,8 @@
 #include <QWidget>
 
 
+class VolumeData;
+
 class TransferFunctionEditor : public QWidget
 {
     Q_OBJECT
@@ -21,10 +23,13 @@ class TransferFunctionEditor : public QWidget
       : QWidget(parent)
       , m_transfer_func()
       , m_cur_tcp_idx(TransferFunction::INVALID_TCP_INDEX)
+      , m_volume_data(nullptr)
     {
       setFocusPolicy(Qt::ClickFocus);
       initTest();
     }
+
+    void setVolumeData(const VolumeData *data) { m_volume_data = data; }
 
   signals:
     void transferFunctionChanged(const TransferFunction & func);
@@ -65,18 +70,19 @@ class TransferFunctionEditor : public QWidget
     inline QPointF toTCP(QPoint pt)
     {
       return QPointF(float(pt.x() - INNER_PADDING) / float(width()  - 2 * INNER_PADDING),
-                     float(pt.y() - INNER_PADDING) / float(height() - 2 * INNER_PADDING));
+                     1.0f - (float(pt.y() - INNER_PADDING) / float(height() - 2 * INNER_PADDING)));
     }
 
     inline QPoint fromTCP(QPointF pt)
     {
       return QPoint(pt.x() * (width()  - 2 * INNER_PADDING) + INNER_PADDING,
-                    pt.y() * (height() - 2 * INNER_PADDING) + INNER_PADDING);
+                    (1.0f - pt.y()) * (height() - 2 * INNER_PADDING) + INNER_PADDING);
     }
 
   private:
     TransferFunction m_transfer_func;
     int m_cur_tcp_idx;
+    const VolumeData *m_volume_data;
 };
 
 #endif // TRANSFER_FUNCTION_EDITOR_H

@@ -68,7 +68,7 @@ int TransferFunction::findByPosition(QPointF mouse_pos, QPointF tolerance)
   for (int i = 0; i < m_transfer_points.size(); ++i)
   {
     QPointF pos = m_transfer_points[i].position();
-    qDebug() << "mouse_pos=" << mouse_pos << ", pos=" << pos << ", tolerance=" << tolerance;
+    //qDebug() << "mouse_pos=" << mouse_pos << ", pos=" << pos << ", tolerance=" << tolerance;
     if ((fabs(pos.x() - mouse_pos.x()) <= tolerance.x()) &&
         (fabs(pos.y() - mouse_pos.y()) <= tolerance.y()))
     {

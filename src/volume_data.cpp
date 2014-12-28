@@ -59,6 +59,7 @@ bool VolumeData::load(const QString & filename)
 
 bool VolumeData::loadFromDICOM(const QString & filename)
 {
+  (void) filename;
   return false;
 }
 
@@ -103,7 +104,7 @@ bool VolumeData::loadFromPVM(const QString & filename)
   {
     // the endianness conversion in ddsbase.cpp seem to be broken,
     // so we perform it here instead
-
+/*
     uint16_t *data16 = reinterpret_cast<uint16_t *>(data);
     int n = width * height * depth;
 
@@ -111,7 +112,7 @@ bool VolumeData::loadFromPVM(const QString & filename)
     {
       endian_swap(data16[i]);
     }
-
+*/
     loadRaw(data, width, height, depth, 16);
   }
 #endif
@@ -202,6 +203,7 @@ bool VolumeData::loadRaw8bit(const unsigned char *p_luminance, int width, int he
 
 bool VolumeData::loadRaw(const void *p_luminance, int width, int height, int depth, int bit_depth)
 {
+  // Konverzia z grayscale na rgba (kvoli opengl, lebo format moze byt len GL_RGBA)
   const int voxels_cnt = depth * width * height;
   void *p_rgba = nullptr;
   GLenum data_type = 0;
@@ -210,11 +212,13 @@ bool VolumeData::loadRaw(const void *p_luminance, int width, int height, int dep
   {
     p_rgba = (void *) intensityToRGBA<uint8_t>((uint8_t *) p_luminance, voxels_cnt);
     data_type = GL_UNSIGNED_BYTE;
+    m_hist.rebuild((uint8_t *) p_luminance, voxels_cnt);
   }
   else if (bit_depth == 16)
   {
     p_rgba = (void *) intensityToRGBA<uint16_t>((uint16_t *) p_luminance, voxels_cnt);
     data_type = GL_UNSIGNED_SHORT;
+    m_hist.rebuild((uint16_t *) p_luminance, voxels_cnt);
   }
   else
   {
@@ -222,6 +226,7 @@ bool VolumeData::loadRaw(const void *p_luminance, int width, int height, int dep
     return false;
   }
 
+  // nahratie dat do textury
   GLuint id = 0;
   glGenTextures(1, &id);
 

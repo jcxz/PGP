@@ -1,4 +1,5 @@
 #include "transfer_function_editor.h"
+#include "volume_data.h"
 
 #include <QMouseEvent>
 #include <QPainter>
@@ -41,13 +42,39 @@ void TransferFunctionEditor::paintEvent(QPaintEvent *event)
   QPen pen;
   QBrush brush;
 
-  // nakreslenie pozdia
+  // vykreslenie pozadia
   pen.setColor(QColor(Qt::white));
   brush.setColor(QColor(255, 255, 255, 128));
   brush.setStyle(Qt::SolidPattern);
   painter.setPen(pen);
   painter.setBrush(brush);
+
   painter.drawRect(rect());
+
+  // vykreslenie histogramu dat
+  if (m_volume_data)
+  {
+    //pen.setColor(QColor(0, 0, 0, 128));
+    //brush.setColor(QColor(0, 0, 0, 128));
+
+    pen.setColor(QColor(128, 0, 0, 128));
+    brush.setColor(QColor(128, 0, 0, 128));
+
+    painter.setPen(pen);
+    painter.setBrush(brush);
+
+    const VolumeDataHistogram & hist = m_volume_data->intensityHistogram();
+    float range = m_volume_data->maxIntensity();
+    float vox_cnt = m_volume_data->voxelCount();
+    float max = hist.max();
+    for (int i = INNER_PADDING; i < (width() - INNER_PADDING); ++i)
+    {
+      int y = hist.value((float(i - INNER_PADDING) / float(width() - 2 * INNER_PADDING)) * range);
+      //y = (float(y) / float(vox_cnt)) * (height() - 2 * INNER_PADDING) + INNER_PADDING;
+      y = (float(y) / float(max)) * (height() - 2 * INNER_PADDING) + INNER_PADDING;
+      painter.drawLine(QPoint(i, height() - INNER_PADDING), QPoint(i, height() - y));
+    }
+  }
 
   // nakreslenie krivky medzi kontrolnymi bodmi transfer funkcie
   pen.setColor(QColor(Qt::red));
@@ -89,6 +116,7 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent *event)
   m_cur_tcp_idx = m_transfer_func.findByPosition(toTCP(event->pos()),
                                                  scaleToTCP(POINT_SEARCH_RADIUS,
                                                             POINT_SEARCH_RADIUS));
+  update();
 
   return QWidget::mousePressEvent(event);
 }

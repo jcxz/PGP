@@ -35,11 +35,14 @@ void MainWindow::handleLoadModel(void)
   if (!ui->volumeViewer->openFile(filename))
   {
     QMessageBox::critical(this, tr("Error"), tr("Failed open file %1").arg(filename));
+    return;
   }
   else
   {
     qDebug() << "volume file loaded successfully";
   }
+
+  ui->transferFuncEditor->setVolumeData(&ui->volumeViewer->volumeData());
 }
 
 
@@ -54,6 +57,8 @@ void MainWindow::showEvent(QShowEvent *event)
   //bool ret = ui->volumeViewer->openFile("D:/AC601/VirtualBOXShare/Ubuntu/PGP/projekt/PGP_p4jos/data/16-bit/MRI-Woman.pvm");
 
   qDebug() << "volume file loaded: " << (ret ? "yes" : "no");
+
+  ui->transferFuncEditor->setVolumeData(&ui->volumeViewer->volumeData());
 
   return QMainWindow::showEvent(event);
 }
