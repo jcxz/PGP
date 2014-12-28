@@ -66,6 +66,13 @@ class VolumeData
     int width(void) const { return m_width; }
     int height(void) const { return m_height; }
     int depth(void) const { return m_depth; }
+
+    float maxPhysicalSize(void) const { return std::max(physicalWidth(), std::max(physicalHeight(), physicalDepth())); }
+    float minPhysicalSize(void) const { return std::min(physicalWidth(), std::min(physicalHeight(), physicalDepth())); }
+    float physicalWidth(void) const { return m_width * m_scale_x; }
+    float physicalHeight(void) const { return m_height * m_scale_y; }
+    float physicalDepth(void) const { return m_depth * m_scale_z; }
+
     int voxelCount(void) const { return m_width * m_height * m_depth; }
     int bitDepth(void) const { return m_bit_depth; }
     int maxIntensity(void) const { return m_bit_depth == 8 ? 255 : 65535; }

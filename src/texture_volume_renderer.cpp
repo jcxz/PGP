@@ -1,11 +1,9 @@
 #include "texture_volume_renderer.h"
 #include "ogl.h"
 
-// Tato konstanta predstavuje world-space velkost mojich volumetrickych dat,
-// resp. work-size velkost bounding box-u okolo tychto mojich volumetrickych dat
-#define PROXY_GEOM_SIZE 256.0f //100.0f
-#define NUM_PROXY_QUADS 300    //256 //109 //218 //100
-#define OGL_DEBUG
+#define NUM_PROXY_QUADS 300 //256 //109 //218 //100
+
+
 
 struct Point2D
 {
@@ -30,6 +28,14 @@ bool TextureVolumeRenderer::reset(void)
   m_prog_bbox.bind();
   m_prog_bbox.setUniformValue("col", QVector3D(1.0f, 0.0f, 0.0f));
   m_prog_bbox.setUniformValue("dimensions", QVector3D(1.0f, 1.0f, 1.0f));
+
+  // shader na kreslenie stvorca (len pre debugovanie)
+  m_prog_rectangle.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/rectangle.vert");
+  m_prog_rectangle.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/src/opengl/rectangle.frag");
+  m_prog_rectangle.link();
+
+  m_prog_rectangle.bind();
+  m_prog_rectangle.setUniformValue("col", QVector4D(0.0f, 0.0f, 0.9f, 0.5f));
 
   // shader pre kreslenie volumetrickych dat
   m_program.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/texture_volume_renderer.vert");
@@ -87,6 +93,12 @@ void TextureVolumeRenderer::renderBBox(const QQuaternion & rotation, const QVect
   mv.rotate(rotation);
   mv.scale(scale);
 
+#if 0
+  mv.scale(m_data->maxPhysicalSize() / m_data->physicalWidth(),
+           m_data->maxPhysicalSize() / m_data->physicalHeight(),
+           m_data->maxPhysicalSize() / m_data->physicalDepth());
+#endif
+
   m_prog_bbox.setUniformValue("proj", m_proj);
   m_prog_bbox.setUniformValue("mv", mv);
 
@@ -127,12 +139,18 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   // normalizacia proxy geometrie podla velkosti volumetrickych dat
   // Toto je potrebne, pretoze moje volumetricke data nemusia mat
-  // kazdej dimenzii rovnaky pocet voxelov
+  // v kazdej dimenzii rovnaky pocet voxelov
+#if 0
   tex_matrix.scale(//-PROXY_GEOM_SIZE / float(m_tex_vol_data.width()),
                     PROXY_GEOM_SIZE / float(m_data->width()),
                    -PROXY_GEOM_SIZE / float(m_data->height()),
                     PROXY_GEOM_SIZE / float(m_data->depth()));
                    //-PROXY_GEOM_SIZE / float(m_tex_vol_data.depth()));
+#else
+  tex_matrix.scale(m_data->maxPhysicalSize() / m_data->physicalWidth(),
+                   m_data->maxPhysicalSize() / m_data->physicalHeight(),
+                   m_data->maxPhysicalSize() / m_data->physicalDepth());
+#endif
 
   // rotacia s datami
   //tex_matrix.rotate(rotation);
@@ -153,6 +171,16 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   mvp_matrix.translate(0.0f, 0.0f, -1.0f);
   mvp_matrix.scale(scale);
 
+#if 0
+  mvp_matrix.scale(m_data->maxPhysicalSize() / m_data->physicalWidth(),
+                   m_data->maxPhysicalSize() / m_data->physicalHeight(),
+                   m_data->maxPhysicalSize() / m_data->physicalDepth());
+
+  qDebug() << "scale=" << (m_data->maxPhysicalSize() / m_data->physicalWidth())
+           << "," << (m_data->maxPhysicalSize() / m_data->physicalHeight())
+           << "," << (m_data->maxPhysicalSize() / m_data->physicalDepth());
+#endif
+
   m_program.setUniformValue("mvp_matrix", mvp_matrix);
   m_program.setUniformValue("tex_matrix", tex_matrix);
 
@@ -172,6 +200,13 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   m_vao.bind();
   OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, NUM_PROXY_QUADS);
   OGLF->glBindVertexArray(0);
+
+  // vykreslenie debugovacieho stvorca
+  //glDisable(GL_DEPTH_TEST);
+  //m_prog_rectangle.bind();
+  //m_prog_rectangle.setUniformValue("mvp", mvp_matrix);
+  //OGLF->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  //glEnable(GL_DEPTH_TEST);
 
   // deaktivovanie shader programu
   OGLF->glUseProgram(0);

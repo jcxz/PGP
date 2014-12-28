@@ -145,12 +145,18 @@ bool VolumeData::loadFromRaw(const QString & filename, int width, int height, in
 
   QByteArray data(f.readAll());
 
+  qDebug() << "Reading raw volume" << filename;
+
   //return loadRaw8bit((const unsigned char *) data.data(), width, height, depth);
   if (!loadRaw((const unsigned char *) data.data(), width, height, depth, bit_depth)) return false;
 
   m_scale_x = 1.0f;
   m_scale_y = 1.0f;
   m_scale_z = 1.0f;
+
+  qDebug() << "Size: "      << m_width  << " x " << m_height << " x " << m_depth;
+  qDebug() << "Spacing: "   << m_scale_x << " x " << m_scale_y << " x " << m_scale_z;
+  qDebug() << "Bit depth: " << m_bit_depth;
 
   return true;
 }

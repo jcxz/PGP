@@ -18,6 +18,7 @@ class TextureVolumeRenderer : public VolumeRenderer
       , m_vbo(QOpenGLBuffer::VertexBuffer)
       , m_program()
       , m_prog_bbox()
+      , m_prog_rectangle()
     {
       // tento prikaz v skutocnosti ani nie je potrebny,
       // pretoze StaticDraw je pre QOpenGLBuffer defaultny
@@ -40,6 +41,7 @@ class TextureVolumeRenderer : public VolumeRenderer
     QOpenGLBuffer m_vbo;
     QOpenGLShaderProgram m_program;
     QOpenGLShaderProgram m_prog_bbox;
+    QOpenGLShaderProgram m_prog_rectangle;
 };
 
 #endif // TEXTURE_VOLUME_RENDERER_H
