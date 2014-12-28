@@ -6,10 +6,14 @@
 
 bool VolumeRenderer::uploadTransferFunction(const TransferFunction & transfer_func)
 {
-  int width = m_data->maxIntensity();// 256;
-  //const int width = 256;
+  int width = m_data->maxIntensity();
+  int max_texture_size;
 
-  if (width > 16384) width = 16384;
+  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
+  qDebug() << "max_texture_size=" << max_texture_size;
+
+  //if (width > 16384) width = 16384;
+  if (width > max_texture_size) width = max_texture_size;
 
   unsigned char *pixels = new unsigned char[width * 4];
 
@@ -20,7 +24,7 @@ bool VolumeRenderer::uploadTransferFunction(const TransferFunction & transfer_fu
     pixels[i * 4 + 0] = c.red();
     pixels[i * 4 + 1] = c.green();
     pixels[i * 4 + 2] = c.blue();
-    pixels[i * 4 + 3] = (int) (transfer_func.opacity(i, width) * width);//255.0f);
+    pixels[i * 4 + 3] = (int) (transfer_func.opacity(i, width) * 255.0f);
   }
 
   if (!m_transfer_func.create())
