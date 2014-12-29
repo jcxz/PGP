@@ -16,7 +16,17 @@ class TransferFunctionEditor : public QWidget
     static constexpr int POINT_RENDER_RADIUS = 2;
     static constexpr int POINT_SELECT_RADIUS = 4;
     static constexpr int POINT_SEARCH_RADIUS = 8;
-    static constexpr int INNER_PADDING = POINT_SELECT_RADIUS + 3;
+    static constexpr int AXIS_ARROW_SIZE     = 15;
+
+    static constexpr int EXTRA_INNNER_PADDING_RIGHT = POINT_SELECT_RADIUS + 4;
+    static constexpr int EXTRA_INNNER_PADDING_TOP   = POINT_SELECT_RADIUS + 4;
+
+    static constexpr int INNER_PADDING_LEFT   = POINT_SELECT_RADIUS + AXIS_ARROW_SIZE;
+    static constexpr int INNER_PADDING_RIGHT  = POINT_SELECT_RADIUS + AXIS_ARROW_SIZE + EXTRA_INNNER_PADDING_RIGHT;
+    static constexpr int INNER_PADDING_TOP    = POINT_SELECT_RADIUS + AXIS_ARROW_SIZE + EXTRA_INNNER_PADDING_TOP;
+    static constexpr int INNER_PADDING_BOTTOM = POINT_SELECT_RADIUS + AXIS_ARROW_SIZE;
+    static constexpr int INNER_PADDING_X      = INNER_PADDING_LEFT + INNER_PADDING_RIGHT;
+    static constexpr int INNER_PADDING_Y      = INNER_PADDING_TOP + INNER_PADDING_BOTTOM;
 
   public:
     explicit TransferFunctionEditor(QWidget *parent = 0)
@@ -26,6 +36,7 @@ class TransferFunctionEditor : public QWidget
       , m_volume_data(nullptr)
     {
       setFocusPolicy(Qt::ClickFocus);
+      setMinimumSize(QSize(INNER_PADDING_X + 30, INNER_PADDING_Y + 30));
       initTest();
     }
 
@@ -63,21 +74,24 @@ class TransferFunctionEditor : public QWidget
 
     inline QPointF scaleToTCP(float x, float y)
     {
-      return QPointF(x / float(width()  - 2 * INNER_PADDING),
-                     y / float(height() - 2 * INNER_PADDING));
+      return QPointF(x / float(width()  - INNER_PADDING_X),
+                     y / float(height() - INNER_PADDING_Y));
     }
 
     inline QPointF toTCP(QPoint pt)
     {
-      return QPointF(float(pt.x() - INNER_PADDING) / float(width()  - 2 * INNER_PADDING),
-                     1.0f - (float(pt.y() - INNER_PADDING) / float(height() - 2 * INNER_PADDING)));
+      return QPointF(float(pt.x() - INNER_PADDING_LEFT) / float(width() - INNER_PADDING_X),
+                     1.0f - (float(pt.y() - INNER_PADDING_TOP) / float(height() - INNER_PADDING_Y)));
     }
 
     inline QPoint fromTCP(QPointF pt)
     {
-      return QPoint(pt.x() * (width()  - 2 * INNER_PADDING) + INNER_PADDING,
-                    (1.0f - pt.y()) * (height() - 2 * INNER_PADDING) + INNER_PADDING);
+      return QPoint(pt.x() * (width() - INNER_PADDING_X) + INNER_PADDING_LEFT,
+                    (1.0f - pt.y()) * (height() - INNER_PADDING_Y) + INNER_PADDING_TOP);
     }
+
+  private:
+    void drawGrid(QPainter & painter, int w, int h);
 
   private:
     TransferFunction m_transfer_func;
