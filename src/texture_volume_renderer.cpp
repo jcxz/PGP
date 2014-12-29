@@ -99,7 +99,7 @@ void TextureVolumeRenderer::renderBBox(const QQuaternion & rotation, const QVect
   m_prog_bbox.setUniformValue("proj", m_proj);
   m_prog_bbox.setUniformValue("mv", mv);
 
-  glDrawArrays(GL_LINES, 0, 24);
+  OGLF->glDrawArrays(GL_LINES, 0, 24);
 
   m_prog_bbox.release();
 }
@@ -111,7 +111,7 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
                                         float peel_depth,
                                         int slice_count)
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   if (m_data == nullptr)
   {
@@ -122,9 +122,9 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   renderBBox(rotation, scale, translation);
 
   // vypnutie depth testu a zapnutie blendovania
-  glDepthMask(GL_FALSE);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  OGLF->glDepthMask(GL_FALSE);
+  OGLF->glEnable(GL_BLEND);
+  OGLF->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // aktivovanie shader programu
   m_program.bind();
@@ -190,13 +190,12 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   // nastavenie textur
   OGLF->glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_3D, m_data->id());
+  OGLF->glBindTexture(GL_TEXTURE_3D, m_data->id());
 
   m_program.setUniformValue("tex_data", 0);
 
   OGLF->glActiveTexture(GL_TEXTURE1);
-  //m_transfer_func.bind();
-  glBindTexture(GL_TEXTURE_1D, m_transfer_func.textureId());
+  OGLF->glBindTexture(GL_TEXTURE_1D, m_transfer_func.textureId());
 
   m_program.setUniformValue("tex_transfer_func", 1);
 
@@ -214,17 +213,17 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   // vykreslenie debugovacieho stvorca
 #ifdef DEBUG
-  glDisable(GL_DEPTH_TEST);
+  OGLF->glDisable(GL_DEPTH_TEST);
   m_prog_rectangle.bind();
   m_prog_rectangle.setUniformValue("mvp", mvp_matrix);
   OGLF->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  glEnable(GL_DEPTH_TEST);
+  OGLF->glEnable(GL_DEPTH_TEST);
 #endif
 
   // deaktivovanie shader programu
   OGLF->glUseProgram(0);
 
   // vratenie blendovania a depth testov do povodneho stavu
-  glDisable(GL_BLEND);
-  glDepthMask(GL_TRUE);
+  OGLF->glDisable(GL_BLEND);
+  OGLF->glDepthMask(GL_TRUE);
 }
