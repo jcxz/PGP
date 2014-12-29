@@ -1,8 +1,7 @@
 #include "texture_volume_renderer.h"
 #include "ogl.h"
 
-//#define NUM_PROXY_QUADS 300 //256 //109 //218 //100
-
+//#define DEBUG
 
 
 struct Point2D
@@ -30,21 +29,19 @@ bool TextureVolumeRenderer::reset(void)
   m_prog_bbox.setUniformValue("dimensions", QVector3D(1.0f, 1.0f, 1.0f));
 
   // shader na kreslenie stvorca (len pre debugovanie)
+#ifdef DEBUG
   m_prog_rectangle.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/rectangle.vert");
   m_prog_rectangle.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/src/opengl/rectangle.frag");
   m_prog_rectangle.link();
 
   m_prog_rectangle.bind();
   m_prog_rectangle.setUniformValue("col", QVector4D(0.0f, 0.0f, 0.9f, 0.5f));
+#endif
 
   // shader pre kreslenie volumetrickych dat
   m_program.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/texture_volume_renderer.vert");
   m_program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/src/opengl/texture_volume_renderer.frag");
   m_program.link();
-
-  m_program.bind();
-  //m_program.setUniformValue("num_instances", (GLfloat) NUM_PROXY_QUADS);
-  //m_program.setUniformValue("num_instances_inv", 1.0f / ((GLfloat) NUM_PROXY_QUADS));
 
   // Odbindovanie shader programov
   OGLF->glUseProgram(0);
@@ -212,16 +209,17 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   // vykreslenie proxy geometrie
   m_vao.bind();
-  //OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, NUM_PROXY_QUADS);
   OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, slice_count);
   OGLF->glBindVertexArray(0);
 
   // vykreslenie debugovacieho stvorca
-  //glDisable(GL_DEPTH_TEST);
-  //m_prog_rectangle.bind();
-  //m_prog_rectangle.setUniformValue("mvp", mvp_matrix);
-  //OGLF->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  //glEnable(GL_DEPTH_TEST);
+#ifdef DEBUG
+  glDisable(GL_DEPTH_TEST);
+  m_prog_rectangle.bind();
+  m_prog_rectangle.setUniformValue("mvp", mvp_matrix);
+  OGLF->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  glEnable(GL_DEPTH_TEST);
+#endif
 
   // deaktivovanie shader programu
   OGLF->glUseProgram(0);
