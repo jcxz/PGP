@@ -29,35 +29,15 @@ void drawPoint(QPainter & painter, QPoint pt, int r, const QColor & c)
 
 void TransferFunctionEditor::drawGrid(QPainter & painter, int w, int h)
 {
-#if 0
-  float aspect = float(width()) / float(height());
-
-  QTransform t;
-  t.scale(aspect, 1.0f);
-  //t.scale(3.0f * aspect, 3.0f);
-
-  QBrush brush(QColor(128, 128, 128, 128));
-  brush.setStyle(Qt::CrossPattern);
-  brush.setTransform(t);
-
-  painter.setPen(Qt::NoPen);
-  painter.setBrush(brush);
-  painter.drawRect(QRect(INNER_PADDING, INNER_PADDING, width() - 2 * INNER_PADDING, height() - 2 * INNER_PADDING));
-#else
-  //float aspect = float(width()) / float(height());
-
   QColor c(128, 128, 128, 128);
 
   QPen pen(c);
   pen.setWidth(1);
 
   QBrush brush(c);
-  //brush.setStyle(Qt::CrossPattern);
 
   painter.setPen(pen);
   painter.setBrush(brush);
-
-  //painter.drawRect(QRect(INNER_PADDING, INNER_PADDING, w - 2 * INNER_PADDING, h - 2 * INNER_PADDING));
 
   // vykreslenie samotnej mriezky
   painter.setRenderHint(QPainter::Antialiasing, false);
@@ -65,8 +45,6 @@ void TransferFunctionEditor::drawGrid(QPainter & painter, int w, int h)
 
   const int vert_step = 20;
   const int horz_step = 10;
-  //const int padding_left  = INNER_PADDING_LEFT;
-  //const int padding_right = INNER_PADDING_RIGHT;
 
   // horizontalne ciary mriezky
   for (int i = INNER_PADDING_BOTTOM; i < h - INNER_PADDING_TOP; i += horz_step)
@@ -82,9 +60,7 @@ void TransferFunctionEditor::drawGrid(QPainter & painter, int w, int h)
 
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
-#endif
 
-#if 1
   pen.setWidth(2);
   painter.setPen(pen);
 
@@ -109,22 +85,19 @@ void TransferFunctionEditor::drawGrid(QPainter & painter, int w, int h)
   painter.drawLine(INNER_PADDING_LEFT, h - INNER_PADDING_BOTTOM, INNER_PADDING_LEFT, INNER_PADDING_TOP - EXTRA_INNNER_PADDING_TOP);
   painter.drawPolygon(triangle_vert, 3);
 
-#if 0
   // vykreslenie horizontalneho popisku
-  painter.drawStaticText(w - INNER_PADDING - 40, h - INNER_PADDING, QStaticText("intensity"));
+  painter.drawStaticText(w - INNER_PADDING_RIGHT - 40, h - INNER_PADDING_BOTTOM + 2, QStaticText("intensity"));
 
   // vykreslenie vertikalneho popisku
   {
     QTransform old_t = painter.transform();
     QTransform t;
-    t.translate(0, INNER_PADDING + 30);
+    t.translate(0, INNER_PADDING_TOP + 30);
     t.rotate(-90);
     painter.setTransform(t);
     painter.drawStaticText(0, 0, QStaticText("opacity"));
     painter.setTransform(old_t);
   }
-#endif
-#endif
 }
 
 
