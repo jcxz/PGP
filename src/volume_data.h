@@ -2,6 +2,7 @@
 #define VOLUME_DATA_H
 
 #include <QOpenGLFunctions>
+#include <QOpenGLTexture>
 #include <QHash>
 #include <limits>
 
@@ -48,7 +49,7 @@ class VolumeData
 {
   public:
     VolumeData(void)
-      : m_id(0)
+      : m_tex(QOpenGLTexture::Target3D)
       , m_width(0)
       , m_height(0)
       , m_depth(0)
@@ -59,13 +60,16 @@ class VolumeData
       , m_hist()
     { }
 
-    ~VolumeData(void) { glDeleteTextures(1, (GLuint *) &m_id); }
+    //bool isValid(void) const { return m_id != 0; }
 
-    bool isValid(void) const { return m_id != 0; }
-    unsigned int id(void) const { return m_id; }
+    unsigned int id(void) const { return m_tex.textureId(); }
     int width(void) const { return m_width; }
     int height(void) const { return m_height; }
     int depth(void) const { return m_depth; }
+    int bitDepth(void) const { return m_bit_depth; }
+    float scaleX(void) const { return m_scale_x; }
+    float scaleY(void) const { return m_scale_y; }
+    float scaleZ(void) const { return m_scale_z; }
 
     float maxPhysicalSize(void) const { return std::max(physicalWidth(), std::max(physicalHeight(), physicalDepth())); }
     float minPhysicalSize(void) const { return std::min(physicalWidth(), std::min(physicalHeight(), physicalDepth())); }
@@ -74,11 +78,7 @@ class VolumeData
     float physicalDepth(void) const { return m_depth * m_scale_z; }
 
     int voxelCount(void) const { return m_width * m_height * m_depth; }
-    int bitDepth(void) const { return m_bit_depth; }
     int maxIntensity(void) const { return m_bit_depth == 8 ? 255 : 65535; }
-    float scaleX(void) const { return m_scale_x; }
-    float scaleY(void) const { return m_scale_y; }
-    float scaleZ(void) const { return m_scale_z; }
 
     const VolumeDataHistogram & intensityHistogram(void) const { return m_hist; }
 
@@ -88,19 +88,17 @@ class VolumeData
     bool loadFromRaw(const QString & filename, int width, int height, int depth, int bit_depth);
 
   private:
-    //bool loadRaw8bit(const unsigned char *p_luminance, int width, int height, int depth);
-    //bool loadRaw16bit(const unsigned char *p_luminance, int width, int height, int depth);
     bool loadRaw(const void *p_luminance, int width, int height, int depth, int bit_depth);
 
   private:
-    unsigned int m_id;  // id OpenGL 3D textury
-    int m_width;        // sirka dat
-    int m_height;       // vyska dat
-    int m_depth;        // hlbka dat
-    int m_bit_depth;    // bitova hlbka dat (8/16 bitov)
-    float m_scale_x;
-    float m_scale_y;
-    float m_scale_z;
+    QOpenGLTexture m_tex;        // OpenGL 3D textura s datami
+    int m_width;                 // sirka dat
+    int m_height;                // vyska dat
+    int m_depth;                 // hlbka dat
+    int m_bit_depth;             // bitova hlbka dat (8/16 bitov)
+    float m_scale_x;             // udava realnu fyzicku vzdialenost (asi v milimetroch) medzi jednotlivymi voxelmi na x-ovej osi
+    float m_scale_y;             // to iste, ale pre y-ovu os
+    float m_scale_z;             // to iste, ale pre z-ovu os
     VolumeDataHistogram m_hist;  // histogram roznych intenzit v datach
 };
 

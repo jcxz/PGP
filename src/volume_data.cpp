@@ -2,7 +2,6 @@
  * The PVM loader implementation was taken from Voreen project: http://www.voreen.org
  */
 
-// include this before any windows headers
 #include "thirdparty/ddsbase.h"
 #include "volume_data.h"
 #include "ogl.h"
@@ -17,11 +16,6 @@
 
 
 namespace {
-
-inline void endian_swap(uint16_t & x)
-{
-  x = (x >> 8) | (x << 8);
-}
 
 template <typename T>
 const T *intensityToRGBA(const T *p_intensity, const int n)
@@ -93,44 +87,31 @@ bool VolumeData::loadFromPVM(const QString & filename)
   if (parameter)   qDebug() << "Parameter: "   << (char *) parameter;
   if (comment)     qDebug() << "Comment: "     << (char *) comment;
 
+  bool res = true;
+
   if (components == 1)
   {
-    qDebug() << "Create 8 bit data set.";
-    //loadRaw8bit(data, width, height, depth);
-    loadRaw(data, width, height, depth, 8);
+    qDebug() << "Creating 8 bit data set ...";
+    res = loadRaw(data, width, height, depth, 8);
   }
-#if 1
   else if (components == 2)
   {
-    // the endianness conversion in ddsbase.cpp seem to be broken,
-    // so we perform it here instead
-/*
-    uint16_t *data16 = reinterpret_cast<uint16_t *>(data);
-    int n = width * height * depth;
-
-    for (int i = 0; i < n; ++i)
-    {
-      endian_swap(data16[i]);
-    }
-*/
-    loadRaw(data, width, height, depth, 16);
+    qDebug() << "Creating 16 bit data set ...";
+    res = loadRaw(data, width, height, depth, 16);
   }
-#endif
   else
   {
-    free(data);
-    qWarning() << "Bit depth not supported.";
-    return false;
+    qWarning() << "Bit depth" << (components * 8) << "not supported.";
+    res = false;
   }
 
-  // TODO now it is safe to free
   free(data);
 
   m_scale_x = scalex;
   m_scale_y = scaley;
   m_scale_z = scalez;
 
-  return true;
+  return res;
 }
 
 
@@ -147,7 +128,6 @@ bool VolumeData::loadFromRaw(const QString & filename, int width, int height, in
 
   qDebug() << "Reading raw volume" << filename;
 
-  //return loadRaw8bit((const unsigned char *) data.data(), width, height, depth);
   if (!loadRaw((const unsigned char *) data.data(), width, height, depth, bit_depth)) return false;
 
   m_scale_x = 1.0f;
@@ -160,51 +140,6 @@ bool VolumeData::loadFromRaw(const QString & filename, int width, int height, in
 
   return true;
 }
-
-
-/*
-bool VolumeData::loadRaw8bit(const unsigned char *p_luminance, int width, int height, int depth)
-{
-  const int voxels_cnt = depth * width * height;
-  unsigned char* p_rgba = new unsigned char[voxels_cnt * 4];
-
-  for (int i = 0; i < voxels_cnt; ++i)
-  {
-    p_rgba[i * 4]     = p_luminance[i];
-    p_rgba[i * 4 + 1] = p_luminance[i];
-    p_rgba[i * 4 + 2] = p_luminance[i];
-    p_rgba[i * 4 + 3] = p_luminance[i];
-  }
-
-  GLuint id = 0;
-  glGenTextures(1, &id);
-
-  glBindTexture(GL_TEXTURE_3D, id);
-  //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-  OGLF->glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, width, height, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, p_rgba);
-  glBindTexture(GL_TEXTURE_3D, 0);
-
-  if (m_id != 0)
-  {
-    glDeleteTextures(1, (GLuint *) &m_id);
-  }
-
-  m_id = id;
-  m_depth = depth;
-  m_width = width;
-  m_height = height;
-
-  delete [] p_rgba;
-
-  return true;
-}
-*/
 
 
 bool VolumeData::loadRaw(const void *p_luminance, int width, int height, int depth, int bit_depth)
@@ -233,27 +168,20 @@ bool VolumeData::loadRaw(const void *p_luminance, int width, int height, int dep
   }
 
   // nahratie dat do textury
-  GLuint id = 0;
-  glGenTextures(1, &id);
+  m_tex.create();
 
-  glBindTexture(GL_TEXTURE_3D, id);
-  //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  OGLF->glBindTexture(GL_TEXTURE_3D, m_tex.textureId());
 
+  OGLF->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+  OGLF->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+  OGLF->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+  OGLF->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  OGLF->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
   OGLF->glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, width, height, depth, 0, GL_RGBA, data_type, p_rgba);
-  glBindTexture(GL_TEXTURE_3D, 0);
 
-  if (m_id != 0)
-  {
-    glDeleteTextures(1, (GLuint *) &m_id);
-  }
+  OGLF->glBindTexture(GL_TEXTURE_3D, 0);
 
-  m_id = id;
   m_depth = depth;
   m_width = width;
   m_height = height;
