@@ -1,7 +1,7 @@
 #include "texture_volume_renderer.h"
 #include "ogl.h"
 
-#define NUM_PROXY_QUADS 300 //256 //109 //218 //100
+//#define NUM_PROXY_QUADS 300 //256 //109 //218 //100
 
 
 
@@ -43,8 +43,8 @@ bool TextureVolumeRenderer::reset(void)
   m_program.link();
 
   m_program.bind();
-  m_program.setUniformValue("num_instances", (GLfloat) NUM_PROXY_QUADS);
-  m_program.setUniformValue("num_instances_inv", 1.0f / ((GLfloat) NUM_PROXY_QUADS));
+  //m_program.setUniformValue("num_instances", (GLfloat) NUM_PROXY_QUADS);
+  //m_program.setUniformValue("num_instances_inv", 1.0f / ((GLfloat) NUM_PROXY_QUADS));
 
   // Odbindovanie shader programov
   OGLF->glUseProgram(0);
@@ -111,7 +111,8 @@ void TextureVolumeRenderer::renderBBox(const QQuaternion & rotation, const QVect
 void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
                                         const QVector3D & scale,
                                         const QVector3D & translation,
-                                        const float peel_depth)
+                                        float peel_depth,
+                                        int slice_count)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -147,9 +148,13 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
                     PROXY_GEOM_SIZE / float(m_data->depth()));
                    //-PROXY_GEOM_SIZE / float(m_tex_vol_data.depth()));
 #else
-  tex_matrix.scale(m_data->maxPhysicalSize() / m_data->physicalWidth(),
-                   m_data->maxPhysicalSize() / m_data->physicalHeight(),
-                   m_data->maxPhysicalSize() / m_data->physicalDepth());
+  // sqrt(3) je dlzka ulopriecky v jednotkovej kocke a aby som nemal orezane
+  // rohy modelu, tak kocku zmensim tak, aby ziadna hrana nebola dlhsia ako
+  // odmocnina z 3
+  const float sqrt3 = sqrt(3.0f);
+  tex_matrix.scale((m_data->maxPhysicalSize() / m_data->physicalWidth())  * sqrt3,
+                   (m_data->maxPhysicalSize() / m_data->physicalHeight()) * sqrt3,
+                   (m_data->maxPhysicalSize() / m_data->physicalDepth())  * sqrt3);
 #endif
 
   // rotacia s datami
@@ -170,6 +175,8 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   mvp_matrix.translate(translation);
   mvp_matrix.translate(0.0f, 0.0f, -1.0f);
   mvp_matrix.scale(scale);
+  // kompenzacia (pretoze proxy quad som zmensil, tak aby nebol vysledok moc maly, ale taky ako ma byt)
+  mvp_matrix.scale(sqrt3, sqrt3, sqrt3);
 
 #if 0
   mvp_matrix.scale(m_data->maxPhysicalSize() / m_data->physicalWidth(),
@@ -196,9 +203,17 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   m_program.setUniformValue("tex_transfer_func", 1);
 
+  // nastavenie poctu sliceov
+  if (slice_count <= 0) slice_count = m_data->maxSize() * 2;
+  qDebug() << "slice_count=" << slice_count;
+
+  m_program.setUniformValue("num_instances", (GLfloat) slice_count);
+  m_program.setUniformValue("num_instances_inv", 1.0f / ((GLfloat) slice_count));
+
   // vykreslenie proxy geometrie
   m_vao.bind();
-  OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, NUM_PROXY_QUADS);
+  //OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, NUM_PROXY_QUADS);
+  OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, slice_count);
   OGLF->glBindVertexArray(0);
 
   // vykreslenie debugovacieho stvorca

@@ -71,6 +71,7 @@ class VolumeData
     float scaleY(void) const { return m_scale_y; }
     float scaleZ(void) const { return m_scale_z; }
 
+    int maxSize(void) const { return std::max(m_width, std::max(m_height, m_depth)); }
     float maxPhysicalSize(void) const { return std::max(physicalWidth(), std::max(physicalHeight(), physicalDepth())); }
     float minPhysicalSize(void) const { return std::min(physicalWidth(), std::min(physicalHeight(), physicalDepth())); }
     float physicalWidth(void) const { return m_width * m_scale_x; }

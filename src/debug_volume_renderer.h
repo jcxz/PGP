@@ -30,7 +30,8 @@ class DebugVolumeRenderer : public VolumeRenderer
     virtual void render_impl(const QQuaternion & rotation,
                              const QVector3D & scale,
                              const QVector3D & translation,
-                             const float /* peel_depth */) override;
+                             float /* peel_depth */,
+                             int /* slice_count */) override;
 
   protected:
     QOpenGLShaderProgram m_prog;

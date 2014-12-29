@@ -135,10 +135,23 @@ void VolumeViewer::paintGL(void)
     m_transfer_func_changed = false;
   }
 
-  m_renderer->render(m_track_ball.getRotation(),
-                     QVector3D(m_scale, m_scale, m_scale),
-                     QVector3D(0.0f, 0.0f, 0.0f),
-                     m_peel_depth);
+  if (m_high_quality)
+  {
+    m_renderer->render(m_track_ball.getRotation(),
+                       QVector3D(m_scale, m_scale, m_scale),
+                       //QVector3D(0.0f, 0.0f, 0.0f),
+                       m_transl,
+                       m_peel_depth);
+  }
+  else
+  {
+    m_renderer->renderPreview(m_track_ball.getRotation(),
+                              QVector3D(m_scale, m_scale, m_scale),
+                              //QVector3D(0.0f, 0.0f, 0.0f),
+                              m_transl,
+                              m_peel_depth);
+    m_high_quality = true;
+  }
 }
 
 
@@ -147,6 +160,7 @@ void VolumeViewer::resizeGL(int w, int h)
   qDebug() << __PRETTY_FUNCTION__;
   glViewport(0, 0, w, h);
   m_renderer->setPerspectiveProjection(w, h);
+  m_high_quality = false;
 }
 
 
@@ -176,6 +190,7 @@ void VolumeViewer::mousePressEvent(QMouseEvent *event)
   if (event->button() == Qt::LeftButton)
   {
     m_track_ball.push(event->pos(), width(), height());
+    m_high_quality = false;
     event->accept();
     update();
   }
@@ -184,11 +199,28 @@ void VolumeViewer::mousePressEvent(QMouseEvent *event)
 }
 
 
+void VolumeViewer::mouseReleaseEvent(QMouseEvent *event)
+{
+  m_high_quality = true;
+  update();
+  return QOpenGLWidget::mouseReleaseEvent(event);
+}
+
+
 void VolumeViewer::mouseMoveEvent(QMouseEvent *event)
 {
   if (event->buttons() & Qt::LeftButton)
   {
     m_track_ball.move(event->pos(), width(), height());
+    m_high_quality = false;
+    event->accept();
+    update();
+  }
+  else if (event->buttons() & Qt::MiddleButton)
+  {
+    //m_transl.setX(event->pos().x());
+    //m_transl.setY(event->pos().y());
+    qDebug() << "m_transl=" << m_transl;
     event->accept();
     update();
   }
