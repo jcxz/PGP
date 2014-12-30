@@ -2,6 +2,7 @@
 #include "transfer_function.h"
 #include "volume_data.h"
 
+#include <QColorDialog>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QBrush>
@@ -265,6 +266,27 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent *event)
   update();
 
   return QWidget::mousePressEvent(event);
+}
+
+
+void TransferFunctionEditor::mouseDoubleClickEvent(QMouseEvent *event)
+{
+  int idx = m_transfer_func->findByPosition(toTCP(event->pos()),
+                                            scaleToTCP(POINT_SEARCH_RADIUS,
+                                                       POINT_SEARCH_RADIUS));
+  if (idx != TransferFunction::INVALID_TCP_INDEX)
+  {
+    m_transfer_func->setTCPColor(idx, QColorDialog::getColor());
+  }
+  else
+  {
+    m_transfer_func->addTCP(toTCP(event->pos()));
+  }
+
+  update();
+  emit transferFunctionChanged(m_transfer_func);
+
+  return QWidget::mouseDoubleClickEvent(event);
 }
 
 

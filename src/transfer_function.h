@@ -73,11 +73,10 @@ class TransferFunction
       //m_transfer_points.push_back(pt);
     }
 
-    //void addTCP(QPointF pos)
-    //{
-      //m_transfer_points.insert(m_transfer_points.size() - 1, pt);
-      //m_transfer_points.push_back(pt);
-    //}
+    void addTCP(QPointF pos);
+    void removeTCP(int idx);
+    void setTCPPosition(int idx, QPointF pos);
+    void setTCPColor(int idx, const QColor & col);
 
     void clear(void)
     {
@@ -86,15 +85,11 @@ class TransferFunction
       m_transfer_points.push_back(defaultRightBorderCP());
     }
 
-    void removeTCP(int idx);
-    void setTCPPosition(int idx, QPointF pos);
-    void setTCPColor(int idx, const QColor & col);
-
-    float opacity(float idx) const;
+    float opacity(float pos_x) const;
     float opacity(int idx, int index_max = 256) const
     { return opacity(float(idx) / float(index_max)); }
 
-    QColor color(float idx) const;
+    QColor color(float pos_x) const;
     QColor color(int idx, int index_max = 256) const
     { return color(float(idx) / float(index_max)); }
 
@@ -115,7 +110,7 @@ class TransferFunction
 
   private:
     // calculate the interpolation parameter t
-    float calcT(float idx, const TransferControlPoint * & cp1, const TransferControlPoint * & cp2) const;
+    float calcT(float pos_x, const TransferControlPoint * & cp1, const TransferControlPoint * & cp2, int *idx = nullptr) const;
 
     //inline bool isValid(void) const { return !m_transfer_points.isEmpty(); }
     inline bool isValid(void) const { return m_transfer_points.size() >= 3; }

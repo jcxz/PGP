@@ -33,6 +33,34 @@ QDataStream & operator<<(QDataStream & stream, const TransferControlPoint & tcp)
 }
 
 
+void TransferFunction::addTCP(QPointF pos)
+{
+  const TransferControlPoint *p1 = nullptr;
+  const TransferControlPoint *p2 = nullptr;
+  int idx = INVALID_TCP_INDEX;
+
+  float t = calcT(pos.x(), p1, p2, &idx);
+  assert(idx != INVALID_TCP_INDEX);
+
+  QColor c1(p1->color());
+  QColor c2(p2->color());
+  QColor c(c1.red()   * t + c2.red()   * (1.0f - t),
+           c1.green() * t + c2.green() * (1.0f - t),
+           c1.blue()  * t + c2.blue()  * (1.0f - t));
+
+  m_transfer_points.insert(idx, TransferControlPoint(pos, c));
+}
+
+
+void TransferFunction::removeTCP(int idx)
+{
+  if ((idx > 0) && (idx < (m_transfer_points.size() - 1)))
+  {
+    m_transfer_points.remove(idx);
+  }
+}
+
+
 void TransferFunction::setTCPPosition(int idx, QPointF pos)
 {
   qDebug() << __PRETTY_FUNCTION__;
@@ -77,15 +105,6 @@ void TransferFunction::setTCPColor(int idx, const QColor & col)
 }
 
 
-void TransferFunction::removeTCP(int idx)
-{
-  if ((idx > 0) && (idx < (m_transfer_points.size() - 1)))
-  {
-    m_transfer_points.remove(idx);
-  }
-}
-
-
 int TransferFunction::findByPosition(QPointF mouse_pos, QPointF tolerance) const
 {
   qDebug() << __PRETTY_FUNCTION__;
@@ -105,7 +124,7 @@ int TransferFunction::findByPosition(QPointF mouse_pos, QPointF tolerance) const
 }
 
 
-float TransferFunction::calcT(float idx, const TransferControlPoint * & cp1, const TransferControlPoint * & cp2) const
+float TransferFunction::calcT(float pos_x, const TransferControlPoint * & cp1, const TransferControlPoint * & cp2, int *idx) const
 {
 #if 0
   // find upper boundary
@@ -116,7 +135,7 @@ float TransferFunction::calcT(float idx, const TransferControlPoint * & cp1, con
   for (int i = 1; i < m_transfer_points.size(); ++i)
   {
     QPointF pos = m_transfer_points[i].position();
-    if (idx >= pos.x())
+    if (pos_x >= pos.x())
     {
       cp1 = &m_transfer_points[i];
       break;
@@ -131,7 +150,7 @@ float TransferFunction::calcT(float idx, const TransferControlPoint * & cp1, con
   for (int i = 0; i < (m_transfer_points.size() - 1); ++i)
   {
     QPointF pos = m_transfer_points[i].position();
-    if (idx <= pos.x())
+    if (pos_x <= pos.x())
     {
       cp2 = &m_transfer_points[i];
       break;
@@ -143,10 +162,11 @@ float TransferFunction::calcT(float idx, const TransferControlPoint * & cp1, con
   {
     QPointF pos1 = m_transfer_points[i - 1].position();
     QPointF pos2 = m_transfer_points[i].position();
-    if ((idx >= pos1.x()) && (idx <= pos2.x()))
+    if ((pos_x >= pos1.x()) && (pos_x <= pos2.x()))
     {
       cp1 = &m_transfer_points[i - 1];
       cp2 = &m_transfer_points[i];
+      if (idx) *idx = i;
       break;
     }
   }
@@ -158,26 +178,26 @@ float TransferFunction::calcT(float idx, const TransferControlPoint * & cp1, con
   float p1_x = cp1->position().x();
   float p2_x = cp2->position().x();
 
-  return float(idx - p1_x) / float(p2_x - p1_x);
+  return float(pos_x - p1_x) / float(p2_x - p1_x);
 }
 
 
-float TransferFunction::opacity(float idx) const
+float TransferFunction::opacity(float pos_x) const
 {
   const TransferControlPoint *p1 = nullptr;
   const TransferControlPoint *p2 = nullptr;
-  const float t = calcT(idx, p1, p2);
+  const float t = calcT(pos_x, p1, p2);
 
   return p1->alpha() * t + p2->alpha() * (1.0f - t);
 }
 
 
-QColor TransferFunction::color(float idx) const
+QColor TransferFunction::color(float pos_x) const
 {
   const TransferControlPoint *p1 = nullptr;
   const TransferControlPoint *p2 = nullptr;
 
-  const float t = calcT(idx, p1, p2);
+  const float t = calcT(pos_x, p1, p2);
 
   const QColor & p1_col = p1->color();
   const QColor & p2_col = p2->color();
