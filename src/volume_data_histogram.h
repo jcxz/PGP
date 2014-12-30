@@ -17,6 +17,8 @@ class VolumeDataHistogram
       , m_max(std::numeric_limits<int>::min())
     { }
 
+    bool isEmpty(void) const { return m_hist.isEmpty(); }
+
     int value(int intensity) const
     {
       tContainer::const_iterator it = m_hist.find(intensity);

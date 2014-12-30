@@ -23,6 +23,7 @@ class MainWindow : public QMainWindow
     void handleLoadTF(void);
     void handleSaveTF(void);
     void handleDumpTF(void);
+    void setTransferFunctionPreset(int preset_id);
 
   protected:
     virtual void showEvent(QShowEvent *event) override;

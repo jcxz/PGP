@@ -86,7 +86,7 @@ void TransferFunction::removeTCP(int idx)
 }
 
 
-int TransferFunction::findByPosition(QPointF mouse_pos, QPointF tolerance)
+int TransferFunction::findByPosition(QPointF mouse_pos, QPointF tolerance) const
 {
   qDebug() << __PRETTY_FUNCTION__;
 

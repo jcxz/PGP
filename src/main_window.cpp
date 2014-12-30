@@ -79,7 +79,26 @@ void MainWindow::handleSaveTF(void)
 
 void MainWindow::handleDumpTF(void)
 {
-  ui->transferFuncEditor->dumpTransferFunction();
+  qDebug() << m_transfer_func;
+}
+
+
+void MainWindow::setTransferFunctionPreset(int preset_id)
+{
+  switch (preset_id)
+  {
+    case 1:
+      m_transfer_func.clear();
+      m_transfer_func.addTCP(QPointF(0.05859375f, 0.00f), QColor(Qt::red));
+      m_transfer_func.addTCP(QPointF(0.19531250f, 0.05f), QColor(Qt::green));
+      m_transfer_func.addTCP(QPointF(0.39062500f, 0.03f), QColor(Qt::blue));
+      m_transfer_func.addTCP(QPointF(0.58593750f, 0.10f), QColor(Qt::yellow));
+      m_transfer_func.addTCP(QPointF(0.78125000f, 0.06f), QColor(Qt::magenta));
+      m_transfer_func.addTCP(QPointF(1.00000000f, 0.50f), QColor(Qt::cyan));
+      break;
+  }
+
+  ui->transferFuncEditor->setTransferFunction(&m_transfer_func);
 }
 
 
@@ -101,6 +120,7 @@ void MainWindow::showEvent(QShowEvent *event)
 #endif
 
   setRawVolumeFile(":/data/head256x256x109_8bit_chan.raw", 256, 256, 109, 8, 1.0f, 1.0f, 1.0f);
+  setTransferFunctionPreset(1);
 
   return QMainWindow::showEvent(event);
 }

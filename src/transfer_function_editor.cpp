@@ -1,6 +1,6 @@
 #include "transfer_function_editor.h"
+#include "transfer_function.h"
 #include "volume_data.h"
-#include "color_picker.h"
 
 #include <QMouseEvent>
 #include <QPainter>
@@ -33,12 +33,36 @@ TransferFunctionEditor::TransferFunctionEditor(QWidget *parent)
   : QWidget(parent)
   , m_cur_tcp_idx(TransferFunction::INVALID_TCP_INDEX)
   , m_volume_data_range(255.0f)
-  , m_transfer_func()
+  , m_transfer_func(nullptr)
   , m_volume_data_hist()
 {
   setFocusPolicy(Qt::ClickFocus);
   setMinimumSize(QSize(INNER_PADDING_X + 30, INNER_PADDING_Y + 30));
-  initTest();
+  //initTest();
+}
+
+
+void TransferFunctionEditor::initTest(void)
+{
+  /*
+  setFixedHeight(100);
+  if (m_transfer_func != nullptr)
+  {
+    m_transfer_func->addTCP(toTCP2(QPoint(15,   0), 256, 100), QColor(Qt::red));
+    m_transfer_func->addTCP(toTCP2(QPoint(50,   5), 256, 100), QColor(Qt::green));
+    m_transfer_func->addTCP(toTCP2(QPoint(100,  3), 256, 100), QColor(Qt::blue));
+    m_transfer_func->addTCP(toTCP2(QPoint(150, 10), 256, 100), QColor(Qt::yellow));
+    m_transfer_func->addTCP(toTCP2(QPoint(200,  6), 256, 100), QColor(Qt::magenta));
+    m_transfer_func->addTCP(toTCP2(QPoint(256, 50), 256, 100), QColor(Qt::cyan));
+  }
+  */
+}
+
+
+void TransferFunctionEditor::setTransferFunction(TransferFunction *func)
+{
+  m_transfer_func = func;
+  emit transferFunctionChanged(m_transfer_func);
 }
 
 
@@ -160,55 +184,69 @@ void TransferFunctionEditor::paintEvent(QPaintEvent * /* event */)
   drawGrid(painter, width(), height());
 
   // vykreslenie histogramu dat
-  pen.setColor(QColor(128, 0, 0, 128));
-  brush.setColor(QColor(128, 0, 0, 128));
-
-  painter.setPen(pen);
-  painter.setBrush(brush);
-
-  float max = m_volume_data_hist.max();
-
-  //qDebug() << "Plotting histogram";
-  //hist.dump(qDebug(), m_volume_data->bitDepth());
-
-  for (int i = INNER_PADDING_LEFT; i < (width() - INNER_PADDING_RIGHT); ++i)
+  if (!m_volume_data_hist.isEmpty())
   {
-    int hist_val = m_volume_data_hist.value((float(i - INNER_PADDING_LEFT) / float(width() - INNER_PADDING_X)) * m_volume_data_range);
-    int y = (float(hist_val) / float(max)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
-    //int y = (float(y) / float(range)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
+    pen.setColor(QColor(128, 0, 0, 128));
+    brush.setColor(QColor(128, 0, 0, 128));
 
-    //y *= 0.7f;
+    painter.setPen(pen);
+    painter.setBrush(brush);
 
-    painter.drawLine(QPoint(i, height() - INNER_PADDING_BOTTOM), QPoint(i, height() - y));
+    float max = m_volume_data_hist.max();
+
+    //qDebug() << "Plotting histogram";
+    //hist.dump(qDebug(), m_volume_data->bitDepth());
+
+    for (int i = INNER_PADDING_LEFT; i < (width() - INNER_PADDING_RIGHT); ++i)
+    {
+      int hist_val = m_volume_data_hist.value((float(i - INNER_PADDING_LEFT) / float(width() - INNER_PADDING_X)) * m_volume_data_range);
+      int y = (float(hist_val) / float(max)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
+      //int y = (float(y) / float(range)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
+
+      //y *= 0.7f;
+
+      painter.drawLine(QPoint(i, height() - INNER_PADDING_BOTTOM), QPoint(i, height() - y));
+    }
+  }
+  else
+  {
+    qWarning() << "Not drawing volume data histogram because it is empty";
   }
 
   // nakreslenie krivky medzi kontrolnymi bodmi transfer funkcie
-  pen.setColor(QColor(Qt::red));
-  pen.setWidth(2);
-  painter.setPen(pen);
-  painter.setBrush(old_brush);
-
-  const TransferFunction::tContainer & cpts = m_transfer_func.controlPoints();
-
-  for (int i = 1; i < cpts.size(); ++i)
+  if (m_transfer_func)
   {
-    painter.drawLine(fromTCP(cpts[i - 1].position()),
-                     fromTCP(cpts[i + 0].position()));
-  }
+    pen.setColor(QColor(Qt::red));
+    pen.setWidth(2);
+    painter.setPen(pen);
+    painter.setBrush(old_brush);
 
-  // vykreslenie kontrolnych bodov transfer funkcie
-  for (int i = 0; i < cpts.size(); ++i)
-  {
-    const TransferControlPoint & p = cpts[i];
+    const TransferFunction::tContainer & cpts = m_transfer_func->controlPoints();
 
-    // nakresli podsvietenie pre vybrany kontrolny bod
-    if (i == m_cur_tcp_idx)
+    for (int i = 1; i < cpts.size(); ++i)
     {
-      QColor c(128, 128, 128, 128);
-      drawPoint(painter, fromTCP(p.position()), POINT_SELECT_RADIUS, c); //QColor(Qt::black));
+      painter.drawLine(fromTCP(cpts[i - 1].position()),
+          fromTCP(cpts[i + 0].position()));
     }
 
-    drawPoint(painter, fromTCP(p.position()), POINT_RENDER_RADIUS, p.color());
+    // vykreslenie kontrolnych bodov transfer funkcie
+    for (int i = 0; i < cpts.size(); ++i)
+    {
+      const TransferControlPoint & p = cpts[i];
+
+      // nakresli podsvietenie pre vybrany kontrolny bod
+      if (i == m_cur_tcp_idx)
+      {
+        QColor c(128, 128, 128, 128);
+        drawPoint(painter, fromTCP(p.position()), POINT_SELECT_RADIUS, c); //QColor(Qt::black));
+      }
+
+      drawPoint(painter, fromTCP(p.position()), POINT_RENDER_RADIUS, p.color());
+    }
+  }
+  else
+  {
+    qWarning() << "Not drawing transfer function because m_transfer_func is NULL";
   }
 
   painter.end();
@@ -217,9 +255,9 @@ void TransferFunctionEditor::paintEvent(QPaintEvent * /* event */)
 
 void TransferFunctionEditor::mousePressEvent(QMouseEvent *event)
 {
-  m_cur_tcp_idx = m_transfer_func.findByPosition(toTCP(event->pos()),
-                                                 scaleToTCP(POINT_SEARCH_RADIUS,
-                                                            POINT_SEARCH_RADIUS));
+  m_cur_tcp_idx = m_transfer_func->findByPosition(toTCP(event->pos()),
+                                                  scaleToTCP(POINT_SEARCH_RADIUS,
+                                                             POINT_SEARCH_RADIUS));
   if (m_cur_tcp_idx == TransferFunction::INVALID_TCP_INDEX)
   {
     //m_transfer_func.addTCP(toTCP(event->pos()));
@@ -235,9 +273,9 @@ void TransferFunctionEditor::mouseMoveEvent(QMouseEvent *event)
 {
   if (m_cur_tcp_idx != TransferFunction::INVALID_TCP_INDEX)
   {
-    m_transfer_func.setTCPPosition(m_cur_tcp_idx, toTCP(event->pos()));
+    m_transfer_func->setTCPPosition(m_cur_tcp_idx, toTCP(event->pos()));
     update();
-    emit transferFunctionChanged(&m_transfer_func);
+    emit transferFunctionChanged(m_transfer_func);
 
     //qDebug() << m_transfer_func;
   }
@@ -246,14 +284,8 @@ void TransferFunctionEditor::mouseMoveEvent(QMouseEvent *event)
 }
 
 
-void TransferFunctionEditor::showEvent(QShowEvent *event)
-{
-  emit transferFunctionChanged(&m_transfer_func);
-  return QWidget::showEvent(event);
-}
-
-
-void TransferFunctionEditor::dumpTransferFunction(void)
-{
-  qDebug() << m_transfer_func;
-}
+//void TransferFunctionEditor::showEvent(QShowEvent *event)
+//{
+  //emit transferFunctionChanged(m_transfer_func);
+  //return QWidget::showEvent(event);
+//}

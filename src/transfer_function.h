@@ -102,7 +102,7 @@ class TransferFunction
     { return m_transfer_points; }
 
     // the mouse_pos and the tolerance have to be transformed to interval [0, 1]
-    int findByPosition(QPointF mouse_pos, QPointF tolerance = QPointF(0.0f, 0.0f));
+    int findByPosition(QPointF mouse_pos, QPointF tolerance = QPointF(0.0f, 0.0f)) const;
 
     bool load(const QString & filename);
     bool save(const QString & filename) const;

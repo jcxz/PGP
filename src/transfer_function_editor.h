@@ -1,13 +1,13 @@
 #ifndef TRANSFER_FUNCTION_EDITOR_H
 #define TRANSFER_FUNCTION_EDITOR_H
 
-#include "transfer_function.h"
 #include "volume_data_histogram.h"
 
 #include <QWidget>
 
 
 class VolumeData;
+class TransferFunction;
 
 class TransferFunctionEditor : public QWidget
 {
@@ -32,14 +32,11 @@ class TransferFunctionEditor : public QWidget
   public:
     explicit TransferFunctionEditor(QWidget *parent = 0);
 
-    bool loadTransferFunction(void);
-    bool saveTransferFunction(void);
-    void dumpTransferFunction(void);
-
   signals:
     void transferFunctionChanged(const TransferFunction *func);
 
   public slots:
+    void setTransferFunction(TransferFunction *func);
     void updateHistogram(const VolumeData & data);
 
   protected:
@@ -47,20 +44,9 @@ class TransferFunctionEditor : public QWidget
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
 
-    virtual void showEvent(QShowEvent *event) override;
+    //virtual void showEvent(QShowEvent *event) override;
 
   private:
-    void initTest(void)
-    {
-      setFixedHeight(100);
-      m_transfer_func.addTCP(toTCP2(QPoint(15,   0), 256, 100), QColor(Qt::red));
-      m_transfer_func.addTCP(toTCP2(QPoint(50,   5), 256, 100), QColor(Qt::green));
-      m_transfer_func.addTCP(toTCP2(QPoint(100,  3), 256, 100), QColor(Qt::blue));
-      m_transfer_func.addTCP(toTCP2(QPoint(150, 10), 256, 100), QColor(Qt::yellow));
-      m_transfer_func.addTCP(toTCP2(QPoint(200,  6), 256, 100), QColor(Qt::magenta));
-      m_transfer_func.addTCP(toTCP2(QPoint(256, 50), 256, 100), QColor(Qt::cyan));
-    }
-
     inline QPointF toTCP2(QPoint pt, int w, int h)
     {
       return QPointF(float(pt.x()) / float(w), float(pt.y()) / float(h));
@@ -88,12 +74,13 @@ class TransferFunctionEditor : public QWidget
     }
 
   private:
+    void initTest(void);
     void drawGrid(QPainter & painter, int w, int h);
 
   private:
     int m_cur_tcp_idx;
     float m_volume_data_range;
-    TransferFunction m_transfer_func;
+    TransferFunction *m_transfer_func;
     VolumeDataHistogram m_volume_data_hist;
 };
 
