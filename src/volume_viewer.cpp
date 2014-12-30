@@ -88,12 +88,9 @@ void VolumeViewer::paintGL(void)
 
     m_renderer->setPerspectiveProjection(width(), height());
 
-    if ((m_volume_data != nullptr) && (!m_renderer->setVolumeData(*m_volume_data)))
-    {
-      emit error(tr("Failed to upload volume data to OpenGL for the new renderer"));
-    }
-
     m_renderer_changed = false;
+    m_volume_data_changed = true;
+    m_transfer_func_changed = true;
   }
 
   // nastavenie volumetrickych dat
