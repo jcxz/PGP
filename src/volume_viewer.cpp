@@ -23,6 +23,8 @@ void VolumeViewer::toggleRenderer(void)
 
 void VolumeViewer::setRenderer(RendererType type)
 {
+  makeCurrent();
+
   switch (type)
   {
     case DebugRenderer:
@@ -54,6 +56,13 @@ void VolumeViewer::setTransferFunction(const TransferFunction *transfer_func)
 {
   m_transfer_func = transfer_func;
   m_transfer_func_changed = true;
+  update();
+}
+
+
+void VolumeViewer::setSliceCount(int count)
+{
+  m_renderer->setSliceCount(count);
   update();
 }
 

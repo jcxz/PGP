@@ -25,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->pbLoadTF, SIGNAL(clicked()), this, SLOT(handleLoadTF()));
   connect(ui->pbSaveTF, SIGNAL(clicked()), this, SLOT(handleSaveTF()));
   connect(ui->pbDumpTF, SIGNAL(clicked()), this, SLOT(handleDumpTF()));
+
+  connect(ui->sliderSliceCount, SIGNAL(valueChanged(int)), ui->volumeViewer, SLOT(setSliceCount(int)));
 }
 
 

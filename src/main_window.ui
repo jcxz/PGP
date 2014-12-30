@@ -21,7 +21,7 @@
        <widget class="VolumeViewer" name="volumeViewer" native="true"/>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,0">
         <item>
          <widget class="QPushButton" name="pbLoadModel">
           <property name="text">
@@ -54,6 +54,22 @@
          <widget class="QPushButton" name="pbLoadTF">
           <property name="text">
            <string>Load Transfer Function</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="sliderSliceCount">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>15000</number>
+          </property>
+          <property name="value">
+           <number>300</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
