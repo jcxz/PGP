@@ -6,7 +6,7 @@
 
 bool VolumeRenderer::uploadTransferFunction(const TransferFunction & transfer_func)
 {
-  int width = m_data->maxIntensity();
+  int width = m_data.maxIntensity();
   int max_texture_size;
 
   glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);

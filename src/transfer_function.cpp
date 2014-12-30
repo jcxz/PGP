@@ -1,10 +1,35 @@
 #include "transfer_function.h"
 
+#include <QDataStream>
+#include <QFile>
+#include <cassert>
+
 
 
 QDebug operator<<(QDebug debug, const TransferControlPoint & tcp)
 {
-  return debug.nospace() << "TransferControlPoint(" << tcp.position() << ", " << tcp.color() << ", Alpha(" << tcp.alpha() << "))";
+  bool b = debug.autoInsertSpaces();
+
+  debug.nospace() << "TransferControlPoint(" << tcp.position();
+  debug.nospace() << ", ";
+  debug.nospace() << tcp.color();
+  debug.nospace() << ", Alpha(" << tcp.alpha() << "))";
+
+  debug.setAutoInsertSpaces(b);
+
+  return debug;
+}
+
+
+QDataStream & operator>>(QDataStream & stream, TransferControlPoint & tcp)
+{
+  return stream >> tcp.m_col >> tcp.m_pos;
+}
+
+
+QDataStream & operator<<(QDataStream & stream, const TransferControlPoint & tcp)
+{
+  return stream << tcp.m_col << tcp.m_pos;
 }
 
 
@@ -82,6 +107,7 @@ int TransferFunction::findByPosition(QPointF mouse_pos, QPointF tolerance)
 
 float TransferFunction::calcT(float idx, const TransferControlPoint * & cp1, const TransferControlPoint * & cp2) const
 {
+#if 0
   // find upper boundary
   //cp1 = &m_cp_left_border;
   //for (int i = 0; i < m_transfer_points.size(); ++i)
@@ -111,6 +137,23 @@ float TransferFunction::calcT(float idx, const TransferControlPoint * & cp1, con
       break;
     }
   }
+#else
+  // find upper boundary
+  for (int i = 1; i < m_transfer_points.size(); ++i)
+  {
+    QPointF pos1 = m_transfer_points[i - 1].position();
+    QPointF pos2 = m_transfer_points[i].position();
+    if ((idx >= pos1.x()) && (idx <= pos2.x()))
+    {
+      cp1 = &m_transfer_points[i - 1];
+      cp2 = &m_transfer_points[i];
+      break;
+    }
+  }
+
+  assert(cp1 != nullptr);
+  assert(cp2 != nullptr);
+#endif
 
   float p1_x = cp1->position().x();
   float p2_x = cp2->position().x();
@@ -151,13 +194,59 @@ QColor TransferFunction::color(float idx) const
 }
 
 
+bool TransferFunction::load(const QString & filename)
+{
+  QFile file(filename);
+  if (!file.open(QFile::ReadOnly))
+  {
+    qWarning() << "Failed to open transfer function file " << filename;
+    return false;
+  }
+
+  QDataStream stream(&file);
+
+  stream >> m_transfer_points;
+
+  return stream.status() == QDataStream::Ok;
+}
+
+
+bool TransferFunction::save(const QString & filename) const
+{
+  QFile file(filename);
+  if (!file.open(QFile::WriteOnly))
+  {
+    qWarning() << "Failed to create transfer function file " << filename;
+    return false;
+  }
+
+  QDataStream stream(&file);
+
+  stream << m_transfer_points;
+
+  return stream.status() == QDataStream::Ok;
+}
+
+
+QDataStream & operator>>(QDataStream & stream, TransferFunction & tf)
+{
+  return stream >> tf.m_transfer_points;
+}
+
+
+QDataStream & operator<<(QDataStream & stream, const TransferFunction & tf)
+{
+  return stream << tf.m_transfer_points;
+}
+
+
 QDebug operator<<(QDebug debug, const TransferFunction & tf)
 {
   const TransferFunction::tContainer & tcps = tf.controlPoints();
 
   for (int i = 0; i < tcps.size(); ++i)
   {
-    debug << tcps[i] << "\n";
+    debug.nospace() << tcps[i] << "\n";
   }
 
   return debug;

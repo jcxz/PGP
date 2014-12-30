@@ -16,7 +16,7 @@ class VolumeRenderer
   public:
     VolumeRenderer(void)
       : m_proj()
-      , m_data(nullptr)
+      , m_data()
       , m_transfer_func(QOpenGLTexture::Target1D)
       , m_slice_count(0)
     { }
@@ -32,7 +32,7 @@ class VolumeRenderer
       m_proj.perspective(30.0f, ((float) width) / ((float) height), 0.01f, 1000.0f);
     }
 
-    void setVolumeData(VolumeData *data) { m_data = data; }
+    bool setVolumeData(const VolumeData & data) { return data.toVolumeDataOGL(m_data); }
 
     bool uploadTransferFunction(const TransferFunction & transfer_func);
 
@@ -40,7 +40,7 @@ class VolumeRenderer
                        const QVector3D & scale,
                        const QVector3D & translation,
                        const float peel_depth = 0.0f)
-    { return render_impl(rotation, scale, translation, peel_depth, m_data->maxSize() / 4); }
+    { return render_impl(rotation, scale, translation, peel_depth, m_data.maxSize() / 4); }
 
     void render(const QQuaternion & rotation,
                 const QVector3D & scale,
@@ -61,7 +61,7 @@ class VolumeRenderer
 
   protected:
     QMatrix4x4 m_proj;
-    VolumeData *m_data;
+    VolumeDataOGL m_data;
     QOpenGLTexture m_transfer_func;
 
   private:

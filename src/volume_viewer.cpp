@@ -31,7 +31,7 @@ bool VolumeViewer::openRawFile(const QString & filename, int width, int height, 
     return false;
   }
 
-  m_renderer->setVolumeData(&m_volume_data);
+  m_renderer->setVolumeData(m_volume_data);
 
   return true;
 }
@@ -53,7 +53,7 @@ bool VolumeViewer::openFile(const QString & filename)
     return false;
   }
 
-  m_renderer->setVolumeData(&m_volume_data);
+  m_renderer->setVolumeData(m_volume_data);
 
   return true;
 }
@@ -124,7 +124,7 @@ void VolumeViewer::paintGL(void)
     }
 
     m_renderer->setPerspectiveProjection(width(), height());
-    m_renderer->setVolumeData(&m_volume_data);
+    m_renderer->setVolumeData(m_volume_data);
 
     m_renderer_changed = false;
   }

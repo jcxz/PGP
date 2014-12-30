@@ -2,6 +2,7 @@
 #define TRANSFER_FUNCTION_EDITOR_H
 
 #include "transfer_function.h"
+#include "volume_data_histogram.h"
 
 #include <QWidget>
 
@@ -29,24 +30,20 @@ class TransferFunctionEditor : public QWidget
     static constexpr int INNER_PADDING_Y      = INNER_PADDING_TOP + INNER_PADDING_BOTTOM;
 
   public:
-    explicit TransferFunctionEditor(QWidget *parent = 0)
-      : QWidget(parent)
-      , m_transfer_func()
-      , m_cur_tcp_idx(TransferFunction::INVALID_TCP_INDEX)
-      , m_volume_data(nullptr)
-    {
-      setFocusPolicy(Qt::ClickFocus);
-      setMinimumSize(QSize(INNER_PADDING_X + 30, INNER_PADDING_Y + 30));
-      initTest();
-    }
+    explicit TransferFunctionEditor(QWidget *parent = 0);
 
-    void setVolumeData(const VolumeData *data) { m_volume_data = data; }
+    bool loadTransferFunction(void);
+    bool saveTransferFunction(void);
+    void dumpTransferFunction(void);
 
   signals:
     void transferFunctionChanged(const TransferFunction & func);
 
+  public slots:
+    void updateHistogram(const VolumeData & data);
+
   protected:
-    virtual void paintEvent(QPaintEvent *event) override;
+    virtual void paintEvent(QPaintEvent * /* event */) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
 
@@ -94,9 +91,10 @@ class TransferFunctionEditor : public QWidget
     void drawGrid(QPainter & painter, int w, int h);
 
   private:
-    TransferFunction m_transfer_func;
     int m_cur_tcp_idx;
-    const VolumeData *m_volume_data;
+    float m_volume_data_range;
+    TransferFunction m_transfer_func;
+    VolumeDataHistogram m_volume_data_hist;
 };
 
 #endif // TRANSFER_FUNCTION_EDITOR_H

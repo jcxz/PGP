@@ -28,6 +28,10 @@ class TransferControlPoint
 
     friend QDebug operator<<(QDebug debug, const TransferControlPoint & tcp);
 
+    // serialization functions
+    friend QDataStream & operator>>(QDataStream & stream, TransferControlPoint & tcp); // input
+    friend QDataStream & operator<<(QDataStream & stream, const TransferControlPoint & tcp); // output
+
   private:
     QPointF m_pos;
     QColor m_col;
@@ -41,6 +45,13 @@ class TransferFunction
 
     static constexpr int INVALID_TCP_INDEX = -1;
 
+  private:
+    static TransferControlPoint defaultLeftBorderCP(void)
+    { return TransferControlPoint(QPointF(0.0f, 0.0f), QColor(Qt::white)); }
+
+    static TransferControlPoint defaultRightBorderCP(void)
+    { return TransferControlPoint(QPointF(1.0f, 0.0f), QColor(Qt::black)); }
+
   public:
     TransferFunction(void)
       : m_transfer_points()
@@ -49,8 +60,8 @@ class TransferFunction
     {
       // dva specialne krajne body, pretoze vo funkcii musia byt vzdy
       // aspon 2 krajne body
-      m_transfer_points.push_back(TransferControlPoint(QPointF(0.0f, 0.0f), QColor(Qt::white)));
-      m_transfer_points.push_back(TransferControlPoint(QPointF(1.0f, 0.0f), QColor(Qt::black)));
+      m_transfer_points.push_back(defaultLeftBorderCP());
+      m_transfer_points.push_back(defaultRightBorderCP());
     }
 
     void addTCP(QPointF pos, QColor col)
@@ -60,6 +71,19 @@ class TransferFunction
     {
       m_transfer_points.insert(m_transfer_points.size() - 1, pt);
       //m_transfer_points.push_back(pt);
+    }
+
+    //void addTCP(QPointF pos)
+    //{
+      //m_transfer_points.insert(m_transfer_points.size() - 1, pt);
+      //m_transfer_points.push_back(pt);
+    //}
+
+    void clear(void)
+    {
+      m_transfer_points.clear();
+      m_transfer_points.push_back(defaultLeftBorderCP());
+      m_transfer_points.push_back(defaultRightBorderCP());
     }
 
     void removeTCP(int idx);
@@ -80,7 +104,14 @@ class TransferFunction
     // the mouse_pos and the tolerance have to be transformed to interval [0, 1]
     int findByPosition(QPointF mouse_pos, QPointF tolerance = QPointF(0.0f, 0.0f));
 
+    bool load(const QString & filename);
+    bool save(const QString & filename) const;
+
     friend QDebug operator<<(QDebug debug, const TransferFunction & tf);
+
+    // serialization functions
+    friend QDataStream & operator>>(QDataStream & stream, TransferFunction & tf); // input
+    friend QDataStream & operator<<(QDataStream & stream, const TransferFunction & tf); // output
 
   private:
     // calculate the interpolation parameter t

@@ -28,8 +28,11 @@ HEADERS += \
     src/volume_viewer.h \
     src/main_window.h \
     src/volume_data.h \
+    src/volume_data_histogram.h \
     src/transfer_function_editor.h \
     src/transfer_function.h \
+    src/color_picker.h \
+    src/color_luminance_picker.h \
     src/thirdparty/codebase.h \
     src/thirdparty/ddsbase.h
 
@@ -43,8 +46,11 @@ SOURCES += \
     src/main_window.cpp \
     src/main.cpp \
     src/volume_data.cpp \
+    src/volume_data_histogram.cpp \
     src/transfer_function_editor.cpp \
     src/transfer_function.cpp \
+    src/color_picker.cpp \
+    src/color_luminance_picker.cpp \
     src/thirdparty/ddsbase.cpp
 
 FORMS += \

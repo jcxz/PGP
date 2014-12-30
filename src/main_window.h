@@ -16,6 +16,9 @@ class MainWindow : public QMainWindow
 
   private slots:
     void handleLoadModel(void);
+    void handleLoadTF(void);
+    void handleSaveTF(void);
+    void handleDumpTF(void);
 
   protected:
     virtual void showEvent(QShowEvent *event) override;

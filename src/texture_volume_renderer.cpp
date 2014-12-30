@@ -113,9 +113,9 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 {
   OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  if (m_data == nullptr)
+  if (!m_data.isValid())
   {
-    qWarning() << "Not rendering because NO volume data is set";
+    qWarning() << "Not rendering because volume data is NOT initialized";
     return;
   }
 
@@ -149,9 +149,9 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   // rohy modelu, tak kocku zmensim tak, aby ziadna hrana nebola dlhsia ako
   // odmocnina z 3
   const float sqrt3 = sqrt(3.0f);
-  tex_matrix.scale((m_data->maxPhysicalSize() / m_data->physicalWidth())  * sqrt3,
-                   (m_data->maxPhysicalSize() / m_data->physicalHeight()) * sqrt3,
-                   (m_data->maxPhysicalSize() / m_data->physicalDepth())  * sqrt3);
+  tex_matrix.scale((m_data.maxPhysicalSize() / m_data.physicalWidth())  * sqrt3,
+                   (m_data.maxPhysicalSize() / m_data.physicalHeight()) * sqrt3,
+                   (m_data.maxPhysicalSize() / m_data.physicalDepth())  * sqrt3);
 #endif
 
   // rotacia s datami
@@ -190,7 +190,7 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   // nastavenie textur
   OGLF->glActiveTexture(GL_TEXTURE0);
-  OGLF->glBindTexture(GL_TEXTURE_3D, m_data->id());
+  OGLF->glBindTexture(GL_TEXTURE_3D, m_data.oglID());
 
   m_program.setUniformValue("tex_data", 0);
 
@@ -200,7 +200,7 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   m_program.setUniformValue("tex_transfer_func", 1);
 
   // nastavenie poctu sliceov
-  if (slice_count <= 0) slice_count = m_data->maxSize() * 2;
+  if (slice_count <= 0) slice_count = m_data.maxSize() * 2;
   qDebug() << "slice_count=" << slice_count;
 
   m_program.setUniformValue("num_instances", (GLfloat) slice_count);

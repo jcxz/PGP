@@ -1,11 +1,13 @@
 #include "transfer_function_editor.h"
 #include "volume_data.h"
+#include "color_picker.h"
 
 #include <QMouseEvent>
 #include <QPainter>
 #include <QBrush>
 #include <QDebug>
 #include <QStaticText>
+#include <cstdint>
 
 
 
@@ -24,6 +26,34 @@ void drawPoint(QPainter & painter, QPoint pt, int r, const QColor & c)
   painter.drawEllipse(pt, r, r);
 }
 
+}
+
+
+TransferFunctionEditor::TransferFunctionEditor(QWidget *parent)
+  : QWidget(parent)
+  , m_cur_tcp_idx(TransferFunction::INVALID_TCP_INDEX)
+  , m_volume_data_range(255.0f)
+  , m_transfer_func()
+  , m_volume_data_hist()
+{
+  setFocusPolicy(Qt::ClickFocus);
+  setMinimumSize(QSize(INNER_PADDING_X + 30, INNER_PADDING_Y + 30));
+  initTest();
+}
+
+
+void TransferFunctionEditor::updateHistogram(const VolumeData & data)
+{
+  if (data.bitDepth() == 8)
+  {
+    m_volume_data_hist.rebuild((uint8_t *) data.data(), data.voxelCount());
+  }
+  else if (data.bitDepth() == 16)
+  {
+    m_volume_data_hist.rebuild((uint16_t *) data.data(), data.voxelCount());
+  }
+
+  m_volume_data_range = data.maxIntensity();
 }
 
 
@@ -101,7 +131,7 @@ void TransferFunctionEditor::drawGrid(QPainter & painter, int w, int h)
 }
 
 
-void TransferFunctionEditor::paintEvent(QPaintEvent *event)
+void TransferFunctionEditor::paintEvent(QPaintEvent * /* event */)
 {
   QPainter painter;
 
@@ -129,28 +159,31 @@ void TransferFunctionEditor::paintEvent(QPaintEvent *event)
   // vykreslenie mriezky a sipok
   drawGrid(painter, width(), height());
 
-#if 1
   // vykreslenie histogramu dat
-  if (m_volume_data)
-  {
+  //if (m_volume_data)
+  //{
     pen.setColor(QColor(128, 0, 0, 128));
     brush.setColor(QColor(128, 0, 0, 128));
 
     painter.setPen(pen);
     painter.setBrush(brush);
 
-    const VolumeDataHistogram & hist = m_volume_data->intensityHistogram();
-    float range = m_volume_data->maxIntensity();
-    //float vox_cnt = m_volume_data->voxelCount();
-    float max = hist.max();
+    float max = m_volume_data_hist.max();
+
+    //qDebug() << "Plotting histogram";
+    //hist.dump(qDebug(), m_volume_data->bitDepth());
+
     for (int i = INNER_PADDING_LEFT; i < (width() - INNER_PADDING_RIGHT); ++i)
     {
-      int y = hist.value((float(i - INNER_PADDING_LEFT) / float(width() - INNER_PADDING_X)) * range);
-      //y = (float(y) / float(vox_cnt)) * (height() - 2 * INNER_PADDING) + INNER_PADDING;
-      y = (float(y) / float(max)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
+      int hist_val = m_volume_data_hist.value((float(i - INNER_PADDING_LEFT) / float(width() - INNER_PADDING_X)) * m_volume_data_range);
+      int y = (float(hist_val) / float(max)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
+      //int y = (float(y) / float(range)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
+
+      //y *= 0.7f;
+
       painter.drawLine(QPoint(i, height() - INNER_PADDING_BOTTOM), QPoint(i, height() - y));
     }
-  }
+  //}
 
   // nakreslenie krivky medzi kontrolnymi bodmi transfer funkcie
   pen.setColor(QColor(Qt::red));
@@ -180,7 +213,6 @@ void TransferFunctionEditor::paintEvent(QPaintEvent *event)
 
     drawPoint(painter, fromTCP(p.position()), POINT_RENDER_RADIUS, p.color());
   }
-#endif
 
   painter.end();
 }
@@ -191,6 +223,11 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent *event)
   m_cur_tcp_idx = m_transfer_func.findByPosition(toTCP(event->pos()),
                                                  scaleToTCP(POINT_SEARCH_RADIUS,
                                                             POINT_SEARCH_RADIUS));
+  if (m_cur_tcp_idx == TransferFunction::INVALID_TCP_INDEX)
+  {
+    //m_transfer_func.addTCP(toTCP(event->pos()));
+  }
+
   update();
 
   return QWidget::mousePressEvent(event);
@@ -216,4 +253,10 @@ void TransferFunctionEditor::showEvent(QShowEvent *event)
 {
   emit transferFunctionChanged(m_transfer_func);
   return QWidget::showEvent(event);
+}
+
+
+void TransferFunctionEditor::dumpTransferFunction(void)
+{
+  qDebug() << m_transfer_func;
 }
