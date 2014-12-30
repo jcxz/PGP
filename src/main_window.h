@@ -1,6 +1,9 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
+#include "volume_data.h"
+#include "transfer_function.h"
+
 #include <QMainWindow>
 
 
@@ -15,6 +18,7 @@ class MainWindow : public QMainWindow
     ~MainWindow(void);
 
   private slots:
+    void displayError(const QString & msg);
     void handleLoadModel(void);
     void handleLoadTF(void);
     void handleSaveTF(void);
@@ -24,7 +28,13 @@ class MainWindow : public QMainWindow
     virtual void showEvent(QShowEvent *event) override;
 
   private:
+    void setVolumeFile(const QString & filename);
+    void setRawVolumeFile(const QString & filename, int width, int height, int depth, int bit_depth, float scalex, float scaley, float scalez);
+
+  private:
     Ui::MainWindow *ui;
+    VolumeData m_volume_data;
+    TransferFunction m_transfer_func;
 };
 
 #endif // MAIN_WINDOW_H

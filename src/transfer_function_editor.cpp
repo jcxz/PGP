@@ -237,7 +237,7 @@ void TransferFunctionEditor::mouseMoveEvent(QMouseEvent *event)
   {
     m_transfer_func.setTCPPosition(m_cur_tcp_idx, toTCP(event->pos()));
     update();
-    emit transferFunctionChanged(m_transfer_func);
+    emit transferFunctionChanged(&m_transfer_func);
 
     //qDebug() << m_transfer_func;
   }
@@ -248,7 +248,7 @@ void TransferFunctionEditor::mouseMoveEvent(QMouseEvent *event)
 
 void TransferFunctionEditor::showEvent(QShowEvent *event)
 {
-  emit transferFunctionChanged(m_transfer_func);
+  emit transferFunctionChanged(&m_transfer_func);
   return QWidget::showEvent(event);
 }
 

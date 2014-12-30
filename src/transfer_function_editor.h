@@ -37,7 +37,7 @@ class TransferFunctionEditor : public QWidget
     void dumpTransferFunction(void);
 
   signals:
-    void transferFunctionChanged(const TransferFunction & func);
+    void transferFunctionChanged(const TransferFunction *func);
 
   public slots:
     void updateHistogram(const VolumeData & data);

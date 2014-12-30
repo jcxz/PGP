@@ -29,18 +29,19 @@ class VolumeViewer : public QOpenGLWidget
   public:
     explicit VolumeViewer(QWidget *parent = 0)
       : QOpenGLWidget(parent)
-      , m_renderer_type(TextureRenderer)
       , m_renderer_changed(false)
+      , m_renderer_type(TextureRenderer)
       , m_renderer(nullptr)
+      , m_volume_data_changed(false)
+      , m_volume_data(nullptr)
+      , m_transfer_func_changed(false)
+      , m_transfer_func(nullptr)
       , m_track_ball()
       , m_scale(0.15f)
       , m_peel_depth(0.0f)
       , m_transl(QVector3D(0.0f, 0.0f, 0.0f))
       , m_shift_pressed(false)
       , m_high_quality(true)
-      , m_volume_data()
-      , m_transfer_func(nullptr)
-      , m_transfer_func_changed(false)
       , m_logger()
     {
       // aby fungovala keyPressEvent
@@ -49,16 +50,14 @@ class VolumeViewer : public QOpenGLWidget
 
     ~VolumeViewer(void);
 
-    const VolumeData & volumeData(void) const { return m_volume_data; }
-
-    bool openRawFile(const QString & filename, int width, int height, int depth, int bit_depth);
-    bool openFile(const QString & filename);
-
-    void setRenderer(RendererType type);
+  signals:
+    void error(const QString & msg);
 
   public slots:
     void toggleRenderer(void);
-    bool setTransferFunction(const TransferFunction & transfer_func);
+    void setRenderer(RendererType type);
+    void setVolumeData(const VolumeData *volume_data);
+    void setTransferFunction(const TransferFunction *transfer_func);
 
   protected:
     virtual void initializeGL(void) override;
@@ -74,10 +73,20 @@ class VolumeViewer : public QOpenGLWidget
     virtual void wheelEvent(QWheelEvent *event) override;
 
   private:
-    RendererType m_renderer_type;
+    // renderer
     bool m_renderer_changed;
+    RendererType m_renderer_type;
     std::unique_ptr<VolumeRenderer> m_renderer;
 
+    // volume data
+    bool m_volume_data_changed;
+    const VolumeData *m_volume_data;
+
+    // transfer function
+    bool m_transfer_func_changed;
+    const TransferFunction *m_transfer_func;
+
+    // scene manipulation
     TrackBall m_track_ball;
     float m_scale;
     float m_peel_depth;
@@ -85,11 +94,7 @@ class VolumeViewer : public QOpenGLWidget
     bool m_shift_pressed;
     bool m_high_quality;    // whether the user manipulates with the scene (then render in high quality) or not (render in low quality)
 
-    VolumeData m_volume_data;
-
-    const TransferFunction *m_transfer_func;
-    bool m_transfer_func_changed;
-
+    // OpenGL debug logging
     Logger m_logger;
 };
 

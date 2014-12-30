@@ -15,47 +15,9 @@ VolumeViewer::~VolumeViewer(void)
 }
 
 
-bool VolumeViewer::openRawFile(const QString & filename, int width, int height, int depth, int bit_depth)
+void VolumeViewer::toggleRenderer(void)
 {
-  if (context() == nullptr)
-  {
-    qWarning() << "OpenGL context is not yet initialized";
-    return false;
-  }
-
-  makeCurrent(); // ak nahodou este nie je OpenGL kontext aktivny
-
-  if (!m_volume_data.loadFromRaw(filename, width, height, depth, bit_depth))
-  {
-    qWarning() << "Failed to load model from raw file" << filename;
-    return false;
-  }
-
-  m_renderer->setVolumeData(m_volume_data);
-
-  return true;
-}
-
-
-bool VolumeViewer::openFile(const QString & filename)
-{
-  if (context() == nullptr)
-  {
-    qWarning() << "OpenGL context is not yet initialized";
-    return false;
-  }
-
-  makeCurrent(); // ak nahodou este nie je OpenGL kontext aktivny
-
-  if (!m_volume_data.load(filename))
-  {
-    qWarning() << "Failed to load model from file" << filename;
-    return false;
-  }
-
-  m_renderer->setVolumeData(m_volume_data);
-
-  return true;
+  setRenderer(RendererType((int(m_renderer_type) + 1) % RENDERER_COUNT));
 }
 
 
@@ -67,32 +29,32 @@ void VolumeViewer::setRenderer(RendererType type)
       m_renderer.reset(new DebugVolumeRenderer);
       m_renderer_type = DebugRenderer;
       m_renderer_changed = true;
+      update();
       break;
 
     case TextureRenderer:
       m_renderer.reset(new TextureVolumeRenderer);
       m_renderer_type = TextureRenderer;
       m_renderer_changed = true;
+      update();
       break;
   }
 }
 
 
-void VolumeViewer::toggleRenderer(void)
+void VolumeViewer::setVolumeData(const VolumeData *volume_data)
 {
-  qDebug() << __PRETTY_FUNCTION__;
-  setRenderer(RendererType((int(m_renderer_type) + 1) % RENDERER_COUNT));
+  m_volume_data = volume_data;
+  m_volume_data_changed = true;
   update();
 }
 
 
-bool VolumeViewer::setTransferFunction(const TransferFunction & transfer_func)
+void VolumeViewer::setTransferFunction(const TransferFunction *transfer_func)
 {
-  qDebug() << __PRETTY_FUNCTION__;
-  m_transfer_func = &transfer_func;
+  m_transfer_func = transfer_func;
   m_transfer_func_changed = true;
   update();
-  return true;
 }
 
 
@@ -120,21 +82,43 @@ void VolumeViewer::paintGL(void)
   {
     if (!m_renderer->reset())
     {
-      qWarning() << "Failed to initialize renderer";
+      emit error(tr("Failed to initialize renderer"));
+      return;
     }
 
     m_renderer->setPerspectiveProjection(width(), height());
-    m_renderer->setVolumeData(m_volume_data);
+
+    if ((m_volume_data != nullptr) && (!m_renderer->setVolumeData(*m_volume_data)))
+    {
+      emit error(tr("Failed to upload volume data to OpenGL for the new renderer"));
+    }
 
     m_renderer_changed = false;
   }
 
+  // nastavenie volumetrickych dat
+  if (m_volume_data_changed)
+  {
+    if ((m_volume_data != nullptr) && (!m_renderer->setVolumeData(*m_volume_data)))
+    {
+      emit error(tr("Failed to upload volume data to OpenGL"));
+    }
+
+    m_volume_data_changed = false;
+  }
+
+  // nastavenie transfer funkcie
   if (m_transfer_func_changed)
   {
-    m_renderer->uploadTransferFunction(*m_transfer_func);
+    if ((m_transfer_func != nullptr) && (!m_renderer->uploadTransferFunction(*m_transfer_func)))
+    {
+      emit error(tr("Failed to upload transfer function to OpenGL"));
+    }
+
     m_transfer_func_changed = false;
   }
 
+  // renderovanie
   if (m_high_quality)
   {
     m_renderer->render(m_track_ball.getRotation(),
