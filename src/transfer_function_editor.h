@@ -44,17 +44,7 @@ class TransferFunctionEditor : public QWidget
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
 
-    //virtual void showEvent(QShowEvent *event) override;
-
   private:
-    inline QPointF toTCP2(QPoint pt, int w, int h)
-    {
-      return QPointF(float(pt.x()) / float(w), float(pt.y()) / float(h));
-    }
-
-    inline QPointF scaleToTCP(QPoint pt)
-    { return scaleToTCP(pt.x(), pt.y()); }
-
     inline QPointF scaleToTCP(float x, float y)
     {
       return QPointF(x / float(width()  - INNER_PADDING_X),
@@ -74,7 +64,6 @@ class TransferFunctionEditor : public QWidget
     }
 
   private:
-    void initTest(void);
     void drawGrid(QPainter & painter, int w, int h);
 
   private:

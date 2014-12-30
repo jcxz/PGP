@@ -38,13 +38,12 @@ TransferFunctionEditor::TransferFunctionEditor(QWidget *parent)
 {
   setFocusPolicy(Qt::ClickFocus);
   setMinimumSize(QSize(INNER_PADDING_X + 30, INNER_PADDING_Y + 30));
-  //initTest();
 }
 
 
+#if 0
 void TransferFunctionEditor::initTest(void)
 {
-  /*
   setFixedHeight(100);
   if (m_transfer_func != nullptr)
   {
@@ -55,8 +54,8 @@ void TransferFunctionEditor::initTest(void)
     m_transfer_func->addTCP(toTCP2(QPoint(200,  6), 256, 100), QColor(Qt::magenta));
     m_transfer_func->addTCP(toTCP2(QPoint(256, 50), 256, 100), QColor(Qt::cyan));
   }
-  */
 }
+#endif
 
 
 void TransferFunctionEditor::setTransferFunction(TransferFunction *func)
@@ -282,10 +281,3 @@ void TransferFunctionEditor::mouseMoveEvent(QMouseEvent *event)
 
   return QWidget::mouseMoveEvent(event);
 }
-
-
-//void TransferFunctionEditor::showEvent(QShowEvent *event)
-//{
-  //emit transferFunctionChanged(m_transfer_func);
-  //return QWidget::showEvent(event);
-//}

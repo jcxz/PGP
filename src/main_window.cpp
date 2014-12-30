@@ -14,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
   ui->setupUi(this);
 
-  // signaly z volume vieweru
   connect(ui->volumeViewer, SIGNAL(error(const QString &)), SLOT(displayError(const QString &)));
 
   connect(ui->pbToggleRenderer, SIGNAL(clicked()), ui->volumeViewer, SLOT(toggleRenderer()));
@@ -23,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
           ui->volumeViewer, SLOT(setTransferFunction(const TransferFunction *)));
 
   connect(ui->pbLoadModel, SIGNAL(clicked()), this, SLOT(handleLoadModel()));
+  connect(ui->pbLoadTF, SIGNAL(clicked()), this, SLOT(handleLoadTF()));
+  connect(ui->pbSaveTF, SIGNAL(clicked()), this, SLOT(handleSaveTF()));
   connect(ui->pbDumpTF, SIGNAL(clicked()), this, SLOT(handleDumpTF()));
 }
 
@@ -67,6 +68,13 @@ void MainWindow::handleLoadTF(void)
   QString filename(QFileDialog::getOpenFileName(this, tr("Load Transfer Function")));
   if (filename.isNull()) return;
 
+  if (!m_transfer_func.load(filename))
+  {
+    displayError(tr("Failed to load transfer function from file %1").arg(filename));
+    return;
+  }
+
+  ui->transferFuncEditor->setTransferFunction(&m_transfer_func);
 }
 
 
@@ -74,6 +82,11 @@ void MainWindow::handleSaveTF(void)
 {
   QString filename(QFileDialog::getSaveFileName(this, tr("Save Transfer Function")));
   if (filename.isNull()) return;
+
+  if (!m_transfer_func.save(filename))
+  {
+    displayError(tr("Failed to save transfer function to file %1").arg(filename));
+  }
 }
 
 
