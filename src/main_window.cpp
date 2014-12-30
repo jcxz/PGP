@@ -44,7 +44,6 @@ void MainWindow::handleLoadModel(void)
     qDebug() << "volume file loaded successfully";
   }
 
-  //ui->transferFuncEditor->setVolumeData(&ui->volumeViewer->volumeData());
   ui->transferFuncEditor->updateHistogram(ui->volumeViewer->volumeData());
 }
 
@@ -83,7 +82,6 @@ void MainWindow::showEvent(QShowEvent *event)
 
   qDebug() << "volume file loaded: " << (ret ? "yes" : "no");
 
-  //ui->transferFuncEditor->setVolumeData(&ui->volumeViewer->volumeData());
   ui->transferFuncEditor->updateHistogram(ui->volumeViewer->volumeData());
 
   return QMainWindow::showEvent(event);

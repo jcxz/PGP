@@ -160,30 +160,27 @@ void TransferFunctionEditor::paintEvent(QPaintEvent * /* event */)
   drawGrid(painter, width(), height());
 
   // vykreslenie histogramu dat
-  //if (m_volume_data)
-  //{
-    pen.setColor(QColor(128, 0, 0, 128));
-    brush.setColor(QColor(128, 0, 0, 128));
+  pen.setColor(QColor(128, 0, 0, 128));
+  brush.setColor(QColor(128, 0, 0, 128));
 
-    painter.setPen(pen);
-    painter.setBrush(brush);
+  painter.setPen(pen);
+  painter.setBrush(brush);
 
-    float max = m_volume_data_hist.max();
+  float max = m_volume_data_hist.max();
 
-    //qDebug() << "Plotting histogram";
-    //hist.dump(qDebug(), m_volume_data->bitDepth());
+  //qDebug() << "Plotting histogram";
+  //hist.dump(qDebug(), m_volume_data->bitDepth());
 
-    for (int i = INNER_PADDING_LEFT; i < (width() - INNER_PADDING_RIGHT); ++i)
-    {
-      int hist_val = m_volume_data_hist.value((float(i - INNER_PADDING_LEFT) / float(width() - INNER_PADDING_X)) * m_volume_data_range);
-      int y = (float(hist_val) / float(max)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
-      //int y = (float(y) / float(range)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
+  for (int i = INNER_PADDING_LEFT; i < (width() - INNER_PADDING_RIGHT); ++i)
+  {
+    int hist_val = m_volume_data_hist.value((float(i - INNER_PADDING_LEFT) / float(width() - INNER_PADDING_X)) * m_volume_data_range);
+    int y = (float(hist_val) / float(max)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
+    //int y = (float(y) / float(range)) * (height() - INNER_PADDING_Y) + INNER_PADDING_BOTTOM;
 
-      //y *= 0.7f;
+    //y *= 0.7f;
 
-      painter.drawLine(QPoint(i, height() - INNER_PADDING_BOTTOM), QPoint(i, height() - y));
-    }
-  //}
+    painter.drawLine(QPoint(i, height() - INNER_PADDING_BOTTOM), QPoint(i, height() - y));
+  }
 
   // nakreslenie krivky medzi kontrolnymi bodmi transfer funkcie
   pen.setColor(QColor(Qt::red));
