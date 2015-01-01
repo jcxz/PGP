@@ -30,7 +30,7 @@ class DebugVolumeRenderer : public VolumeRenderer
                              const QVector3D & scale,
                              const QVector3D & translation,
                              float /* peel_depth */,
-                             int /* slice_count */) override;
+                             int /* detail */) override;
 
   protected:
     QOpenGLShaderProgram m_prog;

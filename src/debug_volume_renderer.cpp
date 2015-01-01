@@ -111,7 +111,7 @@ void DebugVolumeRenderer::render_impl(const QQuaternion & rotation,
                                       const QVector3D & scale,
                                       const QVector3D & translation,
                                       float /* peel_depth */,
-                                      int /* slice_count */)
+                                      int /* detail */)
 {
   QMatrix4x4 mv;
 

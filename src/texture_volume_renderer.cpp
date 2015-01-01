@@ -109,7 +109,7 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
                                         const QVector3D & scale,
                                         const QVector3D & translation,
                                         float peel_depth,
-                                        int slice_count)
+                                        int detail)
 {
   OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -200,15 +200,15 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   m_program.setUniformValue("tex_transfer_func", 1);
 
   // nastavenie poctu sliceov
-  if (slice_count <= 0) slice_count = m_data.maxSize() * 2;
-  qDebug() << "slice_count=" << slice_count;
+  if (detail <= 0) detail = m_data.maxSize() * 2;
+  qDebug() << "slice_count=" << detail;
 
-  m_program.setUniformValue("num_instances", (GLfloat) slice_count);
-  m_program.setUniformValue("num_instances_inv", 1.0f / ((GLfloat) slice_count));
+  m_program.setUniformValue("num_instances", (GLfloat) detail);
+  m_program.setUniformValue("num_instances_inv", 1.0f / ((GLfloat) detail));
 
   // vykreslenie proxy geometrie
   m_vao.bind();
-  OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, slice_count);
+  OGLF->glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, detail);
   OGLF->glBindVertexArray(0);
 
   // vykreslenie debugovacieho stvorca

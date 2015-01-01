@@ -65,7 +65,7 @@ class VolumeRenderer
                              const QVector3D & scale,
                              const QVector3D & translation,
                              float peel_depth,
-                             int slice_count) = 0;
+                             int detail) = 0;
 
   protected:
     QMatrix4x4 m_proj;

@@ -160,9 +160,9 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
                                         const QVector3D & scale,
                                         const QVector3D & translation,
                                         float peel_depth,
-                                        int slice_count)
+                                        int detail)
 {
-  // Transformacna model-view matica matica
+  // Transformacna model-view matica
   QMatrix4x4 mv;
 
   mv.translate(0.0f, 0.0f, -0.5f);
@@ -170,13 +170,14 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   mv.rotate(rotation);
   mv.scale(scale);
 
+  // Uprava rozmerov volumetrickych dat, tak aby presne sedeli na jednotkovu kocku
   mv.scale((m_data.physicalWidth()  / m_data.maxPhysicalSize()),
            (m_data.physicalHeight() / m_data.maxPhysicalSize()),
            (m_data.physicalDepth()  / m_data.maxPhysicalSize()));
 
   mv.translate(-0.5f, -0.5f, -0.5f);
 
-  // nabindovanie textur, geometrie a povolenie cullingu
+  // nabindovanie textur, geometrie, povolenie cullingu, depth testovania a HW blendingu (robi sa v shaderi)
   OGLF->glActiveTexture(GL_TEXTURE0);
   OGLF->glBindTexture(GL_TEXTURE_1D, m_transfer_func.textureId());
   OGLF->glActiveTexture(GL_TEXTURE1);
@@ -186,7 +187,8 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   m_vao.bind();
 
-  OGLF->glEnable(GL_DEPTH_TEST);
+  //OGLF->glEnable(GL_DEPTH_TEST);
+  OGLF->glDisable(GL_DEPTH_TEST);
   OGLF->glEnable(GL_CULL_FACE);
   OGLF->glDisable(GL_BLEND);
 
@@ -205,9 +207,20 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   OGLF->glCullFace(GL_BACK);
 
+  float step;
+
+  if (detail <= 0)
+    step = 1.0f / float(m_data.maxSize());
+  else
+    step = 1.0f / float(detail);
+
+  qDebug() << "step=" << step;
+
   m_prog_ray_cast.bind();
   m_prog_ray_cast.setUniformValue("mvp", m_proj * mv);
-  m_prog_ray_cast.setUniformValue("step", 0.005f);
+  //m_prog_ray_cast.setUniformValue("step", 0.005f);
+  m_prog_ray_cast.setUniformValue("step", step);
+  m_prog_ray_cast.setUniformValue("offset", peel_depth);
   m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
   m_prog_ray_cast.setUniformValue("tex_back_faces", 1);
   m_prog_ray_cast.setUniformValue("tex_volume_data", 2);
@@ -219,7 +232,8 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   OGLF->glEnable(GL_BLEND);
   OGLF->glDisable(GL_CULL_FACE);
-  OGLF->glDisable(GL_DEPTH_TEST);
+  //OGLF->glDisable(GL_DEPTH_TEST);
+  OGLF->glEnable(GL_DEPTH_TEST);
 
   OGLF->glBindVertexArray(0);
 

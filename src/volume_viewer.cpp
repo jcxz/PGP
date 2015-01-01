@@ -29,6 +29,7 @@ void VolumeViewer::setRenderer(RendererType type)
   switch (type)
   {
     case DebugRenderer:
+      qDebug() << "Using debug renderer";
       m_renderer.reset(new DebugVolumeRenderer);
       m_renderer_type = DebugRenderer;
       m_renderer_changed = true;
@@ -36,6 +37,7 @@ void VolumeViewer::setRenderer(RendererType type)
       break;
 
     case TextureRenderer:
+      qDebug() << "Using texture renderer";
       m_renderer.reset(new TextureVolumeRenderer);
       m_renderer_type = TextureRenderer;
       m_renderer_changed = true;
@@ -43,6 +45,7 @@ void VolumeViewer::setRenderer(RendererType type)
       break;
 
     case RayCastRenderer:
+      qDebug() << "Using raycasting renderer";
       m_renderer.reset(new RayCastVolumeRenderer);
       m_renderer_type = RayCastRenderer;
       m_renderer_changed = true;
@@ -237,7 +240,7 @@ void VolumeViewer::wheelEvent(QWheelEvent *event)
   {
     m_peel_depth += delta;
 
-    if (m_peel_depth >= 2.0f) m_peel_depth = 2.0f;
+    if (m_peel_depth >= 1.0f) m_peel_depth = 1.0f;
     else if (m_peel_depth <= 0.0f) m_peel_depth = 0.0f;
   }
   else

@@ -39,7 +39,7 @@ class RayCastVolumeRenderer : public VolumeRenderer
                              const QVector3D & scale,
                              const QVector3D & translation,
                              float peel_depth,
-                             int slice_count) override;
+                             int detail) override;
 
   private:
     bool initFramebuffer(int w, int h);

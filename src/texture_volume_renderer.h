@@ -30,7 +30,7 @@ class TextureVolumeRenderer : public VolumeRenderer
                              const QVector3D & scale,
                              const QVector3D & translation,
                              float peel_depth,
-                             int slice_count) override;
+                             int detail) override;
 
   private:
     void renderBBox(const QQuaternion &rotation, const QVector3D &scale, const QVector3D &translation);
