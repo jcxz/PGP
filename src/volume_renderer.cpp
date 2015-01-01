@@ -38,6 +38,26 @@ bool VolumeRenderer::resize(QRect rect)
 }
 
 
+void VolumeRenderer::render(const QQuaternion & rotation,
+                            const QVector3D & scale,
+                            const QVector3D & translation,
+                            const int detail,
+                            const float peel_depth)
+{
+  OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  if (!m_data.isValid())
+  {
+    qWarning() << "Not rendering because volume data is NOT initialized";
+    return;
+  }
+
+  if (m_render_bbox) renderBBox(rotation, scale, translation);
+
+  return render_impl(rotation, scale, translation, peel_depth, detail);
+}
+
+
 void VolumeRenderer::renderBBox(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation)
 {
   m_prog_bbox.bind();

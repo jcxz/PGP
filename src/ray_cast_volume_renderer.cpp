@@ -5,9 +5,21 @@
 #include <QMatrix4x4>
 
 
+#define DEPTH
+
 namespace {
 
 const GLfloat g_cube_vertices[][3] = {
+#ifdef DEPTH
+  { -1.0f, -1.0f, -1.0f },  // 0
+  { -1.0f, -1.0f,  1.0f },  // 1
+  { -1.0f,  1.0f, -1.0f },  // 2
+  { -1.0f,  1.0f,  1.0f },  // 3
+  {  1.0f, -1.0f, -1.0f },  // 4
+  {  1.0f, -1.0f,  1.0f },  // 5
+  {  1.0f,  1.0f, -1.0f },  // 6
+  {  1.0f,  1.0f,  1.0f }   // 7
+#else
   { 0.0f, 0.0f, 0.0f },  // 0
   { 0.0f, 0.0f, 1.0f },  // 1
   { 0.0f, 1.0f, 0.0f },  // 2
@@ -16,6 +28,7 @@ const GLfloat g_cube_vertices[][3] = {
   { 1.0f, 0.0f, 1.0f },  // 5
   { 1.0f, 1.0f, 0.0f },  // 6
   { 1.0f, 1.0f, 1.0f }   // 7
+#endif
 };
 
 const int g_cube_vertices_cnt = sizeof(g_cube_vertices) / sizeof(g_cube_vertices[0]);
@@ -155,6 +168,7 @@ bool RayCastVolumeRenderer::initFramebuffer(int w, int h)
 }
 
 
+#ifndef DEPTH
 void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
                                         const QVector3D & scale,
                                         const QVector3D & translation,
@@ -186,8 +200,8 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   m_vao.bind();
 
-  //OGLF->glEnable(GL_DEPTH_TEST);
-  OGLF->glDisable(GL_DEPTH_TEST);
+  OGLF->glEnable(GL_DEPTH_TEST);
+  //OGLF->glDisable(GL_DEPTH_TEST);
   OGLF->glEnable(GL_CULL_FACE);
   OGLF->glDisable(GL_BLEND);
 
@@ -203,7 +217,9 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   // Ray-casting
   OGLF->glBindFramebuffer(GL_FRAMEBUFFER, m_default_fbo);
-  OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // Toto uz netreba, pretoze defaultny frame buffer clearuje base class
+  // a pripadne este aj kresli bounding box ak treba
+  //OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   OGLF->glCullFace(GL_BACK);
 
   float step;
@@ -231,8 +247,8 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   OGLF->glEnable(GL_BLEND);
   OGLF->glDisable(GL_CULL_FACE);
-  //OGLF->glDisable(GL_DEPTH_TEST);
-  OGLF->glEnable(GL_DEPTH_TEST);
+  OGLF->glDisable(GL_DEPTH_TEST);
+  //OGLF->glEnable(GL_DEPTH_TEST);
 
   OGLF->glBindVertexArray(0);
 
@@ -243,3 +259,99 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   OGLF->glActiveTexture(GL_TEXTURE0);
   OGLF->glBindTexture(GL_TEXTURE_1D, 0);
 }
+#else
+void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
+                                        const QVector3D & scale,
+                                        const QVector3D & translation,
+                                        float peel_depth,
+                                        int detail)
+{
+  // Transformacna model-view matica
+  QMatrix4x4 mv;
+
+  mv.translate(0.0f, 0.0f, -1.0f);
+  mv.translate(translation);
+  mv.rotate(rotation);
+  mv.scale(scale);
+
+  // Uprava rozmerov volumetrickych dat, tak aby presne sedeli na jednotkovu kocku
+  mv.scale((m_data.physicalWidth()  / m_data.maxPhysicalSize()),
+           (m_data.physicalHeight() / m_data.maxPhysicalSize()),
+           (m_data.physicalDepth()  / m_data.maxPhysicalSize()));
+
+  //mv.translate(-0.5f, -0.5f, -0.5f);
+  //mv.translate(-0.5f, -0.5f, -0.5f);
+
+  // nabindovanie textur, geometrie, povolenie cullingu, depth testovania a HW blendingu (robi sa v shaderi)
+  OGLF->glActiveTexture(GL_TEXTURE0);
+  OGLF->glBindTexture(GL_TEXTURE_1D, m_transfer_func.textureId());
+  OGLF->glActiveTexture(GL_TEXTURE1);
+  OGLF->glBindTexture(GL_TEXTURE_2D, m_color_attach);
+  OGLF->glActiveTexture(GL_TEXTURE2);
+  OGLF->glBindTexture(GL_TEXTURE_3D, m_data.oglID());
+
+  m_vao.bind();
+
+  OGLF->glEnable(GL_DEPTH_TEST);
+  OGLF->glDepthMask(GL_FALSE);
+  OGLF->glEnable(GL_CULL_FACE);
+  //OGLF->glDisable(GL_BLEND);
+  OGLF->glEnable(GL_BLEND);
+
+  // Kreslenie sceny do framebufferu (vygenerovanie exit pointov)s
+  OGLF->glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+  OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  OGLF->glCullFace(GL_FRONT);
+
+  m_prog_gen_back_faces.bind();
+  m_prog_gen_back_faces.setUniformValue("mvp", m_proj * mv);
+
+  OGLF->glDrawElements(GL_TRIANGLES, g_cube_indices_cnt, GL_UNSIGNED_INT, nullptr);
+
+  // Ray-casting
+  OGLF->glBindFramebuffer(GL_FRAMEBUFFER, m_default_fbo);
+  // Toto uz netreba, pretoze defaultny frame buffer clearuje base class
+  // a pripadne este aj kresli bounding box ak treba
+  //OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  OGLF->glCullFace(GL_BACK);
+
+  float step;
+
+  if (detail <= 0)
+    step = 1.0f / float(m_data.maxSize());
+  else
+    step = 1.0f / float(detail);
+
+  qDebug() << "step=" << step;
+
+  m_prog_ray_cast.bind();
+  m_prog_ray_cast.setUniformValue("mvp", m_proj * mv);
+  //m_prog_ray_cast.setUniformValue("step", 0.005f);
+  m_prog_ray_cast.setUniformValue("step", step);
+  m_prog_ray_cast.setUniformValue("offset", peel_depth);
+  m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
+  m_prog_ray_cast.setUniformValue("tex_back_faces", 1);
+  m_prog_ray_cast.setUniformValue("tex_volume_data", 2);
+
+  OGLF->glEnable(GL_DEPTH_TEST);
+  OGLF->glDrawElements(GL_TRIANGLES, g_cube_indices_cnt, GL_UNSIGNED_INT, nullptr);
+
+  // Odbindovanie programu, geometrie, textur a zakazanie cullingu
+  OGLF->glUseProgram(0);
+
+  //OGLF->glEnable(GL_BLEND);
+  OGLF->glDisable(GL_BLEND);
+  OGLF->glDisable(GL_CULL_FACE);
+  OGLF->glDepthMask(GL_TRUE);
+  OGLF->glDisable(GL_DEPTH_TEST);
+
+  OGLF->glBindVertexArray(0);
+
+  OGLF->glActiveTexture(GL_TEXTURE2);
+  OGLF->glBindTexture(GL_TEXTURE_3D, 0);
+  OGLF->glActiveTexture(GL_TEXTURE1);
+  OGLF->glBindTexture(GL_TEXTURE_2D, 0);
+  OGLF->glActiveTexture(GL_TEXTURE0);
+  OGLF->glBindTexture(GL_TEXTURE_1D, 0);
+}
+#endif

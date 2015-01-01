@@ -19,15 +19,15 @@ class VolumeRenderer
       : m_proj()
       , m_data()
       , m_transfer_func(QOpenGLTexture::Target1D)
-      , m_detail(0)
       , m_max_texture_size(0)
       , m_prog_bbox()
+      , m_render_bbox(true)
     { }
 
     virtual ~VolumeRenderer(void) { }
 
-    void setDetail(int level) { m_detail = level; }
     bool setVolumeData(const VolumeData & data) { return data.toVolumeDataOGL(m_data); }
+    void setRenderBBox(bool enabled) { m_render_bbox = enabled; }
 
     void setProjection(const QMatrix4x4 & proj) { m_proj = proj; }
     void setPerspectiveProjection(int width, int height)
@@ -43,15 +43,17 @@ class VolumeRenderer
                        const QVector3D & scale,
                        const QVector3D & translation,
                        const float peel_depth = 0.0f)
-    { return render_impl(rotation, scale, translation, peel_depth, m_data.maxSize() / 4); }
+    { return render(rotation, scale, translation, m_data.maxSize() / 4, peel_depth); }
+    //{ return render_impl(rotation, scale, translation, peel_depth, m_data.maxSize() / 4); }
 
     void render(const QQuaternion & rotation,
                 const QVector3D & scale,
                 const QVector3D & translation,
-                const float peel_depth = 0.0f)
-    {
-      return render_impl(rotation, scale, translation, peel_depth, m_detail);
-    }
+                const int detail,
+                const float peel_depth = 0.0f);
+    //{
+    //  return render_impl(rotation, scale, translation, peel_depth, detail);
+    //}
 
     void renderBBox(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation);
     bool uploadTransferFunction(const TransferFunction & transfer_func);
@@ -73,9 +75,9 @@ class VolumeRenderer
     int m_height;
 
   private:
-    int m_detail;
     int m_max_texture_size;
     QOpenGLShaderProgram m_prog_bbox;
+    bool m_render_bbox;
 };
 
 #endif // VOLUME_RENDERER_H

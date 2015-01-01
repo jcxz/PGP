@@ -76,8 +76,10 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
                                         float peel_depth,
                                         int detail)
 {
-  OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // Toto uz netreba, pretoze defaultny frame buffer clearuje base class
+  //OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  /*
   if (!m_data.isValid())
   {
     qWarning() << "Not rendering because volume data is NOT initialized";
@@ -85,6 +87,7 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   }
 
   renderBBox(rotation, scale, translation);
+  */
 
   // vypnutie depth testu a zapnutie blendovania
   OGLF->glEnable(GL_DEPTH_TEST);

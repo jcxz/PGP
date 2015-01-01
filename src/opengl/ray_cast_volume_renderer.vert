@@ -7,10 +7,21 @@ out vec4 tex_coords;
 
 uniform mat4 mvp;
 
+#define DEPTH
 
+
+#ifdef DEPTH
+void main(void)
+{
+  ray_coords = vec4(pos * 0.5f + 0.5f, 1.0f);
+  gl_Position = mvp * vec4(pos, 1.0f);
+  tex_coords = gl_Position;
+}
+#else
 void main(void)
 {
   ray_coords = vec4(pos, 1.0f);
   gl_Position = mvp * ray_coords;
   tex_coords = gl_Position;
 }
+#endif

@@ -87,7 +87,6 @@ void VolumeViewer::setTransferFunction(const TransferFunction *transfer_func)
 
 void VolumeViewer::setDetail(int level)
 {
-  m_renderer->setDetail(level);
   m_detail = level;
   update();
 }
@@ -130,8 +129,6 @@ void VolumeViewer::paintGL(void)
     }
 
     m_renderer->setPerspectiveProjection(width(), height());
-    //m_renderer->resize(rect());
-    m_renderer->setDetail(m_detail);
 
     if (m_renderer_type == RayCastRenderer)
     {
@@ -172,6 +169,7 @@ void VolumeViewer::paintGL(void)
                        QVector3D(m_scale, m_scale, m_scale),
                        //QVector3D(0.0f, 0.0f, 0.0f),
                        m_transl,
+                       m_detail,
                        m_peel_depth);
   }
   else
