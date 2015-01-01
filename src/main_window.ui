@@ -58,7 +58,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_2">
+         <widget class="QGroupBox" name="gbTransferFunctionPresets">
           <property name="toolTip">
            <string>Provides a collection of ready-made transfer functions</string>
           </property>
@@ -67,7 +67,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
-            <widget class="QComboBox" name="comboBox"/>
+            <widget class="QComboBox" name="cbTransferFunctionPresets"/>
            </item>
           </layout>
          </widget>
@@ -99,14 +99,14 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_2">
                 <item>
-                 <widget class="QLabel" name="label">
+                 <widget class="QLabel" name="lblOptionsCustomDetailLevel">
                   <property name="text">
                    <string>Level:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSlider" name="sliderSliceCount">
+                 <widget class="QSlider" name="sliderOptionsCustomDetailLevel">
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -127,7 +127,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="checkBox_2">
+            <widget class="QCheckBox" name="cbOptionsAutoSubsampling">
              <property name="toolTip">
               <string>Enables or disables rendering in low quality during manipulation with data.</string>
              </property>
@@ -140,7 +140,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="checkBox_3">
+            <widget class="QCheckBox" name="cbOptionsDisplayBBox">
              <property name="toolTip">
               <string>Enables or disables displaying the red bounding box around the rendered image.</string>
              </property>
@@ -153,7 +153,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="radioButton">
+            <widget class="QRadioButton" name="rbOptionsTextureRenderer">
              <property name="toolTip">
               <string>Switches to rendering engine that uses the texturing algorithm</string>
              </property>
@@ -166,7 +166,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="radioButton_2">
+            <widget class="QRadioButton" name="rbOptionsRayCastingRenderer">
              <property name="toolTip">
               <string>Switches to rendering engine that uses the ray casting algorithm</string>
              </property>
@@ -190,14 +190,14 @@
            </item>
           </layout>
           <zorder>verticalSpacer</zorder>
-          <zorder>label</zorder>
-          <zorder>checkBox_2</zorder>
-          <zorder>radioButton</zorder>
-          <zorder>radioButton_2</zorder>
-          <zorder>sliderSliceCount</zorder>
-          <zorder>checkBox_3</zorder>
+          <zorder>lblOptionsCustomDetailLevel</zorder>
+          <zorder>cbOptionsAutoSubsampling</zorder>
+          <zorder>rbOptionsTextureRenderer</zorder>
+          <zorder>rbOptionsRayCastingRenderer</zorder>
+          <zorder>sliderOptionsCustomDetailLevel</zorder>
+          <zorder>cbOptionsDisplayBBox</zorder>
           <zorder>groupBox</zorder>
-          <zorder>sliderSliceCount</zorder>
+          <zorder>sliderOptionsCustomDetailLevel</zorder>
          </widget>
         </item>
        </layout>
@@ -249,26 +249,26 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionLoad_Model"/>
-    <addaction name="actionLoad_Transfer_Function"/>
-    <addaction name="actionSave_Transfer_Function"/>
+    <addaction name="actionLoadModel"/>
+    <addaction name="actionLoadTransferFunction"/>
+    <addaction name="actionSaveTransferFunction"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionLoad_Model">
+  <action name="actionLoadModel">
    <property name="text">
     <string>Load Model</string>
    </property>
   </action>
-  <action name="actionLoad_Transfer_Function">
+  <action name="actionLoadTransferFunction">
    <property name="text">
     <string>Load Transfer Function</string>
    </property>
   </action>
-  <action name="actionSave_Transfer_Function">
+  <action name="actionSaveTransferFunction">
    <property name="text">
     <string>Save Transfer Function</string>
    </property>

@@ -14,6 +14,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
   ui->setupUi(this);
 
+  ui->pbDumpTF->hide();
+  ui->pbToggleRenderer->hide();
+
   connect(ui->volumeViewer, SIGNAL(error(const QString &)), SLOT(displayError(const QString &)));
 
   connect(ui->pbToggleRenderer, SIGNAL(clicked()), ui->volumeViewer, SLOT(toggleRenderer()));
@@ -26,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->pbSaveTF, SIGNAL(clicked()), this, SLOT(handleSaveTF()));
   connect(ui->pbDumpTF, SIGNAL(clicked()), this, SLOT(handleDumpTF()));
 
-  connect(ui->sliderSliceCount, SIGNAL(valueChanged(int)), ui->volumeViewer, SLOT(setSliceCount(int)));
+  connect(ui->sliderOptionsCustomDetailLevel, SIGNAL(valueChanged(int)), ui->volumeViewer, SLOT(setDetail(int)));
 }
 
 
