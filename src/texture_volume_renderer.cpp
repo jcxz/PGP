@@ -79,16 +79,6 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   // Toto uz netreba, pretoze defaultny frame buffer clearuje base class
   //OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  /*
-  if (!m_data.isValid())
-  {
-    qWarning() << "Not rendering because volume data is NOT initialized";
-    return;
-  }
-
-  renderBBox(rotation, scale, translation);
-  */
-
   // vypnutie depth testu a zapnutie blendovania
   OGLF->glEnable(GL_DEPTH_TEST);
   OGLF->glDepthMask(GL_FALSE);
@@ -107,13 +97,7 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   // normalizacia proxy geometrie podla velkosti volumetrickych dat
   // Toto je potrebne, pretoze moje volumetricke data nemusia mat
   // v kazdej dimenzii rovnaky pocet voxelov
-#if 0
-  tex_matrix.scale(//-PROXY_GEOM_SIZE / float(m_tex_vol_data.width()),
-                    PROXY_GEOM_SIZE / float(m_data->width()),
-                   -PROXY_GEOM_SIZE / float(m_data->height()),
-                    PROXY_GEOM_SIZE / float(m_data->depth()));
-                   //-PROXY_GEOM_SIZE / float(m_tex_vol_data.depth()));
-#else
+
   // sqrt(3) je dlzka ulopriecky v jednotkovej kocke a aby som nemal orezane
   // rohy modelu, tak kocku zmensim tak, aby ziadna hrana nebola dlhsia ako
   // odmocnina z 3
@@ -121,7 +105,6 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   tex_matrix.scale((m_data.maxPhysicalSize() / m_data.physicalWidth())  * sqrt3,
                    (m_data.maxPhysicalSize() / m_data.physicalHeight()) * sqrt3,
                    (m_data.maxPhysicalSize() / m_data.physicalDepth())  * sqrt3);
-#endif
 
   // rotacia s datami
   //tex_matrix.rotate(rotation);
