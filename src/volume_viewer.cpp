@@ -16,6 +16,20 @@ VolumeViewer::~VolumeViewer(void)
 }
 
 
+QString VolumeViewer::rendererTypeToString(RendererType t)
+{
+  switch (t)
+  {
+    case DebugRenderer:   return tr("Debugging renderer");
+    case TextureRenderer: return tr("Texture based renderer");
+    case RayCastRenderer: return tr("Ray casting based renderer");
+    default:              return tr("Unknown renderer");
+  }
+
+  return tr("Unknown renderer");
+}
+
+
 void VolumeViewer::toggleRenderer(void)
 {
   setRenderer(RendererType((int(m_renderer_type) + 1) % RENDERER_COUNT));

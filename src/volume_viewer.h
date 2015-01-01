@@ -54,6 +54,11 @@ class VolumeViewer : public QOpenGLWidget
 
     ~VolumeViewer(void);
 
+    RendererType currentRendererType(void) const { return m_renderer_type; }
+    QString currentRendererName(void) const { return rendererTypeToString(m_renderer_type); }
+
+    static QString rendererTypeToString(RendererType t);
+
   signals:
     void error(const QString & msg);
 
