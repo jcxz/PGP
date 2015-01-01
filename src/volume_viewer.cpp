@@ -119,6 +119,11 @@ void VolumeViewer::paintGL(void)
     //m_renderer->resize(rect());
     m_renderer->setDetail(m_detail);
 
+    if (m_renderer_type == RayCastRenderer)
+    {
+      static_cast<RayCastVolumeRenderer *>(m_renderer.get())->setDefaultFBO(defaultFramebufferObject());
+    }
+
     m_renderer_changed = false;
     m_volume_data_changed = true;
     m_transfer_func_changed = true;

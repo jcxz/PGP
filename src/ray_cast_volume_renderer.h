@@ -30,6 +30,8 @@ class RayCastVolumeRenderer : public VolumeRenderer
 
     ~RayCastVolumeRenderer(void);
 
+    void setDefaultFBO(int fbo) { m_default_fbo = fbo; }
+
   protected:
     virtual bool resize_impl(QRect rect) override;
     virtual bool reset_impl(void) override;
