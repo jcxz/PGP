@@ -169,12 +169,19 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   mv.translate(translation);
   mv.rotate(rotation);
   mv.scale(scale);
+
+  mv.scale((m_data.physicalWidth()  / m_data.maxPhysicalSize()),
+           (m_data.physicalHeight() / m_data.maxPhysicalSize()),
+           (m_data.physicalDepth()  / m_data.maxPhysicalSize()));
+
   mv.translate(-0.5f, -0.5f, -0.5f);
 
   // nabindovanie textur, geometrie a povolenie cullingu
   OGLF->glActiveTexture(GL_TEXTURE0);
-  OGLF->glBindTexture(GL_TEXTURE_2D, m_color_attach);
+  OGLF->glBindTexture(GL_TEXTURE_1D, m_transfer_func.textureId());
   OGLF->glActiveTexture(GL_TEXTURE1);
+  OGLF->glBindTexture(GL_TEXTURE_2D, m_color_attach);
+  OGLF->glActiveTexture(GL_TEXTURE2);
   OGLF->glBindTexture(GL_TEXTURE_3D, m_data.oglID());
 
   m_vao.bind();
@@ -201,8 +208,9 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   m_prog_ray_cast.bind();
   m_prog_ray_cast.setUniformValue("mvp", m_proj * mv);
   m_prog_ray_cast.setUniformValue("step", 0.005f);
-  m_prog_ray_cast.setUniformValue("tex_back_faces", 0);
-  m_prog_ray_cast.setUniformValue("tex_volume_data", 1);
+  m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
+  m_prog_ray_cast.setUniformValue("tex_back_faces", 1);
+  m_prog_ray_cast.setUniformValue("tex_volume_data", 2);
 
   OGLF->glDrawElements(GL_TRIANGLES, g_cube_indices_cnt, GL_UNSIGNED_INT, nullptr);
 
@@ -215,8 +223,10 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   OGLF->glBindVertexArray(0);
 
-  OGLF->glActiveTexture(GL_TEXTURE0);
-  OGLF->glBindTexture(GL_TEXTURE_2D, 0);
-  OGLF->glActiveTexture(GL_TEXTURE1);
+  OGLF->glActiveTexture(GL_TEXTURE2);
   OGLF->glBindTexture(GL_TEXTURE_3D, 0);
+  OGLF->glActiveTexture(GL_TEXTURE1);
+  OGLF->glBindTexture(GL_TEXTURE_2D, 0);
+  OGLF->glActiveTexture(GL_TEXTURE0);
+  OGLF->glBindTexture(GL_TEXTURE_1D, 0);
 }
