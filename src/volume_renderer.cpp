@@ -4,6 +4,16 @@
 
 
 
+bool VolumeRenderer::resize(QRect rect)
+{
+  glViewport(0, 0, rect.width(), rect.height());
+  setPerspectiveProjection(rect.width(), rect.height());
+  m_width = rect.width();
+  m_height = rect.height();
+  return true;
+}
+
+
 bool VolumeRenderer::uploadTransferFunction(const TransferFunction & transfer_func)
 {
   int width = m_data.maxIntensity();

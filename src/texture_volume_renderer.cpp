@@ -17,7 +17,7 @@ struct Vertex
 
 
 
-bool TextureVolumeRenderer::reset(void)
+bool TextureVolumeRenderer::reset_impl(void)
 {
   // shader pre bounding box
   m_prog_bbox.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/wire_box.vert");

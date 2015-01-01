@@ -2,7 +2,6 @@
 #define TEXTURE_VOLUME_RENDERER_H
 
 #include "volume_renderer.h"
-#include "volume_data.h"
 
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
@@ -25,9 +24,8 @@ class TextureVolumeRenderer : public VolumeRenderer
       m_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
     }
 
-    virtual bool reset(void) override;
-
   protected:
+    virtual bool reset_impl(void) override;
     virtual void render_impl(const QQuaternion & rotation,
                              const QVector3D & scale,
                              const QVector3D & translation,

@@ -24,9 +24,8 @@ class DebugVolumeRenderer : public VolumeRenderer
       m_ibo_cube.setUsagePattern(QOpenGLBuffer::StaticDraw);
     }
 
-    virtual bool reset(void) override;
-
   protected:
+    virtual bool reset_impl(void) override;
     virtual void render_impl(const QQuaternion & rotation,
                              const QVector3D & scale,
                              const QVector3D & translation,

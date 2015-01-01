@@ -258,10 +258,6 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent *event)
   m_cur_tcp_idx = m_transfer_func->findByPosition(toTCP(event->pos()),
                                                   scaleToTCP(POINT_SEARCH_RADIUS,
                                                              POINT_SEARCH_RADIUS));
-  if (m_cur_tcp_idx == TransferFunction::INVALID_TCP_INDEX)
-  {
-    //m_transfer_func.addTCP(toTCP(event->pos()));
-  }
 
   update();
 

@@ -20,17 +20,19 @@ class VolumeViewer : public QOpenGLWidget
   public:
     enum RendererType {
       DebugRenderer,
-      TextureRenderer
+      TextureRenderer,
+      RayCastRenderer
     };
 
   private:
-    static constexpr int RENDERER_COUNT = int(TextureRenderer) + 1;
+    static constexpr int RENDERER_COUNT = int(RayCastRenderer) + 1;
 
   public:
     explicit VolumeViewer(QWidget *parent = 0)
       : QOpenGLWidget(parent)
       , m_renderer_changed(false)
       , m_renderer_type(TextureRenderer)
+      //, m_renderer_type(RayCastRenderer)
       , m_renderer(nullptr)
       , m_volume_data_changed(false)
       , m_volume_data(nullptr)

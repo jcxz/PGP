@@ -55,7 +55,7 @@ const int g_cube_indices_cnt = sizeof(g_cube_indices) / sizeof(g_cube_indices[0]
 
 
 
-bool DebugVolumeRenderer::reset(void)
+bool DebugVolumeRenderer::reset_impl(void)
 {
   // kompilacia shaderov
   m_prog.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/src/opengl/debug_volume_renderer.vert");

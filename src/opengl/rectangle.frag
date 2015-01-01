@@ -1,11 +1,15 @@
 #version 330
 
-out vec4 fragColor;
+in vec2 tex_coords;
+
+out vec4 frag_color;
 
 uniform vec4 col;
+uniform bool use_texture;
+uniform sampler2D tex;
 
 
 void main(void)
 {
-  fragColor = col;
+  frag_color = use_texture ? texture2D(tex, tex_coords) : col;
 }

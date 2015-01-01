@@ -34,7 +34,8 @@ HEADERS += \
     src/color_picker.h \
     src/color_luminance_picker.h \
     src/thirdparty/codebase.h \
-    src/thirdparty/ddsbase.h
+    src/thirdparty/ddsbase.h \
+    src/ray_cast_volume_renderer.h
 
 SOURCES += \
     src/logger.cpp \
@@ -51,7 +52,8 @@ SOURCES += \
     src/transfer_function.cpp \
     src/color_picker.cpp \
     src/color_luminance_picker.cpp \
-    src/thirdparty/ddsbase.cpp
+    src/thirdparty/ddsbase.cpp \
+    src/ray_cast_volume_renderer.cpp
 
 FORMS += \
     src/main_window.ui

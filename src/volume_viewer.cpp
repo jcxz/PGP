@@ -2,6 +2,7 @@
 #include "ogl.h"
 #include "debug_volume_renderer.h"
 #include "texture_volume_renderer.h"
+#include "ray_cast_volume_renderer.h"
 
 #include <QWheelEvent>
 #include <QKeyEvent>
@@ -37,6 +38,13 @@ void VolumeViewer::setRenderer(RendererType type)
     case TextureRenderer:
       m_renderer.reset(new TextureVolumeRenderer);
       m_renderer_type = TextureRenderer;
+      m_renderer_changed = true;
+      update();
+      break;
+
+    case RayCastRenderer:
+      m_renderer.reset(new RayCastVolumeRenderer);
+      m_renderer_type = RayCastRenderer;
       m_renderer_changed = true;
       update();
       break;
@@ -89,7 +97,7 @@ void VolumeViewer::paintGL(void)
   // A navyse medzi renderermi sa da aj prepinat ...)
   if (m_renderer_changed)
   {
-    if (!m_renderer->reset())
+    if (!m_renderer->reset(width(), height()))
     {
       emit error(tr("Failed to initialize renderer"));
       return;
@@ -148,8 +156,10 @@ void VolumeViewer::paintGL(void)
 void VolumeViewer::resizeGL(int w, int h)
 {
   qDebug() << __PRETTY_FUNCTION__;
-  glViewport(0, 0, w, h);
-  m_renderer->setPerspectiveProjection(w, h);
+  m_renderer->resize(rect());
+  //m_renderer->resize(w, h);
+  //glViewport(0, 0, w, h);
+  //m_renderer->setPerspectiveProjection(w, h);
   m_high_quality = false;
 }
 

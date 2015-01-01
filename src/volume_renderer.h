@@ -36,6 +36,13 @@ class VolumeRenderer
 
     bool uploadTransferFunction(const TransferFunction & transfer_func);
 
+    bool reset(int w, int h)
+    {
+      m_width = w;
+      m_height = h;
+      return reset_impl();
+    }
+
     void renderPreview(const QQuaternion & rotation,
                        const QVector3D & scale,
                        const QVector3D & translation,
@@ -50,9 +57,10 @@ class VolumeRenderer
       return render_impl(rotation, scale, translation, peel_depth, m_slice_count);
     }
 
-    virtual bool reset(void) = 0;
+    virtual bool resize(QRect rect);
 
   protected:
+    virtual bool reset_impl(void) = 0;
     virtual void render_impl(const QQuaternion & rotation,
                              const QVector3D & scale,
                              const QVector3D & translation,
@@ -63,6 +71,8 @@ class VolumeRenderer
     QMatrix4x4 m_proj;
     VolumeDataOGL m_data;
     QOpenGLTexture m_transfer_func;
+    int m_width;
+    int m_height;
 
   private:
     int m_slice_count;

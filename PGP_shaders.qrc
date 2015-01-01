@@ -4,6 +4,9 @@
         <file>src/opengl/debug_volume_renderer.frag</file>
         <file>src/opengl/texture_volume_renderer.vert</file>
         <file>src/opengl/texture_volume_renderer.frag</file>
+        <file>src/opengl/ray_cast_volume_renderer.vert</file>
+        <file>src/opengl/ray_cast_volume_renderer.frag</file>
+        <file>src/opengl/ray_cast_volume_renderer_back_faces.frag</file>
         <file>src/opengl/wire_box.vert</file>
         <file>src/opengl/wire_box.frag</file>
         <file>src/opengl/rectangle.vert</file>
