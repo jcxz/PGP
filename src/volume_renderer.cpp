@@ -1,7 +1,31 @@
 #include "volume_renderer.h"
 #include "transfer_function.h"
 #include "volume_data.h"
+#include "ogl.h"
 
+
+
+bool VolumeRenderer::reset(int w, int h)
+{
+  // query the maximum texture size
+  OGLF->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_max_texture_size);
+  qDebug() << "max_texture_size=" << m_max_texture_size;
+
+  // shader pre bounding box
+  m_prog_bbox.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/wire_box.vert");
+  m_prog_bbox.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/src/opengl/wire_box.frag");
+  m_prog_bbox.link();
+
+  m_prog_bbox.bind();
+  m_prog_bbox.setUniformValue("col", QVector3D(1.0f, 0.0f, 0.0f));
+  m_prog_bbox.setUniformValue("dimensions", QVector3D(1.0f, 1.0f, 1.0f));
+
+  // set the width and the height
+  m_width = w;
+  m_height = h;
+
+  return reset_impl();
+}
 
 
 bool VolumeRenderer::resize(QRect rect)
@@ -10,20 +34,45 @@ bool VolumeRenderer::resize(QRect rect)
   setPerspectiveProjection(rect.width(), rect.height());
   m_width = rect.width();
   m_height = rect.height();
-  return true;
+  return resize_impl(rect);
+}
+
+
+void VolumeRenderer::renderBBox(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation)
+{
+  m_prog_bbox.bind();
+
+  QMatrix4x4 mv;
+
+  mv.translate(translation);
+  mv.translate(0.0f, 0.0f, -1.0f);
+  mv.rotate(rotation);
+  mv.scale(scale);
+  mv.scale(1.1f, 1.1f, 1.1f);
+
+#if 0
+  mv.scale(m_data->maxPhysicalSize() / m_data->physicalWidth(),
+           m_data->maxPhysicalSize() / m_data->physicalHeight(),
+           m_data->maxPhysicalSize() / m_data->physicalDepth());
+#endif
+
+  m_prog_bbox.setUniformValue("proj", m_proj);
+  m_prog_bbox.setUniformValue("mv", mv);
+
+  OGLF->glEnable(GL_DEPTH_TEST);
+  OGLF->glDrawArrays(GL_LINES, 0, 24);
+  OGLF->glDisable(GL_DEPTH_TEST);
+
+  m_prog_bbox.release();
 }
 
 
 bool VolumeRenderer::uploadTransferFunction(const TransferFunction & transfer_func)
 {
   int width = m_data.maxIntensity();
-  int max_texture_size;
-
-  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
-  qDebug() << "max_texture_size=" << max_texture_size;
 
   //if (width > 16384) width = 16384;
-  if (width > max_texture_size) width = max_texture_size;
+  if (width > m_max_texture_size) width = m_max_texture_size;
 
   unsigned char *pixels = new unsigned char[width * 4];
 
@@ -46,13 +95,13 @@ bool VolumeRenderer::uploadTransferFunction(const TransferFunction & transfer_fu
 
   m_transfer_func.bind();
 
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  OGLF->glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+  OGLF->glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  OGLF->glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-  glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  OGLF->glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
-  glBindTexture(GL_TEXTURE_1D, 0);
+  OGLF->glBindTexture(GL_TEXTURE_1D, 0);
 
   delete [] pixels;
 

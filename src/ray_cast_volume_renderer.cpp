@@ -113,9 +113,8 @@ RayCastVolumeRenderer::~RayCastVolumeRenderer(void)
 }
 
 
-bool RayCastVolumeRenderer::resize(QRect rect)
+bool RayCastVolumeRenderer::resize_impl(QRect rect)
 {
-  VolumeRenderer::resize(rect);
   return initFramebuffer(rect.width(), rect.height());
 }
 

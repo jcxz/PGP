@@ -3,7 +3,6 @@
 
 #include "volume_renderer.h"
 
-#include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 

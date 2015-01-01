@@ -19,15 +19,6 @@ struct Vertex
 
 bool TextureVolumeRenderer::reset_impl(void)
 {
-  // shader pre bounding box
-  m_prog_bbox.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/wire_box.vert");
-  m_prog_bbox.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/src/opengl/wire_box.frag");
-  m_prog_bbox.link();
-
-  m_prog_bbox.bind();
-  m_prog_bbox.setUniformValue("col", QVector3D(1.0f, 0.0f, 0.0f));
-  m_prog_bbox.setUniformValue("dimensions", QVector3D(1.0f, 1.0f, 1.0f));
-
   // shader na kreslenie stvorca (len pre debugovanie)
 #ifdef DEBUG
   m_prog_rectangle.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/src/opengl/rectangle.vert");
@@ -76,35 +67,6 @@ bool TextureVolumeRenderer::reset_impl(void)
   OGLF->glBindVertexArray(0);
 
   return true;
-}
-
-
-void TextureVolumeRenderer::renderBBox(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation)
-{
-  m_prog_bbox.bind();
-
-  QMatrix4x4 mv;
-
-  mv.translate(translation);
-  mv.translate(0.0f, 0.0f, -1.0f);
-  mv.rotate(rotation);
-  mv.scale(scale);
-  mv.scale(1.1f, 1.1f, 1.1f);
-
-#if 0
-  mv.scale(m_data->maxPhysicalSize() / m_data->physicalWidth(),
-           m_data->maxPhysicalSize() / m_data->physicalHeight(),
-           m_data->maxPhysicalSize() / m_data->physicalDepth());
-#endif
-
-  m_prog_bbox.setUniformValue("proj", m_proj);
-  m_prog_bbox.setUniformValue("mv", mv);
-
-  OGLF->glEnable(GL_DEPTH_TEST);
-  OGLF->glDrawArrays(GL_LINES, 0, 24);
-  OGLF->glDisable(GL_DEPTH_TEST);
-
-  m_prog_bbox.release();
 }
 
 

@@ -5,6 +5,7 @@
 
 #include <QMatrix4x4>
 #include <QOpenGLTexture>
+#include <QOpenGLShaderProgram>
 
 
 class TransferFunction;
@@ -19,11 +20,14 @@ class VolumeRenderer
       , m_data()
       , m_transfer_func(QOpenGLTexture::Target1D)
       , m_detail(0)
+      , m_max_texture_size(0)
+      , m_prog_bbox()
     { }
 
     virtual ~VolumeRenderer(void) { }
 
     void setDetail(int level) { m_detail = level; }
+    bool setVolumeData(const VolumeData & data) { return data.toVolumeDataOGL(m_data); }
 
     void setProjection(const QMatrix4x4 & proj) { m_proj = proj; }
     void setPerspectiveProjection(int width, int height)
@@ -32,16 +36,8 @@ class VolumeRenderer
       m_proj.perspective(30.0f, ((float) width) / ((float) height), 0.01f, 1000.0f);
     }
 
-    bool setVolumeData(const VolumeData & data) { return data.toVolumeDataOGL(m_data); }
-
-    bool uploadTransferFunction(const TransferFunction & transfer_func);
-
-    bool reset(int w, int h)
-    {
-      m_width = w;
-      m_height = h;
-      return reset_impl();
-    }
+    bool reset(int w, int h);
+    bool resize(QRect rect);
 
     void renderPreview(const QQuaternion & rotation,
                        const QVector3D & scale,
@@ -57,9 +53,11 @@ class VolumeRenderer
       return render_impl(rotation, scale, translation, peel_depth, m_detail);
     }
 
-    virtual bool resize(QRect rect);
+    void renderBBox(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation);
+    bool uploadTransferFunction(const TransferFunction & transfer_func);
 
   protected:
+    virtual bool resize_impl(QRect /* rect */) { return true; }
     virtual bool reset_impl(void) = 0;
     virtual void render_impl(const QQuaternion & rotation,
                              const QVector3D & scale,
@@ -76,6 +74,8 @@ class VolumeRenderer
 
   private:
     int m_detail;
+    int m_max_texture_size;
+    QOpenGLShaderProgram m_prog_bbox;
 };
 
 #endif // VOLUME_RENDERER_H

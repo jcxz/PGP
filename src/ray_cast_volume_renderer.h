@@ -3,7 +3,6 @@
 
 #include "volume_renderer.h"
 
-#include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 #include <QOpenGLFramebufferObject>
@@ -31,9 +30,8 @@ class RayCastVolumeRenderer : public VolumeRenderer
 
     ~RayCastVolumeRenderer(void);
 
-    virtual bool resize(QRect rect) override;
-
   protected:
+    virtual bool resize_impl(QRect rect) override;
     virtual bool reset_impl(void) override;
     virtual void render_impl(const QQuaternion & rotation,
                              const QVector3D & scale,
