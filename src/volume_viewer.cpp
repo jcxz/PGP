@@ -74,6 +74,7 @@ void VolumeViewer::setTransferFunction(const TransferFunction *transfer_func)
 void VolumeViewer::setDetail(int level)
 {
   m_renderer->setDetail(level);
+  m_detail = level;
   update();
 }
 
@@ -107,6 +108,7 @@ void VolumeViewer::paintGL(void)
   // A navyse medzi renderermi sa da aj prepinat ...)
   if (m_renderer_changed)
   {
+    qDebug() << "width=" << width() << ", height=" << height();
     if (!m_renderer->reset(width(), height()))
     {
       emit error(tr("Failed to initialize renderer"));
@@ -114,6 +116,8 @@ void VolumeViewer::paintGL(void)
     }
 
     m_renderer->setPerspectiveProjection(width(), height());
+    //m_renderer->resize(rect());
+    m_renderer->setDetail(m_detail);
 
     m_renderer_changed = false;
     m_volume_data_changed = true;

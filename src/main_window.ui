@@ -82,7 +82,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
-            <widget class="QGroupBox" name="groupBox">
+            <widget class="QGroupBox" name="gbOptionsCustomDetail">
              <property name="toolTip">
               <string>If checked then the level of detail will be determined automatically, otherwise a user provided value will be used</string>
              </property>
@@ -111,7 +111,7 @@
                    <number>1</number>
                   </property>
                   <property name="maximum">
-                   <number>15000</number>
+                   <number>5000</number>
                   </property>
                   <property name="value">
                    <number>300</number>
@@ -196,7 +196,7 @@
           <zorder>rbOptionsRayCastingRenderer</zorder>
           <zorder>sliderOptionsCustomDetailLevel</zorder>
           <zorder>cbOptionsDisplayBBox</zorder>
-          <zorder>groupBox</zorder>
+          <zorder>gbOptionsCustomDetail</zorder>
           <zorder>sliderOptionsCustomDetailLevel</zorder>
          </widget>
         </item>
@@ -475,6 +475,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pbToggleRenderer</sender>
+   <signal>clicked()</signal>
+   <receiver>volumeViewer</receiver>
+   <slot>toggleRenderer()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>811</x>
+     <y>156</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>361</x>
+     <y>226</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>gbOptionsCustomDetail</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleDetailChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>811</x>
+     <y>285</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>handleLoadModel()</slot>
@@ -483,5 +515,6 @@
   <slot>handleDumpTF()</slot>
   <slot>handleAutoSubsamplingChange()</slot>
   <slot>handleRendererSwitch()</slot>
+  <slot>handleDetailChange()</slot>
  </slots>
 </ui>

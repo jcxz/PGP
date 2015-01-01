@@ -155,6 +155,19 @@ void MainWindow::handleAutoSubsamplingChange(void)
 }
 
 
+void MainWindow::handleDetailChange(void)
+{
+  if (ui->gbOptionsCustomDetail->isChecked())
+  {
+    ui->volumeViewer->setDetail(ui->sliderOptionsCustomDetailLevel->value());
+  }
+  else
+  {
+    ui->volumeViewer->setDetail(0);
+  }
+}
+
+
 void MainWindow::showEvent(QShowEvent *event)
 {
 #if 0

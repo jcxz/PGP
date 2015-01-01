@@ -26,6 +26,7 @@ class MainWindow : public QMainWindow
     void setTransferFunctionPreset(int preset_id);
     void handleRendererSwitch(void);
     void handleAutoSubsamplingChange(void);
+    void handleDetailChange(void);
 
   protected:
     virtual void showEvent(QShowEvent *event) override;

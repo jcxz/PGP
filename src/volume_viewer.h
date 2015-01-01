@@ -44,6 +44,7 @@ class VolumeViewer : public QOpenGLWidget
       , m_transl(QVector3D(0.0f, 0.0f, 0.0f))
       , m_shift_pressed(false)
       , m_high_quality(true)
+      , m_detail(0)
       , m_auto_subsampling(true)
       , m_logger()
     {
@@ -98,6 +99,9 @@ class VolumeViewer : public QOpenGLWidget
     QVector3D m_transl;
     bool m_shift_pressed;
     bool m_high_quality;    // whether the user manipulates with the scene (then render in high quality) or not (render in low quality)
+
+    // other settings for a renderer (in case of renderer switch, they must be set again)
+    int m_detail;
 
     // options
     bool m_auto_subsampling;
