@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>682</width>
-    <height>476</height>
+    <width>914</width>
+    <height>620</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,40 +58,181 @@
          </widget>
         </item>
         <item>
-         <widget class="QSlider" name="sliderSliceCount">
-          <property name="minimum">
-           <number>1</number>
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="toolTip">
+           <string>Provides a collection of ready-made transfer functions</string>
           </property>
-          <property name="maximum">
-           <number>15000</number>
+          <property name="title">
+           <string>Transfer Function Presets</string>
           </property>
-          <property name="value">
-           <number>300</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QComboBox" name="comboBox"/>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+         <widget class="QGroupBox" name="gbOptions">
+          <property name="toolTip">
+           <string>Enables to tweak the rendering</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
+          <property name="title">
+           <string>Options</string>
           </property>
-         </spacer>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QGroupBox" name="groupBox">
+             <property name="toolTip">
+              <string>If checked then the level of detail will be determined automatically, otherwise a user provided value will be used</string>
+             </property>
+             <property name="title">
+              <string>Custom Detail</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Level:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSlider" name="sliderSliceCount">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>15000</number>
+                  </property>
+                  <property name="value">
+                   <number>300</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBox_2">
+             <property name="toolTip">
+              <string>Enables or disables rendering in low quality during manipulation with data.</string>
+             </property>
+             <property name="text">
+              <string>Automatic Subsampling</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBox_3">
+             <property name="toolTip">
+              <string>Enables or disables displaying the red bounding box around the rendered image.</string>
+             </property>
+             <property name="text">
+              <string>Display Bounding Box</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButton">
+             <property name="toolTip">
+              <string>Switches to rendering engine that uses the texturing algorithm</string>
+             </property>
+             <property name="text">
+              <string>Texture Based Renderer</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButton_2">
+             <property name="toolTip">
+              <string>Switches to rendering engine that uses the ray casting algorithm</string>
+             </property>
+             <property name="text">
+              <string>Ray Casting Based Renderer</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+          <zorder>verticalSpacer</zorder>
+          <zorder>label</zorder>
+          <zorder>checkBox_2</zorder>
+          <zorder>radioButton</zorder>
+          <zorder>radioButton_2</zorder>
+          <zorder>sliderSliceCount</zorder>
+          <zorder>checkBox_3</zorder>
+          <zorder>groupBox</zorder>
+          <zorder>sliderSliceCount</zorder>
+         </widget>
         </item>
        </layout>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="TransferFunctionEditor" name="transferFuncEditor" native="true"/>
+     <widget class="QGroupBox" name="gbTransferFunctionEditor">
+      <property name="toolTip">
+       <string>Enables or disables the use of transfer function</string>
+      </property>
+      <property name="title">
+       <string>Transfer Function</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="TransferFunctionEditor" name="transferFuncEditor" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>125</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Provides means to modify the transfer function</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+      <zorder>transferFuncEditor</zorder>
+      <zorder>transferFuncEditor</zorder>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -100,20 +241,43 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>682</width>
+     <width>914</width>
      <height>18</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionLoad_Model"/>
+    <addaction name="actionLoad_Transfer_Function"/>
+    <addaction name="actionSave_Transfer_Function"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionLoad_Model">
+   <property name="text">
+    <string>Load Model</string>
+   </property>
+  </action>
+  <action name="actionLoad_Transfer_Function">
+   <property name="text">
+    <string>Load Transfer Function</string>
+   </property>
+  </action>
+  <action name="actionSave_Transfer_Function">
+   <property name="text">
+    <string>Save Transfer Function</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
