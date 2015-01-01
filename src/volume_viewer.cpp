@@ -99,6 +99,14 @@ void VolumeViewer::setAutoSubsampling(bool enabled)
 }
 
 
+void VolumeViewer::setDisplayBBox(bool enabled)
+{
+  qDebug() << __PRETTY_FUNCTION__ << ": enabled=" << enabled;
+  m_display_bbox = enabled;
+  update();
+}
+
+
 void VolumeViewer::initializeGL(void)
 {
   qDebug() << __PRETTY_FUNCTION__;
@@ -139,6 +147,9 @@ void VolumeViewer::paintGL(void)
     m_volume_data_changed = true;
     m_transfer_func_changed = true;
   }
+
+  // nastavenie properties rendereru, ktore sa mozu menit kazdy frame
+  m_renderer->setRenderBBox(m_display_bbox);
 
   // nastavenie volumetrickych dat
   if (m_volume_data_changed)
