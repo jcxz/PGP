@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
   , ui(new Ui::MainWindow)
   , m_volume_data()
   , m_transfer_func()
+  , m_auto_subsampling_modified(false)
 {
   ui->setupUi(this);
 
@@ -117,6 +118,40 @@ void MainWindow::setTransferFunctionPreset(int preset_id)
   }
 
   ui->transferFuncEditor->setTransferFunction(&m_transfer_func);
+}
+
+
+void MainWindow::handleRendererSwitch(void)
+{
+  if (ui->rbOptionsRayCastingRenderer->isChecked())
+  {
+    ui->volumeViewer->setRenderer(VolumeViewer::RayCastRenderer);
+    if (!m_auto_subsampling_modified)
+    {
+      ui->volumeViewer->setAutoSubsampling(false);
+      ui->cbOptionsAutoSubsampling->setChecked(false);
+    }
+  }
+  else if (ui->rbOptionsTextureRenderer->isChecked())
+  {
+    ui->volumeViewer->setRenderer(VolumeViewer::TextureRenderer);
+    if (!m_auto_subsampling_modified)
+    {
+      ui->volumeViewer->setAutoSubsampling(true);
+      ui->cbOptionsAutoSubsampling->setChecked(true);
+    }
+  }
+  else
+  {
+    qWarning() << "Unknown renderer";
+  }
+}
+
+
+void MainWindow::handleAutoSubsamplingChange(void)
+{
+  m_auto_subsampling_modified = true;
+  ui->volumeViewer->setAutoSubsampling(ui->cbOptionsAutoSubsampling->isChecked());
 }
 
 

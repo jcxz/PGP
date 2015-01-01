@@ -24,6 +24,8 @@ class MainWindow : public QMainWindow
     void handleSaveTF(void);
     void handleDumpTF(void);
     void setTransferFunctionPreset(int preset_id);
+    void handleRendererSwitch(void);
+    void handleAutoSubsamplingChange(void);
 
   protected:
     virtual void showEvent(QShowEvent *event) override;
@@ -36,6 +38,7 @@ class MainWindow : public QMainWindow
     Ui::MainWindow *ui;
     VolumeData m_volume_data;
     TransferFunction m_transfer_func;
+    bool m_auto_subsampling_modified; // automatic subsampling changed by user
 };
 
 #endif // MAIN_WINDOW_H

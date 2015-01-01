@@ -286,6 +286,9 @@
    <extends>QWidget</extends>
    <header>volume_viewer.h</header>
    <container>1</container>
+   <slots>
+    <slot>toggleRenderer()</slot>
+   </slots>
   </customwidget>
   <customwidget>
    <class>TransferFunctionEditor</class>
@@ -424,11 +427,61 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cbOptionsAutoSubsampling</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleAutoSubsamplingChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>811</x>
+     <y>326</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rbOptionsRayCastingRenderer</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleRendererSwitch()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>811</x>
+     <y>398</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rbOptionsTextureRenderer</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleRendererSwitch()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>811</x>
+     <y>374</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>handleLoadModel()</slot>
   <slot>handleLoadTF()</slot>
   <slot>handleSaveTF()</slot>
   <slot>handleDumpTF()</slot>
+  <slot>handleAutoSubsamplingChange()</slot>
+  <slot>handleRendererSwitch()</slot>
  </slots>
 </ui>

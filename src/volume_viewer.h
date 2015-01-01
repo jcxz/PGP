@@ -44,6 +44,7 @@ class VolumeViewer : public QOpenGLWidget
       , m_transl(QVector3D(0.0f, 0.0f, 0.0f))
       , m_shift_pressed(false)
       , m_high_quality(true)
+      , m_auto_subsampling(true)
       , m_logger()
     {
       // aby fungovala keyPressEvent
@@ -61,6 +62,7 @@ class VolumeViewer : public QOpenGLWidget
     void setVolumeData(const VolumeData *volume_data);
     void setTransferFunction(const TransferFunction *transfer_func);
     void setDetail(int level);
+    void setAutoSubsampling(bool enabled);
 
   protected:
     virtual void initializeGL(void) override;
@@ -96,6 +98,9 @@ class VolumeViewer : public QOpenGLWidget
     QVector3D m_transl;
     bool m_shift_pressed;
     bool m_high_quality;    // whether the user manipulates with the scene (then render in high quality) or not (render in low quality)
+
+    // options
+    bool m_auto_subsampling;
 
     // OpenGL debug logging
     Logger m_logger;

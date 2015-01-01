@@ -78,6 +78,13 @@ void VolumeViewer::setDetail(int level)
 }
 
 
+void VolumeViewer::setAutoSubsampling(bool enabled)
+{
+  m_auto_subsampling = enabled;
+  update();
+}
+
+
 void VolumeViewer::initializeGL(void)
 {
   qDebug() << __PRETTY_FUNCTION__;
@@ -136,7 +143,7 @@ void VolumeViewer::paintGL(void)
   }
 
   // renderovanie
-  if (m_high_quality)
+  if ((m_high_quality) || (m_auto_subsampling == false))
   {
     m_renderer->render(m_track_ball.getRotation(),
                        QVector3D(m_scale, m_scale, m_scale),
