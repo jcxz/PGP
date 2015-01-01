@@ -30,16 +30,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pbToggleRenderer">
+         <widget class="QPushButton" name="pbLoadTF">
           <property name="text">
-           <string>Toggle Renderer</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbDumpTF">
-          <property name="text">
-           <string>Dump Transfer Function</string>
+           <string>Load Transfer Function</string>
           </property>
          </widget>
         </item>
@@ -51,9 +44,16 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pbLoadTF">
+         <widget class="QPushButton" name="pbDumpTF">
           <property name="text">
-           <string>Load Transfer Function</string>
+           <string>Dump Transfer Function</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbToggleRenderer">
+          <property name="text">
+           <string>Toggle Renderer</string>
           </property>
          </widget>
         </item>
@@ -295,5 +295,140 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pbLoadTF</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLoadTF()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>811</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbSaveTF</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleSaveTF()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>811</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbLoadModel</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLoadModel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>811</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbDumpTF</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleDumpTF()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>811</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSaveTransferFunction</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleSaveTF()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLoadTransferFunction</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLoadTF()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLoadModel</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLoadModel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>handleLoadModel()</slot>
+  <slot>handleLoadTF()</slot>
+  <slot>handleSaveTF()</slot>
+  <slot>handleDumpTF()</slot>
+ </slots>
 </ui>

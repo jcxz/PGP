@@ -24,10 +24,10 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->transferFuncEditor, SIGNAL(transferFunctionChanged(const TransferFunction *)),
           ui->volumeViewer, SLOT(setTransferFunction(const TransferFunction *)));
 
-  connect(ui->pbLoadModel, SIGNAL(clicked()), this, SLOT(handleLoadModel()));
-  connect(ui->pbLoadTF, SIGNAL(clicked()), this, SLOT(handleLoadTF()));
-  connect(ui->pbSaveTF, SIGNAL(clicked()), this, SLOT(handleSaveTF()));
-  connect(ui->pbDumpTF, SIGNAL(clicked()), this, SLOT(handleDumpTF()));
+  //connect(ui->pbLoadModel, SIGNAL(clicked()), this, SLOT(handleLoadModel()));
+  //connect(ui->pbLoadTF, SIGNAL(clicked()), this, SLOT(handleLoadTF()));
+  //connect(ui->pbSaveTF, SIGNAL(clicked()), this, SLOT(handleSaveTF()));
+  //connect(ui->pbDumpTF, SIGNAL(clicked()), this, SLOT(handleDumpTF()));
 
   connect(ui->sliderOptionsCustomDetailLevel, SIGNAL(valueChanged(int)), ui->volumeViewer, SLOT(setDetail(int)));
 }
