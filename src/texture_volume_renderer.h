@@ -33,7 +33,7 @@ class TextureVolumeRenderer : public VolumeRenderer
                              int detail) override;
 
   private:
-    void renderBBox(const QQuaternion &rotation, const QVector3D &scale, const QVector3D &translation);
+    void renderBBox(const QQuaternion & rotation, const QVector3D & scale, const QVector3D &translation);
 
   private:
     QOpenGLVertexArrayObject m_vao;

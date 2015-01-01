@@ -18,12 +18,12 @@ class VolumeRenderer
       : m_proj()
       , m_data()
       , m_transfer_func(QOpenGLTexture::Target1D)
-      , m_slice_count(0)
+      , m_detail(0)
     { }
 
     virtual ~VolumeRenderer(void) { }
 
-    void setSliceCount(int slice_count) { m_slice_count = slice_count; }
+    void setDetail(int level) { m_detail = level; }
 
     void setProjection(const QMatrix4x4 & proj) { m_proj = proj; }
     void setPerspectiveProjection(int width, int height)
@@ -54,7 +54,7 @@ class VolumeRenderer
                 const QVector3D & translation,
                 const float peel_depth = 0.0f)
     {
-      return render_impl(rotation, scale, translation, peel_depth, m_slice_count);
+      return render_impl(rotation, scale, translation, peel_depth, m_detail);
     }
 
     virtual bool resize(QRect rect);
@@ -75,7 +75,7 @@ class VolumeRenderer
     int m_height;
 
   private:
-    int m_slice_count;
+    int m_detail;
 };
 
 #endif // VOLUME_RENDERER_H

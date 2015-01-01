@@ -71,9 +71,9 @@ void VolumeViewer::setTransferFunction(const TransferFunction *transfer_func)
 }
 
 
-void VolumeViewer::setDetail(int count)
+void VolumeViewer::setDetail(int level)
 {
-  m_renderer->setSliceCount(count);
+  m_renderer->setDetail(level);
   update();
 }
 

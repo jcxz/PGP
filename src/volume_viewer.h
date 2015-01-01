@@ -60,7 +60,7 @@ class VolumeViewer : public QOpenGLWidget
     void setRenderer(RendererType type);
     void setVolumeData(const VolumeData *volume_data);
     void setTransferFunction(const TransferFunction *transfer_func);
-    void setDetail(int count);
+    void setDetail(int level);
 
   protected:
     virtual void initializeGL(void) override;

@@ -89,6 +89,7 @@ void TextureVolumeRenderer::renderBBox(const QQuaternion & rotation, const QVect
   mv.translate(0.0f, 0.0f, -1.0f);
   mv.rotate(rotation);
   mv.scale(scale);
+  mv.scale(1.1f, 1.1f, 1.1f);
 
 #if 0
   mv.scale(m_data->maxPhysicalSize() / m_data->physicalWidth(),
@@ -99,7 +100,9 @@ void TextureVolumeRenderer::renderBBox(const QQuaternion & rotation, const QVect
   m_prog_bbox.setUniformValue("proj", m_proj);
   m_prog_bbox.setUniformValue("mv", mv);
 
+  OGLF->glEnable(GL_DEPTH_TEST);
   OGLF->glDrawArrays(GL_LINES, 0, 24);
+  OGLF->glDisable(GL_DEPTH_TEST);
 
   m_prog_bbox.release();
 }
@@ -122,6 +125,7 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   renderBBox(rotation, scale, translation);
 
   // vypnutie depth testu a zapnutie blendovania
+  OGLF->glEnable(GL_DEPTH_TEST);
   OGLF->glDepthMask(GL_FALSE);
   OGLF->glEnable(GL_BLEND);
   OGLF->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -226,4 +230,5 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
   // vratenie blendovania a depth testov do povodneho stavu
   OGLF->glDisable(GL_BLEND);
   OGLF->glDepthMask(GL_TRUE);
+  OGLF->glDisable(GL_DEPTH_TEST);
 }
