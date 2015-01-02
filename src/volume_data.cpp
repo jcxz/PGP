@@ -27,10 +27,8 @@ bool VolumeData::load(const QString & filename)
 {
   QString ext = QFileInfo(filename).suffix();
 
-  //if (filename.endsWith(".pvm"))
   if (ext == "pvm")
     return loadFromPVM(filename);
-  //else if (filename.endsWith(".dcm"))
   else if (ext == "dcm")
     return loadFromDICOM(filename);
   else

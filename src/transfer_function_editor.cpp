@@ -157,6 +157,8 @@ void TransferFunctionEditor::drawGrid(QPainter & painter, int w, int h)
 
 void TransferFunctionEditor::paintEvent(QPaintEvent * /* event */)
 {
+  const QColor disabled_col = QColor(128, 128, 128, 200);
+
   QPainter painter;
 
   painter.begin(this);
@@ -173,7 +175,7 @@ void TransferFunctionEditor::paintEvent(QPaintEvent * /* event */)
 
   // vykreslenie pozadia
   pen.setColor(QColor(Qt::white));
-  brush.setColor(QColor(255, 255, 255, 128));
+  brush.setColor(isEnabled() ? QColor(255, 255, 255, 128) : QColor(128, 128, 128, 100));
   brush.setStyle(Qt::SolidPattern);
   painter.setPen(pen);
   painter.setBrush(brush);
@@ -186,7 +188,8 @@ void TransferFunctionEditor::paintEvent(QPaintEvent * /* event */)
   // vykreslenie histogramu dat
   if (!m_volume_data_hist.isEmpty())
   {
-    pen.setColor(QColor(128, 0, 0, 128));
+    //pen.setColor(QColor(128, 0, 0, 128));
+    pen.setColor(isEnabled() ? QColor(128, 0, 0, 128) : disabled_col);
     brush.setColor(QColor(128, 0, 0, 128));
 
     painter.setPen(pen);
@@ -216,7 +219,7 @@ void TransferFunctionEditor::paintEvent(QPaintEvent * /* event */)
   // nakreslenie krivky medzi kontrolnymi bodmi transfer funkcie
   if (m_transfer_func)
   {
-    pen.setColor(QColor(Qt::red));
+    pen.setColor(isEnabled() ? QColor(Qt::red) : disabled_col);
     pen.setWidth(2);
     painter.setPen(pen);
     painter.setBrush(old_brush);
@@ -226,7 +229,7 @@ void TransferFunctionEditor::paintEvent(QPaintEvent * /* event */)
     for (int i = 1; i < cpts.size(); ++i)
     {
       painter.drawLine(fromTCP(cpts[i - 1].position()),
-          fromTCP(cpts[i + 0].position()));
+                       fromTCP(cpts[i + 0].position()));
     }
 
     // vykreslenie kontrolnych bodov transfer funkcie
@@ -234,14 +237,21 @@ void TransferFunctionEditor::paintEvent(QPaintEvent * /* event */)
     {
       const TransferControlPoint & p = cpts[i];
 
-      // nakresli podsvietenie pre vybrany kontrolny bod
-      if (i == m_cur_tcp_idx)
+      if (isEnabled())
       {
-        QColor c(128, 128, 128, 128);
-        drawPoint(painter, fromTCP(p.position()), POINT_SELECT_RADIUS, c); //QColor(Qt::black));
-      }
+        // nakresli podsvietenie pre vybrany kontrolny bod
+        if (i == m_cur_tcp_idx)
+        {
+          QColor c(128, 128, 128, 128);
+          drawPoint(painter, fromTCP(p.position()), POINT_SELECT_RADIUS, c); //QColor(Qt::black));
+        }
 
-      drawPoint(painter, fromTCP(p.position()), POINT_RENDER_RADIUS, p.color());
+        drawPoint(painter, fromTCP(p.position()), POINT_RENDER_RADIUS, p.color());
+      }
+      else
+      {
+        drawPoint(painter, fromTCP(p.position()), POINT_RENDER_RADIUS, disabled_col);
+      }
     }
   }
   else
