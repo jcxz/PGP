@@ -75,7 +75,7 @@ void MainWindow::handleLoadModel(void)
 
   if (do_open_raw)
   {
-    RawFileDetailsDlg dlg;
+    RawFileDetailsDlg dlg(this);
     if (dlg.exec() == QDialog::Accepted)
     {
       setRawVolumeFile(filename,
