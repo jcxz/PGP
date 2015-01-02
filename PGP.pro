@@ -35,7 +35,8 @@ HEADERS += \
     src/color_luminance_picker.h \
     src/thirdparty/codebase.h \
     src/thirdparty/ddsbase.h \
-    src/ray_cast_volume_renderer.h
+    src/ray_cast_volume_renderer.h \
+    src/raw_file_details_dlg.h
 
 SOURCES += \
     src/logger.cpp \
@@ -53,10 +54,12 @@ SOURCES += \
     src/color_picker.cpp \
     src/color_luminance_picker.cpp \
     src/thirdparty/ddsbase.cpp \
-    src/ray_cast_volume_renderer.cpp
+    src/ray_cast_volume_renderer.cpp \
+    src/raw_file_details_dlg.cpp
 
 FORMS += \
-    src/main_window.ui
+    src/main_window.ui \
+    src/raw_file_details_dlg.ui
 
 RESOURCES += \
     PGP_shaders.qrc \

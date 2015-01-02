@@ -3,6 +3,7 @@
 #include "ogl.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QDebug>
 #include <cstdint>
 
@@ -24,9 +25,13 @@ bool VolumeDataBase::setBitDepth(int bit_depth)
 
 bool VolumeData::load(const QString & filename)
 {
-  if (filename.endsWith(".pvm"))
+  QString ext = QFileInfo(filename).suffix();
+
+  //if (filename.endsWith(".pvm"))
+  if (ext == "pvm")
     return loadFromPVM(filename);
-  else if (filename.endsWith(".dcm"))
+  //else if (filename.endsWith(".dcm"))
+  else if (ext == "dcm")
     return loadFromDICOM(filename);
   else
   {
@@ -230,4 +235,10 @@ bool VolumeData::toVolumeDataOGL(VolumeDataOGL & ogl_data) const
   free(p_rgba);
 
   return true;
+}
+
+
+QStringList VolumeData::supportedFileFormatExtensions(void)
+{
+  return { "pvm", "raw" };
 }

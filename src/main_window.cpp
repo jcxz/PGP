@@ -1,8 +1,10 @@
 #include "main_window.h"
 #include "ui_main_window.h"
+#include "raw_file_details_dlg.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QFileInfo>
 
 
 
@@ -51,21 +53,41 @@ void MainWindow::handleLoadModel(void)
   QString filename(QFileDialog::getOpenFileName(this, tr("Load Model")));
   if (filename.isNull()) return;
 
-#if 0
-  if (!ui->volumeViewer->openFile(filename))
+  QString ext = QFileInfo(filename).suffix();
+
+  bool do_open_raw = false;
+
+  if (ext == "raw")
   {
-    QMessageBox::critical(this, tr("Error"), tr("Failed open file %1").arg(filename));
-    return;
+    do_open_raw = true;
+  }
+  else if (!VolumeData::supportedFileFormatExtensions().contains(ext))
+  {
+    if (QMessageBox::question(this,
+                              tr("Unknown file extension"),
+                              tr("This file extension is not known, do you still want to open the file as raw ?"),
+                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
+    {
+      return;
+    }
+    do_open_raw = true;
+  }
+
+  if (do_open_raw)
+  {
+    RawFileDetailsDlg dlg;
+    if (dlg.exec() == QDialog::Accepted)
+    {
+      setRawVolumeFile(filename,
+                       dlg.dataWidth(), dlg.dataHeight(), dlg.dataDepth(),
+                       dlg.dataBitDepth(),
+                       dlg.dataScaleX(), dlg.dataScaleY(), dlg.dataScaleZ());
+    }
   }
   else
   {
-    qDebug() << "volume file loaded successfully";
+    setVolumeFile(filename);
   }
-
-  ui->transferFuncEditor->updateHistogram(ui->volumeViewer->volumeData());
-#endif
-
-  setVolumeFile(filename);
 }
 
 

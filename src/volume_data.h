@@ -100,6 +100,10 @@ class VolumeData : public VolumeDataBase
 
     bool toVolumeDataOGL(VolumeDataOGL & ogl_data) const;
 
+    // returns a list of extensions for supported volumetric file formats
+    // The entries in the returned list do not include the leading '.'
+    static QStringList supportedFileFormatExtensions(void);
+
   private:
     tDataPtr m_data;  // pointer na data
 };
