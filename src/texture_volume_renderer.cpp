@@ -157,6 +157,7 @@ void TextureVolumeRenderer::render_impl(const QQuaternion & rotation,
 
   m_program.setUniformValue("num_instances", (GLfloat) detail);
   m_program.setUniformValue("num_instances_inv", 1.0f / ((GLfloat) detail));
+  m_program.setUniformValue("use_tf", m_use_transfer_func);
 
   // vykreslenie proxy geometrie
   m_vao.bind();

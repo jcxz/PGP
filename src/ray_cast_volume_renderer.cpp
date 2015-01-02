@@ -225,6 +225,7 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
   m_prog_ray_cast.setUniformValue("tex_back_faces", 1);
   m_prog_ray_cast.setUniformValue("tex_volume_data", 2);
+  m_prog_ray_cast.setUniformValue("use_tf", m_use_transfer_func);
 
   OGLF->glEnable(GL_DEPTH_TEST);
   OGLF->glDrawElements(GL_TRIANGLES, g_cube_indices_cnt, GL_UNSIGNED_INT, nullptr);

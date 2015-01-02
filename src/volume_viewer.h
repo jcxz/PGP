@@ -46,6 +46,7 @@ class VolumeViewer : public QOpenGLWidget
       , m_high_quality(true)
       , m_detail(0)
       , m_display_bbox(true)
+      , m_use_tf(false)
       , m_auto_subsampling(true)
       , m_logger()
     {
@@ -71,6 +72,7 @@ class VolumeViewer : public QOpenGLWidget
     void setDetail(int level);
     void setAutoSubsampling(bool enabled);
     void setDisplayBBox(bool enabled);
+    void setUseTransferFunction(bool enabled);
 
   protected:
     virtual void initializeGL(void) override;
@@ -110,6 +112,7 @@ class VolumeViewer : public QOpenGLWidget
     // other settings for a renderer (in case of renderer switch, they must be set again)
     int m_detail;
     bool m_display_bbox;
+    bool m_use_tf;
 
     // options
     bool m_auto_subsampling;

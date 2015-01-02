@@ -19,6 +19,7 @@ class VolumeRenderer
       : m_proj()
       , m_data()
       , m_transfer_func(QOpenGLTexture::Target1D)
+      , m_use_transfer_func(false)
       , m_max_texture_size(0)
       , m_prog_bbox()
       , m_render_bbox(true)
@@ -28,6 +29,7 @@ class VolumeRenderer
 
     bool setVolumeData(const VolumeData & data) { return data.toVolumeDataOGL(m_data); }
     void setRenderBBox(bool enabled) { m_render_bbox = enabled; }
+    void setUseTransferFunction(bool enabled) { m_use_transfer_func = enabled; }
 
     void setProjection(const QMatrix4x4 & proj) { m_proj = proj; }
     void setPerspectiveProjection(int width, int height)
@@ -73,6 +75,7 @@ class VolumeRenderer
     QOpenGLTexture m_transfer_func;
     int m_width;
     int m_height;
+    bool m_use_transfer_func;
 
   private:
     int m_max_texture_size;

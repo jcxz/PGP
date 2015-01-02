@@ -284,6 +284,7 @@
    <slots>
     <slot>toggleRenderer()</slot>
     <slot>setDisplayBBox(bool)</slot>
+    <slot>setUseTransferFunction(bool)</slot>
    </slots>
   </customwidget>
   <customwidget>
@@ -512,6 +513,22 @@
     <hint type="sourcelabel">
      <x>811</x>
      <y>350</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>361</x>
+     <y>226</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>gbTransferFunctionEditor</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>volumeViewer</receiver>
+   <slot>setUseTransferFunction(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>456</x>
+     <y>512</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>

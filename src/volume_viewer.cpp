@@ -107,6 +107,13 @@ void VolumeViewer::setDisplayBBox(bool enabled)
 }
 
 
+void VolumeViewer::setUseTransferFunction(bool enabled)
+{
+  m_use_tf = enabled;
+  update();
+}
+
+
 void VolumeViewer::initializeGL(void)
 {
   qDebug() << __PRETTY_FUNCTION__;
@@ -150,6 +157,7 @@ void VolumeViewer::paintGL(void)
 
   // nastavenie properties rendereru, ktore sa mozu menit kazdy frame
   m_renderer->setRenderBBox(m_display_bbox);
+  m_renderer->setUseTransferFunction(m_use_tf);
 
   // nastavenie volumetrickych dat
   if (m_volume_data_changed)

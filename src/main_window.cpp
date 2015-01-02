@@ -209,6 +209,7 @@ void MainWindow::showEvent(QShowEvent *event)
 
   setRawVolumeFile(":/data/head256x256x109_8bit_chan.raw", 256, 256, 109, 8, 1.0f, 1.0f, 1.0f);
   setTransferFunctionPreset(1);
+  ui->volumeViewer->setUseTransferFunction(true);
 
   return QMainWindow::showEvent(event);
 }

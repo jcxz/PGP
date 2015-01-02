@@ -6,6 +6,7 @@ out vec4 fragColor;
 
 uniform sampler3D tex_data;
 uniform sampler1D tex_transfer_func;
+uniform bool use_tf;
 
 
 void main(void)
@@ -18,7 +19,12 @@ void main(void)
 
   //fragColor = vec4(c.a * vec3(10.0f, 10.5f, 10.5f), c.a);
   //fragColor = vec4(c.a * texture1D(tex_transfer_func, c.a).xyz, c.a);
-  fragColor = texture1D(tex_transfer_func, c.a);
+
+  //fragColor = texture1D(tex_transfer_func, c.a);
+  if (use_tf)
+    fragColor = texture1D(tex_transfer_func, c.a);
+  else
+    fragColor = c;
 
   //fragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }
