@@ -85,6 +85,9 @@ class TransferFunction
       m_transfer_points.push_back(defaultRightBorderCP());
     }
 
+    bool isBorderPoint(int idx) const
+    { return (idx <= 0) || (idx >= (m_transfer_points.size() - 1)); }
+
     float opacity(float pos_x) const;
     float opacity(int idx, int index_max = 256) const
     { return opacity(float(idx) / float(index_max)); }

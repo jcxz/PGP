@@ -3,11 +3,13 @@
 #include "volume_data.h"
 
 #include <QColorDialog>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QBrush>
-#include <QDebug>
 #include <QStaticText>
+#include <QShortcut>
+#include <QDebug>
 #include <cstdint>
 
 
@@ -36,9 +38,31 @@ TransferFunctionEditor::TransferFunctionEditor(QWidget *parent)
   , m_volume_data_range(255.0f)
   , m_transfer_func(nullptr)
   , m_volume_data_hist()
+  , m_act_insert_tcp(nullptr)
+  , m_act_remove_tcp(nullptr)
+  , m_act_change_col(nullptr)
+  , m_shortcut_remove_tcp(nullptr)
 {
   setFocusPolicy(Qt::ClickFocus);
   setMinimumSize(QSize(INNER_PADDING_X + 30, INNER_PADDING_Y + 30));
+
+  m_act_insert_tcp = new QAction(tr("Add control point"), this);
+  m_act_remove_tcp = new QAction(tr("Remove control point"), this);
+  m_act_change_col = new QAction(tr("Change color"), this);
+  m_shortcut_remove_tcp = new QShortcut(QKeySequence(QKeySequence::Delete),
+                                        this,
+                                        SLOT(removeTCP()),
+                                        nullptr,
+                                        Qt::WidgetShortcut);
+}
+
+
+TransferFunctionEditor::~TransferFunctionEditor(void)
+{
+  delete m_act_insert_tcp;
+  delete m_act_remove_tcp;
+  delete m_act_change_col;
+  delete m_shortcut_remove_tcp;
 }
 
 
@@ -308,4 +332,68 @@ void TransferFunctionEditor::mouseMoveEvent(QMouseEvent *event)
   }
 
   return QWidget::mouseMoveEvent(event);
+}
+
+
+void TransferFunctionEditor::contextMenuEvent(QContextMenuEvent *event)
+{
+  // Nastavenie povolenych a zakazanych akcii podla toho kde sa kliklo
+  int idx = m_transfer_func->findByPosition(toTCP(event->pos()),
+                                            scaleToTCP(POINT_SEARCH_RADIUS,
+                                                       POINT_SEARCH_RADIUS));
+  if (idx == TransferFunction::INVALID_TCP_INDEX)
+  {
+    m_act_insert_tcp->setEnabled(true);
+    m_act_remove_tcp->setEnabled(false);
+    m_act_change_col->setEnabled(false);
+  }
+  else
+  {
+    m_act_insert_tcp->setEnabled(false);
+    m_act_remove_tcp->setEnabled(!m_transfer_func->isBorderPoint(idx));
+    m_act_change_col->setEnabled(true);
+  }
+
+  // Vytvorenie kontextoveho menu
+  QMenu menu(this);
+
+  menu.addAction(m_act_insert_tcp);
+  menu.addAction(m_act_remove_tcp);
+  menu.addAction(m_act_change_col);
+
+  // spust menu a spracuj akcie
+  QAction *act = menu.exec(event->globalPos());
+  if (act == m_act_insert_tcp)
+  {
+    m_transfer_func->addTCP(toTCP(event->pos()));
+    update();
+    emit transferFunctionChanged(m_transfer_func);
+  }
+  else if (act == m_act_remove_tcp)
+  {
+    m_transfer_func->removeTCP(idx);
+    update();
+    emit transferFunctionChanged(m_transfer_func);
+  }
+  else if (act == m_act_change_col)
+  {
+    m_transfer_func->setTCPColor(idx, QColorDialog::getColor());
+    update();
+    emit transferFunctionChanged(m_transfer_func);
+  }
+  else
+  {
+    qDebug() << "No action selected. Menu canceled.";
+  }
+}
+
+
+void TransferFunctionEditor::removeTCP(void)
+{
+  if (m_cur_tcp_idx != TransferFunction::INVALID_TCP_INDEX)
+  {
+    m_transfer_func->removeTCP(m_cur_tcp_idx);
+    update();
+    emit transferFunctionChanged(m_transfer_func);
+  }
 }

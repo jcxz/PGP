@@ -6,6 +6,7 @@
 #include <QWidget>
 
 
+class QShortcut;
 class VolumeData;
 class TransferFunction;
 
@@ -31,6 +32,7 @@ class TransferFunctionEditor : public QWidget
 
   public:
     explicit TransferFunctionEditor(QWidget *parent = 0);
+    ~TransferFunctionEditor(void);
 
   signals:
     void transferFunctionChanged(const TransferFunction *func);
@@ -44,6 +46,10 @@ class TransferFunctionEditor : public QWidget
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
+    virtual void contextMenuEvent(QContextMenuEvent *event) override;
+
+  private slots:
+    void removeTCP(void);
 
   private:
     inline QPointF scaleToTCP(float x, float y)
@@ -72,6 +78,10 @@ class TransferFunctionEditor : public QWidget
     float m_volume_data_range;
     TransferFunction *m_transfer_func;
     VolumeDataHistogram m_volume_data_hist;
+    QAction *m_act_insert_tcp;
+    QAction *m_act_remove_tcp;
+    QAction *m_act_change_col;
+    QShortcut *m_shortcut_remove_tcp;
 };
 
 #endif // TRANSFER_FUNCTION_EDITOR_H

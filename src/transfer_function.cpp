@@ -65,11 +65,11 @@ void TransferFunction::setTCPPosition(int idx, QPointF pos)
 {
   qDebug() << __PRETTY_FUNCTION__;
 
-  if (!isValid())
-  {
-    qWarning() << "setTCPPosition: Transfer function is invalid";
-    return;
-  }
+  //if (!isValid())
+  //{
+  //  qWarning() << "setTCPPosition: Transfer function is invalid: idx=" << idx;
+  //  return;
+  //}
 
   TransferControlPoint & pt_prev = getTCP(idx - 1);
   TransferControlPoint & pt = getTCP(idx);
