@@ -17,22 +17,29 @@ MainWindow::MainWindow(QWidget *parent)
 {
   ui->setupUi(this);
 
+  // hide debugging widgets
   ui->pbDumpTF->hide();
   ui->pbToggleRenderer->hide();
 
+  // connect to an error handler
   connect(ui->volumeViewer, SIGNAL(error(const QString &)), SLOT(displayError(const QString &)));
 
-  connect(ui->pbToggleRenderer, SIGNAL(clicked()), ui->volumeViewer, SLOT(toggleRenderer()));
-
+  // render in high quality after the transfer function has been changed
+  connect(ui->transferFuncEditor, SIGNAL(transferFunctionChanged(const TransferFunction *)),
+          ui->volumeViewer, SLOT(setHighQuality()));
   connect(ui->transferFuncEditor, SIGNAL(transferFunctionChanged(const TransferFunction *)),
           ui->volumeViewer, SLOT(setTransferFunction(const TransferFunction *)));
 
-  //connect(ui->pbLoadModel, SIGNAL(clicked()), this, SLOT(handleLoadModel()));
-  //connect(ui->pbLoadTF, SIGNAL(clicked()), this, SLOT(handleLoadTF()));
-  //connect(ui->pbSaveTF, SIGNAL(clicked()), this, SLOT(handleSaveTF()));
-  //connect(ui->pbDumpTF, SIGNAL(clicked()), this, SLOT(handleDumpTF()));
+  // render in preview quality while the transfer function is being manipulated
+  connect(ui->transferFuncEditor, SIGNAL(transferFunctionManipulated(const TransferFunction*)),
+          ui->volumeViewer, SLOT(setLowQuality()));
+  connect(ui->transferFuncEditor, SIGNAL(transferFunctionManipulated(const TransferFunction *)),
+          ui->volumeViewer, SLOT(setTransferFunction(const TransferFunction*)));
 
+  // connect sliders for changing the detail (again render in low quality during manipulation)
+  connect(ui->sliderOptionsCustomDetailLevel, SIGNAL(sliderPressed()), ui->volumeViewer, SLOT(setLowQuality()));
   connect(ui->sliderOptionsCustomDetailLevel, SIGNAL(valueChanged(int)), ui->volumeViewer, SLOT(setDetail(int)));
+  connect(ui->sliderOptionsCustomDetailLevel, SIGNAL(sliderReleased()), ui->volumeViewer, SLOT(setHighQuality()));
 }
 
 
@@ -207,9 +214,11 @@ void MainWindow::showEvent(QShowEvent *event)
   ui->transferFuncEditor->updateHistogram(ui->volumeViewer->volumeData());
 #endif
 
+  // nastavenie defaultnych dat a transfer funkcie
   setRawVolumeFile(":/data/head256x256x109_8bit_chan.raw", 256, 256, 109, 8, 1.0f, 1.0f, 1.0f);
   setTransferFunctionPreset(1);
-  ui->volumeViewer->setUseTransferFunction(true);
+
+  ui->volumeViewer->setUseTransferFunction(ui->gbTransferFunctionEditor->isChecked());
 
   return QMainWindow::showEvent(event);
 }

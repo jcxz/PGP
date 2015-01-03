@@ -506,7 +506,7 @@
   </connection>
   <connection>
    <sender>cbOptionsDisplayBBox</sender>
-   <signal>toggled(bool)</signal>
+   <signal>clicked(bool)</signal>
    <receiver>volumeViewer</receiver>
    <slot>setDisplayBBox(bool)</slot>
    <hints>

@@ -36,6 +36,7 @@ class TransferFunctionEditor : public QWidget
 
   signals:
     void transferFunctionChanged(const TransferFunction *func);
+    void transferFunctionManipulated(const TransferFunction *func);
 
   public slots:
     void setTransferFunction(TransferFunction *func);
@@ -44,8 +45,9 @@ class TransferFunctionEditor : public QWidget
   protected:
     virtual void paintEvent(QPaintEvent * /* event */) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
-    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void contextMenuEvent(QContextMenuEvent *event) override;
 
   private slots:

@@ -299,6 +299,34 @@ void TransferFunctionEditor::mousePressEvent(QMouseEvent *event)
 }
 
 
+void TransferFunctionEditor::mouseReleaseEvent(QMouseEvent *event)
+{
+  //qDebug() << m_transfer_func;
+
+  m_cur_tcp_idx = TransferFunction::INVALID_TCP_INDEX;
+  update();
+
+  // treba upoznotnit widget, ktory zobrazuje volumetricke data,
+  // aby sa prekreslil v plnej kvalite
+  emit transferFunctionChanged(m_transfer_func);
+
+  return QWidget::mouseReleaseEvent(event);
+}
+
+
+void TransferFunctionEditor::mouseMoveEvent(QMouseEvent *event)
+{
+  if (m_cur_tcp_idx != TransferFunction::INVALID_TCP_INDEX)
+  {
+    m_transfer_func->setTCPPosition(m_cur_tcp_idx, toTCP(event->pos()));
+    update();
+    emit transferFunctionManipulated(m_transfer_func);
+  }
+
+  return QWidget::mouseMoveEvent(event);
+}
+
+
 void TransferFunctionEditor::mouseDoubleClickEvent(QMouseEvent *event)
 {
   int idx = m_transfer_func->findByPosition(toTCP(event->pos()),
@@ -317,21 +345,6 @@ void TransferFunctionEditor::mouseDoubleClickEvent(QMouseEvent *event)
   emit transferFunctionChanged(m_transfer_func);
 
   return QWidget::mouseDoubleClickEvent(event);
-}
-
-
-void TransferFunctionEditor::mouseMoveEvent(QMouseEvent *event)
-{
-  if (m_cur_tcp_idx != TransferFunction::INVALID_TCP_INDEX)
-  {
-    m_transfer_func->setTCPPosition(m_cur_tcp_idx, toTCP(event->pos()));
-    update();
-    emit transferFunctionChanged(m_transfer_func);
-
-    //qDebug() << m_transfer_func;
-  }
-
-  return QWidget::mouseMoveEvent(event);
 }
 
 

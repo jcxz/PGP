@@ -71,6 +71,8 @@ class VolumeViewer : public QOpenGLWidget
     void setTransferFunction(const TransferFunction *transfer_func);
     void setDetail(int level);
     void setAutoSubsampling(bool enabled);
+    void setHighQuality(void);
+    void setLowQuality(void);
     void setDisplayBBox(bool enabled);
     void setUseTransferFunction(bool enabled);
 

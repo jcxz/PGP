@@ -99,9 +99,22 @@ void VolumeViewer::setAutoSubsampling(bool enabled)
 }
 
 
+void VolumeViewer::setHighQuality(void)
+{
+  m_high_quality = true;
+  update();
+}
+
+
+void VolumeViewer::setLowQuality(void)
+{
+  m_high_quality = false;
+  update();
+}
+
+
 void VolumeViewer::setDisplayBBox(bool enabled)
 {
-  qDebug() << __PRETTY_FUNCTION__ << ": enabled=" << enabled;
   m_display_bbox = enabled;
   update();
 }
@@ -198,7 +211,6 @@ void VolumeViewer::paintGL(void)
                               //QVector3D(0.0f, 0.0f, 0.0f),
                               m_transl,
                               m_peel_depth);
-    m_high_quality = true;
   }
 }
 
@@ -207,14 +219,11 @@ void VolumeViewer::resizeGL(int w, int h)
 {
   qDebug() << __PRETTY_FUNCTION__;
   m_renderer->resize(w, h);
-  m_high_quality = false;
 }
 
 
 void VolumeViewer::keyPressEvent(QKeyEvent *event)
 {
-  qDebug() << __PRETTY_FUNCTION__;
-
   if (event->key() == Qt::Key_Shift)
     m_shift_pressed = true;
   else
@@ -226,7 +235,6 @@ void VolumeViewer::keyPressEvent(QKeyEvent *event)
 
 void VolumeViewer::keyReleaseEvent(QKeyEvent *event)
 {
-  qDebug() << __PRETTY_FUNCTION__;
   m_shift_pressed = false;
   return QOpenGLWidget::keyReleaseEvent(event);
 }
