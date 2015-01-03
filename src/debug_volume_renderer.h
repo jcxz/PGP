@@ -24,7 +24,7 @@ class DebugVolumeRenderer : public VolumeRenderer
     }
 
   protected:
-    virtual bool reset_impl(void) override;
+    virtual bool reset_impl(int /* w */, int /* h */) override;
     virtual void render_impl(const QQuaternion & rotation,
                              const QVector3D & scale,
                              const QVector3D & translation,

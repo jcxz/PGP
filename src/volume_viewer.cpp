@@ -206,10 +206,7 @@ void VolumeViewer::paintGL(void)
 void VolumeViewer::resizeGL(int w, int h)
 {
   qDebug() << __PRETTY_FUNCTION__;
-  m_renderer->resize(rect());
-  //m_renderer->resize(w, h);
-  //glViewport(0, 0, w, h);
-  //m_renderer->setPerspectiveProjection(w, h);
+  m_renderer->resize(w, h);
   m_high_quality = false;
 }
 

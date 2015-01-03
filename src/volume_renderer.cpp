@@ -20,11 +20,7 @@ bool VolumeRenderer::reset(int w, int h)
   m_prog_bbox.setUniformValue("col", QVector3D(1.0f, 0.0f, 0.0f));
   m_prog_bbox.setUniformValue("dimensions", QVector3D(1.0f, 1.0f, 1.0f));
 
-  // set the width and the height
-  m_width = w;
-  m_height = h;
-
-  return reset_impl();
+  return reset_impl(w, h);
 }
 
 
@@ -32,8 +28,6 @@ bool VolumeRenderer::resize(QRect rect)
 {
   glViewport(0, 0, rect.width(), rect.height());
   setPerspectiveProjection(rect.width(), rect.height());
-  m_width = rect.width();
-  m_height = rect.height();
   return resize_impl(rect);
 }
 

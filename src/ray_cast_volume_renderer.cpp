@@ -54,7 +54,7 @@ const int g_cube_indices_cnt = sizeof(g_cube_indices) / sizeof(g_cube_indices[0]
 
 
 
-bool RayCastVolumeRenderer::reset_impl(void)
+bool RayCastVolumeRenderer::reset_impl(int w, int h)
 {
   //*** zistenie defaultneho frame bufferu
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint *) &m_default_fbo);
@@ -99,7 +99,7 @@ bool RayCastVolumeRenderer::reset_impl(void)
   OGLF->glUseProgram(0);
 
   //*** Inicializacia frame bufferu
-  return initFramebuffer(m_width, m_height);
+  return initFramebuffer(w, h);
 }
 
 

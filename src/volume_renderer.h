@@ -40,29 +40,26 @@ class VolumeRenderer
 
     bool reset(int w, int h);
     bool resize(QRect rect);
+    bool resize(int w, int h) { return resize(QRect(0, 0, w, h)); }
 
     void renderPreview(const QQuaternion & rotation,
                        const QVector3D & scale,
                        const QVector3D & translation,
                        const float peel_depth = 0.0f)
     { return render(rotation, scale, translation, m_data.maxSize() / 4, peel_depth); }
-    //{ return render_impl(rotation, scale, translation, peel_depth, m_data.maxSize() / 4); }
 
     void render(const QQuaternion & rotation,
                 const QVector3D & scale,
                 const QVector3D & translation,
                 const int detail,
                 const float peel_depth = 0.0f);
-    //{
-    //  return render_impl(rotation, scale, translation, peel_depth, detail);
-    //}
 
     void renderBBox(const QQuaternion & rotation, const QVector3D & scale, const QVector3D & translation);
     bool uploadTransferFunction(const TransferFunction & transfer_func);
 
   protected:
     virtual bool resize_impl(QRect /* rect */) { return true; }
-    virtual bool reset_impl(void) = 0;
+    virtual bool reset_impl(int w, int h) = 0;
     virtual void render_impl(const QQuaternion & rotation,
                              const QVector3D & scale,
                              const QVector3D & translation,
@@ -73,8 +70,6 @@ class VolumeRenderer
     QMatrix4x4 m_proj;
     VolumeDataOGL m_data;
     QOpenGLTexture m_transfer_func;
-    int m_width;
-    int m_height;
     bool m_use_transfer_func;
 
   private:

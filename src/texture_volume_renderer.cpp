@@ -1,6 +1,7 @@
 #include "texture_volume_renderer.h"
 #include "ogl.h"
 
+
 //#define DEBUG
 
 
@@ -17,7 +18,7 @@ struct Vertex
 
 
 
-bool TextureVolumeRenderer::reset_impl(void)
+bool TextureVolumeRenderer::reset_impl(int /* w */, int /* h */)
 {
   // shader na kreslenie stvorca (len pre debugovanie)
 #ifdef DEBUG
