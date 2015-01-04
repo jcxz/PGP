@@ -150,12 +150,12 @@ bool VolumeData::loadFromRaw(const QString & filename, int width, int height, in
 namespace {
 
 template <typename T>
-const T *intensityToRGBA(const T *p_intensity, const int n)
+T *intensityToRGBA(const T *p_intensity, const int n)
 {
   T *p_rgba = (T *) malloc(sizeof(T) * n * 4);
   if (p_rgba == nullptr)
   {
-    qCritical() << "Failed to allocate memory for the conversion";
+    qCritical() << "Failed to allocate memory for the conversion to RGBA";
     return nullptr;
   }
 
@@ -170,24 +170,210 @@ const T *intensityToRGBA(const T *p_intensity, const int n)
   return p_rgba;
 }
 
+
+void normalize(GLfloat & x, GLfloat & y, GLfloat & z)
+{
+  GLfloat len = sqrtf(x * x + y * y + z * z);
+  if (len > 0.0f)
+  {
+    x /= len;
+    y /= len;
+    z /= len;
+  }
+}
+
+
+template <typename T>
+T get(unsigned int i, unsigned int j, unsigned int k,
+      unsigned int components, unsigned int offset, const T *p,
+      unsigned int width, unsigned int height, unsigned int depth)
+{
+  if ((i > 0) && (i < width) && (j > 0) && (j < height) && (k > 0) && (k < depth))
+  {
+    return p[(k * width * height + j * width + i) * components + offset];
+  }
+  else
+  {
+    return T();
+  }
+}
+
+
+#if 0  // Nefiltrovane gradienty
+template<typename T>
+GLfloat *intensityToGradients(const T *p_intensity, const int width, const int height, const int depth)
+{
+  const int n = width * height * depth;
+
+  // alokacia pomocnej docasnej pamate
+  GLfloat *p_tmp = (GLfloat *) malloc(sizeof(GLfloat) * n * 4);
+  if (p_tmp == nullptr)
+  {
+    qCritical() << "Failed to temporary allocate memory for the computing the gradients";
+    return nullptr;
+  }
+
+  // vypocet gradientov pomocou metody centralnych diferencii
+  for (int k = 0; k < depth; ++k)
+  {
+    for (int j = 0; j < height; ++j)
+    {
+      for (int i = 0; i < width; ++i)
+      {
+        GLfloat grad_x = get(i - 1, j, k, 1, 0, p_intensity, width, height, depth) -
+                         get(i + 1, j, k, 1, 0, p_intensity, width, height, depth);
+        GLfloat grad_y = get(i, j - 1, k, 1, 0, p_intensity, width, height, depth) -
+                         get(i, j + 1, k, 1, 0, p_intensity, width, height, depth);
+        GLfloat grad_z = get(i, j, k - 1, 1, 0, p_intensity, width, height, depth) -
+                         get(i, j, k + 1, 1, 0, p_intensity, width, height, depth);
+
+        normalize(grad_x, grad_y, grad_z);
+
+        int idx = k * width * height + j * width + i;
+        p_tmp[idx * 4 + 0] = grad_x;
+        p_tmp[idx * 4 + 1] = grad_y;
+        p_tmp[idx * 4 + 2] = grad_z;
+        p_tmp[idx * 4 + 3] = p_intensity[idx] / 255.0f;
+      }
+    }
+  }
+
+  return p_tmp;
+}
+#else
+template<typename T>
+GLfloat *intensityToGradients(const T *p_intensity, const int width, const int height, const int depth)
+{
+  const int n = width * height * depth;
+
+
+  // alokacia pamate pre vysledne gradienty
+  GLfloat *p_rgba = (GLfloat *) malloc(sizeof(GLfloat) * n * 4);
+  if (p_rgba == nullptr)
+  {
+    qCritical() << "Failed to allocate memory for the conversion to gradients";
+    return nullptr;
+  }
+
+  // alokacia pomocnej docasnej pamate
+  GLfloat *p_tmp = (GLfloat *) malloc(sizeof(GLfloat) * n * 3);
+  if (p_tmp == nullptr)
+  {
+    free(p_rgba);
+    qCritical() << "Failed to temporary allocate memory for the computing the gradients";
+    return nullptr;
+  }
+
+  // vypocet gradientov pomocou metody centralnych diferencii
+  for (int k = 0; k < depth; ++k)
+  {
+    for (int j = 0; j < height; ++j)
+    {
+      for (int i = 0; i < width; ++i)
+      {
+        GLfloat grad_x = get(i - 1, j, k, 1, 0, p_intensity, width, height, depth) -
+                         get(i + 1, j, k, 1, 0, p_intensity, width, height, depth);
+        GLfloat grad_y = get(i, j - 1, k, 1, 0, p_intensity, width, height, depth) -
+                         get(i, j + 1, k, 1, 0, p_intensity, width, height, depth);
+        GLfloat grad_z = get(i, j, k - 1, 1, 0, p_intensity, width, height, depth) -
+                         get(i, j, k + 1, 1, 0, p_intensity, width, height, depth);
+
+        // tuto normalizaciu podla mna netreba robit,
+        // pretoze ju robim pri filtracii
+        //normalize(grad_x, grad_y, grad_z);
+
+        int idx = (k * width * height + j * width + i) * 3;
+        p_tmp[idx + 0] = grad_x;
+        p_tmp[idx + 1] = grad_y;
+        p_tmp[idx + 2] = grad_z;
+      }
+    }
+  }
+
+  // vyhladenie (spriemerovanie) vypocitanych gradientov
+  const int radius = 1;              // velkost okolia pre filtraciu
+  const int sample_cnt = 3 * 3 * 3;  // celkovy pocet pixlov vo filtrovanom okoli
+  for (int k = 0; k < depth; ++k)
+  {
+    for (int j = 0; j < height; ++j)
+    {
+      for (int i = 0; i < width; ++i)
+      {
+        GLfloat sum_x = 0.0f;
+        GLfloat sum_y = 0.0f;
+        GLfloat sum_z = 0.0f;
+
+        for (int kk = -radius; kk <= radius; ++kk)
+        {
+          for (int jj = -radius; jj < radius; ++jj)
+          {
+            for (int ii = -radius; ii < radius; ++ii)
+            {
+              sum_x += get(i + ii, j + jj, k + kk, 3, 0, p_tmp, width, height, depth);
+              sum_y += get(i + ii, j + jj, k + kk, 3, 1, p_tmp, width, height, depth);
+              sum_z += get(i + ii, j + jj, k + kk, 3, 2, p_tmp, width, height, depth);
+            }
+          }
+        }
+
+        sum_x = sum_x / ((GLfloat) sample_cnt);
+        sum_y = sum_y / ((GLfloat) sample_cnt);
+        sum_z = sum_z / ((GLfloat) sample_cnt);
+
+        normalize(sum_x, sum_y, sum_z);
+
+        int idx = k * width * height + j * width + i;
+        p_rgba[idx * 4 + 0] = sum_x;
+        p_rgba[idx * 4 + 1] = sum_y;
+        p_rgba[idx * 4 + 2] = sum_z;
+        p_rgba[idx * 4 + 3] = p_intensity[idx] / 255.0f;
+      }
+    }
+  }
+
+  free(p_tmp);
+
+  return p_rgba;
+}
+#endif
+
+
+
+
 } // End of private namespace
 
 
-bool VolumeData::toVolumeDataOGL(VolumeDataOGL & ogl_data) const
+bool VolumeData::toVolumeDataOGL(VolumeDataOGL & ogl_data, bool compute_gradients) const
 {
   // Konverzia z grayscale na rgba (kvoli opengl, lebo format moze byt len GL_RGBA)
-  uint8_t *p_rgba = nullptr;
+  GLvoid *p_rgba = nullptr;
   GLenum data_type = 0;
 
   if (m_bit_depth == 8)
   {
-    p_rgba = (uint8_t *) intensityToRGBA<uint8_t>((uint8_t *) m_data.get(), voxelCount());
-    data_type = GL_UNSIGNED_BYTE;
+    if (compute_gradients)
+    {
+      p_rgba = intensityToGradients<uint8_t>((uint8_t *) m_data.get(), m_width, m_height, m_depth);
+      data_type = GL_FLOAT;
+    }
+    else
+    {
+      p_rgba = intensityToRGBA<uint8_t>((uint8_t *) m_data.get(), voxelCount());
+      data_type = GL_UNSIGNED_BYTE;
+    }
   }
   else if (m_bit_depth == 16)
   {
-    p_rgba = (uint8_t *) intensityToRGBA<uint16_t>((uint16_t *) m_data.get(), voxelCount());
-    data_type = GL_UNSIGNED_SHORT;
+    if (compute_gradients)
+    {
+      p_rgba = intensityToGradients<uint16_t>((uint16_t *) m_data.get(), m_width, m_height, m_depth);
+      data_type = GL_FLOAT;
+    }
+    else
+    {
+      p_rgba = intensityToRGBA<uint16_t>((uint16_t *) m_data.get(), voxelCount());
+      data_type = GL_UNSIGNED_SHORT;
+    }
   }
   else
   {
@@ -199,7 +385,7 @@ bool VolumeData::toVolumeDataOGL(VolumeDataOGL & ogl_data) const
   if (p_rgba == nullptr)
   {
     qCritical() << "Failed to convert volume data to OpenGL texture."
-                   "Conversion from luminance to RGBA format failed";
+                   "Conversion from luminance to RGBA format/gradients failed";
     return false;
   }
 

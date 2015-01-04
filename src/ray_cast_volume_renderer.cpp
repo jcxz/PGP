@@ -209,10 +209,11 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   //OGLF->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   OGLF->glCullFace(GL_BACK);
 
+  float default_step = 1.0f / float(m_data.maxSize());
   float step;
 
   if (detail <= 0)
-    step = 1.0f / float(m_data.maxSize());
+    step = default_step;
   else
     step = 1.0f / float(detail);
 
@@ -222,10 +223,26 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   m_prog_ray_cast.setUniformValue("mvp", m_proj * mv);
   m_prog_ray_cast.setUniformValue("step", step);
   m_prog_ray_cast.setUniformValue("offset", peel_depth);
+  m_prog_ray_cast.setUniformValue("alpha_correction_factor", step / default_step);
   m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
   m_prog_ray_cast.setUniformValue("tex_back_faces", 1);
   m_prog_ray_cast.setUniformValue("tex_volume_data", 2);
   m_prog_ray_cast.setUniformValue("use_tf", m_use_transfer_func);
+
+  if (m_use_lighting)
+  {
+    qDebug() << "Using lighting";
+
+    //m_prog_ray_cast.setUniformValue("La", QVector3D(1.0f, 1.0f, 1.0f));
+    //m_prog_ray_cast.setUniformValue("Ld", QVector3D(1.0f, 1.0f, 1.0f));
+
+    //m_prog_ray_cast.setUniformValue("La", QVector3D(0.2f, 0.2f, 0.2f));
+    m_prog_ray_cast.setUniformValue("La", QVector3D(0.5f, 0.5f, 0.5f));
+    m_prog_ray_cast.setUniformValue("Ld", QVector3D(0.8f, 0.8f, 0.8f));
+    //m_prog_ray_cast.setUniformValue("light_pos", QVector3D(0.0f, 2.0f, 2.0f));
+    //m_prog_ray_cast.setUniformValue("light_pos", QVector3D(0.0f, 0.0f, -3.5f));
+    m_prog_ray_cast.setUniformValue("light_pos", QVector3D(3.0f, 0.0f, 0.0f));
+  }
 
   OGLF->glEnable(GL_DEPTH_TEST);
   OGLF->glDrawElements(GL_TRIANGLES, g_cube_indices_cnt, GL_UNSIGNED_INT, nullptr);

@@ -98,7 +98,7 @@ class VolumeData : public VolumeDataBase
     bool loadFromPVM(const QString & filename);
     bool loadFromRaw(const QString & filename, int width, int height, int depth, int bit_depth);
 
-    bool toVolumeDataOGL(VolumeDataOGL & ogl_data) const;
+    bool toVolumeDataOGL(VolumeDataOGL & ogl_data, bool compute_gradients = false) const;
 
     // returns a list of extensions for supported volumetric file formats
     // The entries in the returned list do not include the leading '.'
