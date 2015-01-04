@@ -253,11 +253,6 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
 #else
   if (m_use_lighting)
   {
-    qDebug() << __PRETTY_FUNCTION__ << ": using lighting";
-    qDebug() << "light pos:" << m_light_pos;
-    qDebug() << "ambient color:" << m_light_ambient_col;
-    qDebug() << "diffuse color:" << m_light_diffuse_col;
-
     m_prog_ray_cast.setUniformValue("La", m_light_ambient_col);
     m_prog_ray_cast.setUniformValue("Ld", m_light_diffuse_col);
     m_prog_ray_cast.setUniformValue("light_pos", m_light_pos);

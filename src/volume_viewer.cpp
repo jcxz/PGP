@@ -129,7 +129,6 @@ void VolumeViewer::setUseTransferFunction(bool enabled)
 
 void VolumeViewer::setUseShading(bool enabled)
 {
-  qDebug() << __PRETTY_FUNCTION__;
   m_use_shading = enabled;
   m_volume_data_changed = true;   // treba prepocitat gradienty
   update();
@@ -209,7 +208,6 @@ void VolumeViewer::paintGL(void)
   // nastavenie volumetrickych dat
   if (m_volume_data_changed)
   {
-    qDebug() << "recomputing vsolume data and shading is " << m_use_shading;
     if ((m_volume_data != nullptr) && (!m_renderer->setVolumeData(*m_volume_data)))
     {
       emit error(tr("Failed to upload volume data to OpenGL"));
