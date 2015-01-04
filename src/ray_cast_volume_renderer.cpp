@@ -217,14 +217,14 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   else
     step = 1.0f / float(detail);
 
-  qDebug() << "step=" << step;
+  qDebug() << "step=" << step << ", default_step=" << default_step << ", correction factor=" << (step / default_step);
 
   m_prog_ray_cast.bind();
   m_prog_ray_cast.setUniformValue("mvp", m_proj * mv);
   m_prog_ray_cast.setUniformValue("step", step);
   m_prog_ray_cast.setUniformValue("offset", peel_depth);
   m_prog_ray_cast.setUniformValue("alpha_correction_factor", step / default_step);
-  //m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
+  m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
   m_prog_ray_cast.setUniformValue("tex_back_faces", 1);
   m_prog_ray_cast.setUniformValue("tex_volume_data", 2);
   //m_prog_ray_cast.setUniformValue("use_tf", m_use_transfer_func);
@@ -261,7 +261,7 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   else if (m_use_transfer_func)
   {
     m_prog_ray_cast.setUniformValue("method", 2);
-    m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
+    //m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
   }
   else
   {
