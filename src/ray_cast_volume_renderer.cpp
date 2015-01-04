@@ -224,10 +224,10 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   m_prog_ray_cast.setUniformValue("step", step);
   m_prog_ray_cast.setUniformValue("offset", peel_depth);
   m_prog_ray_cast.setUniformValue("alpha_correction_factor", step / default_step);
-  m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
+  //m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
   m_prog_ray_cast.setUniformValue("tex_back_faces", 1);
   m_prog_ray_cast.setUniformValue("tex_volume_data", 2);
-  m_prog_ray_cast.setUniformValue("use_tf", m_use_transfer_func);
+  //m_prog_ray_cast.setUniformValue("use_tf", m_use_transfer_func);
 
 #if 0
   if (m_use_lighting)
@@ -251,11 +251,21 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
     //m_prog_ray_cast.setUniformValue("light_pos", QVector3D(0.0f, 5.0f, 2.5f));
   }
 #else
-  if (m_use_lighting)
+  if (m_use_lighting && m_use_transfer_func)
   {
+    m_prog_ray_cast.setUniformValue("method", 1);
     m_prog_ray_cast.setUniformValue("La", m_light_ambient_col);
     m_prog_ray_cast.setUniformValue("Ld", m_light_diffuse_col);
     m_prog_ray_cast.setUniformValue("light_pos", m_light_pos);
+  }
+  else if (m_use_transfer_func)
+  {
+    m_prog_ray_cast.setUniformValue("method", 2);
+    m_prog_ray_cast.setUniformValue("tex_transfer_func", 0);
+  }
+  else
+  {
+    m_prog_ray_cast.setUniformValue("method", 3);
   }
 #endif
 
