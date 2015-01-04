@@ -20,8 +20,10 @@ class VolumeRenderer
       , m_data()
       , m_transfer_func(QOpenGLTexture::Target1D)
       , m_use_transfer_func(false)
-      , m_use_lighting(true) //(false)
+      , m_use_lighting(false)
       , m_light_pos(QVector3D(0.0f, 1.0f, 1.0f))
+      , m_light_ambient_col(QVector3D(0.0f, 0.0f, 0.0f))
+      , m_light_diffuse_col(QVector3D(0.0f, 0.0f, 0.0f))
       , m_max_texture_size(0)
       , m_prog_bbox()
       , m_render_bbox(true)
@@ -33,6 +35,9 @@ class VolumeRenderer
     void setRenderBBox(bool enabled) { m_render_bbox = enabled; }
     void setUseTransferFunction(bool enabled) { m_use_transfer_func = enabled; }
     void setUseLighting(bool enabled) { m_use_lighting = enabled; }
+    void setLightPosition(const QVector3D & light_pos) { m_light_pos = light_pos; }
+    void setLightAmbientColor(const QVector3D & ambient_col) { m_light_ambient_col = ambient_col; }
+    void setLightDiffuseColor(const QVector3D & diffuse_col) { m_light_diffuse_col = diffuse_col; }
 
     void setProjection(const QMatrix4x4 & proj) { m_proj = proj; }
     void setPerspectiveProjection(int width, int height)
@@ -76,6 +81,8 @@ class VolumeRenderer
     bool m_use_transfer_func;
     bool m_use_lighting;
     QVector3D m_light_pos;
+    QVector3D m_light_ambient_col;
+    QVector3D m_light_diffuse_col;
 
   private:
     int m_max_texture_size;

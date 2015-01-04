@@ -229,6 +229,7 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
   m_prog_ray_cast.setUniformValue("tex_volume_data", 2);
   m_prog_ray_cast.setUniformValue("use_tf", m_use_transfer_func);
 
+#if 0
   if (m_use_lighting)
   {
     qDebug() << "Using lighting";
@@ -249,6 +250,19 @@ void RayCastVolumeRenderer::render_impl(const QQuaternion & rotation,
     //m_prog_ray_cast.setUniformValue("light_pos", QVector3D(0.0f, 2.5f, 2.5f));
     //m_prog_ray_cast.setUniformValue("light_pos", QVector3D(0.0f, 5.0f, 2.5f));
   }
+#else
+  if (m_use_lighting)
+  {
+    qDebug() << __PRETTY_FUNCTION__ << ": using lighting";
+    qDebug() << "light pos:" << m_light_pos;
+    qDebug() << "ambient color:" << m_light_ambient_col;
+    qDebug() << "diffuse color:" << m_light_diffuse_col;
+
+    m_prog_ray_cast.setUniformValue("La", m_light_ambient_col);
+    m_prog_ray_cast.setUniformValue("Ld", m_light_diffuse_col);
+    m_prog_ray_cast.setUniformValue("light_pos", m_light_pos);
+  }
+#endif
 
   OGLF->glEnable(GL_DEPTH_TEST);
   OGLF->glDrawElements(GL_TRIANGLES, g_cube_indices_cnt, GL_UNSIGNED_INT, nullptr);

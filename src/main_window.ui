@@ -195,6 +195,9 @@
               <property name="singleStep">
                <double>0.250000000000000</double>
               </property>
+              <property name="value">
+               <double>-3.000000000000000</double>
+              </property>
              </widget>
             </item>
             <item row="0" column="2">
@@ -209,7 +212,7 @@
                <double>0.250000000000000</double>
               </property>
               <property name="value">
-               <double>3.000000000000000</double>
+               <double>-3.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -223,6 +226,9 @@
               </property>
               <property name="singleStep">
                <double>0.250000000000000</double>
+              </property>
+              <property name="value">
+               <double>-3.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -241,6 +247,9 @@
               <property name="singleStep">
                <double>0.100000000000000</double>
               </property>
+              <property name="value">
+               <double>0.800000000000000</double>
+              </property>
              </widget>
             </item>
             <item row="1" column="2">
@@ -251,6 +260,9 @@
               <property name="singleStep">
                <double>0.100000000000000</double>
               </property>
+              <property name="value">
+               <double>0.800000000000000</double>
+              </property>
              </widget>
             </item>
             <item row="1" column="3">
@@ -260,6 +272,9 @@
               </property>
               <property name="singleStep">
                <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.800000000000000</double>
               </property>
              </widget>
             </item>
@@ -696,17 +711,161 @@
   </connection>
   <connection>
    <sender>gbOptionsShading</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>volumeViewer</receiver>
-   <slot>setUseShading(bool)</slot>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleShadingSwitch()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>751</x>
      <y>483</y>
     </hint>
     <hint type="destinationlabel">
-     <x>300</x>
-     <y>316</y>
+     <x>492</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbOptionsShadingLightPositionX</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLightPositionChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>804</x>
+     <y>411</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbOptionsShadingLightPositionY</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLightPositionChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>865</x>
+     <y>411</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbOptionsShadingLightPositionZ</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLightPositionChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>926</x>
+     <y>411</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbOptionsShadingAmbientColorR</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLightAmbientColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>804</x>
+     <y>463</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbOptionsShadingAmbientColorG</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLightAmbientColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>865</x>
+     <y>463</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbOptionsShadingAmbientColorB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLightAmbientColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>926</x>
+     <y>463</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbOptionsShadingDiffuseColorR</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLightDiffuseColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>804</x>
+     <y>437</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbOptionsShadingDiffuseColorG</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLightDiffuseColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>865</x>
+     <y>437</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbOptionsShadingDiffuseColorB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleLightDiffuseColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>926</x>
+     <y>437</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>312</y>
     </hint>
    </hints>
   </connection>
@@ -719,5 +878,9 @@
   <slot>handleAutoSubsamplingChange()</slot>
   <slot>handleRendererSwitch()</slot>
   <slot>handleDetailChange()</slot>
+  <slot>handleShadingSwitch()</slot>
+  <slot>handleLightPositionChange()</slot>
+  <slot>handleLightAmbientColorChange()</slot>
+  <slot>handleLightDiffuseColorChange()</slot>
  </slots>
 </ui>

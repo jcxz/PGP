@@ -250,6 +250,48 @@ void MainWindow::handleSampleModelSwitch(void)
 }
 
 
+void MainWindow::handleShadingSwitch(void)
+{
+  qDebug() << __PRETTY_FUNCTION__;
+
+  if (ui->gbOptionsShading->isChecked())
+  {
+    ui->volumeViewer->setUseShading(true);
+    handleLightPositionChange();
+    handleLightAmbientColorChange();
+    handleLightDiffuseColorChange();
+  }
+  else
+  {
+    ui->volumeViewer->setUseShading(false);
+  }
+}
+
+
+void MainWindow::handleLightPositionChange(void)
+{
+  ui->volumeViewer->setLightPosition(QVector3D(ui->sbOptionsShadingLightPositionX->value(),
+                                               ui->sbOptionsShadingLightPositionY->value(),
+                                               ui->sbOptionsShadingLightPositionZ->value()));
+}
+
+
+void MainWindow::handleLightAmbientColorChange(void)
+{
+  ui->volumeViewer->setLightAmbientColor(QVector3D(ui->sbOptionsShadingAmbientColorR->value(),
+                                                   ui->sbOptionsShadingAmbientColorG->value(),
+                                                   ui->sbOptionsShadingAmbientColorB->value()));
+}
+
+
+void MainWindow::handleLightDiffuseColorChange(void)
+{
+  ui->volumeViewer->setLightDiffuseColor(QVector3D(ui->sbOptionsShadingDiffuseColorR->value(),
+                                                   ui->sbOptionsShadingDiffuseColorG->value(),
+                                                   ui->sbOptionsShadingDiffuseColorB->value()));
+}
+
+
 void MainWindow::showEvent(QShowEvent *event)
 {
   // nastavenie defaultnych dat a transfer funkcie

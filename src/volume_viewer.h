@@ -48,6 +48,9 @@ class VolumeViewer : public QOpenGLWidget
       , m_display_bbox(true)
       , m_use_tf(false)
       , m_use_shading(true)
+      , m_light_pos()
+      , m_light_ambient_col()
+      , m_light_diffuse_col()
       , m_auto_subsampling(true)
       , m_logger()
     {
@@ -77,6 +80,9 @@ class VolumeViewer : public QOpenGLWidget
     void setDisplayBBox(bool enabled);
     void setUseTransferFunction(bool enabled);
     void setUseShading(bool enabled);
+    void setLightPosition(const QVector3D & light_pos);
+    void setLightAmbientColor(const QVector3D & ambient_col);
+    void setLightDiffuseColor(const QVector3D & diffuse_col);
 
   protected:
     virtual void initializeGL(void) override;
@@ -118,6 +124,9 @@ class VolumeViewer : public QOpenGLWidget
     bool m_display_bbox;
     bool m_use_tf;
     bool m_use_shading;
+    QVector3D m_light_pos;
+    QVector3D m_light_ambient_col;
+    QVector3D m_light_diffuse_col;
 
     // options
     bool m_auto_subsampling;

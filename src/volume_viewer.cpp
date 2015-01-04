@@ -129,7 +129,30 @@ void VolumeViewer::setUseTransferFunction(bool enabled)
 
 void VolumeViewer::setUseShading(bool enabled)
 {
+  qDebug() << __PRETTY_FUNCTION__;
   m_use_shading = enabled;
+  m_volume_data_changed = true;   // treba prepocitat gradienty
+  update();
+}
+
+
+void VolumeViewer::setLightPosition(const QVector3D & light_pos)
+{
+  m_light_pos = light_pos;
+  update();
+}
+
+
+void VolumeViewer::setLightAmbientColor(const QVector3D & ambient_col)
+{
+  m_light_ambient_col = ambient_col;
+  update();
+}
+
+
+void VolumeViewer::setLightDiffuseColor(const QVector3D & diffuse_col)
+{
+  m_light_diffuse_col = diffuse_col;
   update();
 }
 
@@ -179,10 +202,14 @@ void VolumeViewer::paintGL(void)
   m_renderer->setRenderBBox(m_display_bbox);
   m_renderer->setUseTransferFunction(m_use_tf);
   m_renderer->setUseLighting(m_use_shading);
+  m_renderer->setLightPosition(m_light_pos);
+  m_renderer->setLightAmbientColor(m_light_ambient_col);
+  m_renderer->setLightDiffuseColor(m_light_diffuse_col);
 
   // nastavenie volumetrickych dat
   if (m_volume_data_changed)
   {
+    qDebug() << "recomputing vsolume data and shading is " << m_use_shading;
     if ((m_volume_data != nullptr) && (!m_renderer->setVolumeData(*m_volume_data)))
     {
       emit error(tr("Failed to upload volume data to OpenGL"));

@@ -30,6 +30,10 @@ class MainWindow : public QMainWindow
     void handleDetailChange(void);
     void handleTFPresetSwitch(void);
     void handleSampleModelSwitch(void);
+    void handleShadingSwitch(void);
+    void handleLightPositionChange(void);
+    void handleLightAmbientColorChange(void);
+    void handleLightDiffuseColorChange(void);
 
   protected:
     virtual void showEvent(QShowEvent *event) override;
