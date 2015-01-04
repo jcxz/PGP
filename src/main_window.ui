@@ -6,240 +6,385 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>916</width>
-    <height>681</height>
+    <width>986</width>
+    <height>626</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
       <item>
        <widget class="VolumeViewer" name="volumeViewer" native="true"/>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,0,0">
-        <item>
-         <widget class="QPushButton" name="pbLoadModel">
-          <property name="text">
-           <string>Load Model</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbLoadTF">
-          <property name="text">
-           <string>Load Transfer Function</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbSaveTF">
-          <property name="text">
-           <string>Save Transfer Function</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbDumpTF">
-          <property name="text">
-           <string>Dump Transfer Function</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbToggleRenderer">
-          <property name="text">
-           <string>Toggle Renderer</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="gbSampleModels">
-          <property name="title">
-           <string>Sample Models</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_7">
-           <item>
-            <widget class="QComboBox" name="cbSampleModels"/>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="gbTransferFunctionPresets">
-          <property name="toolTip">
-           <string>Provides a collection of ready-made transfer functions</string>
-          </property>
-          <property name="title">
-           <string>Transfer Function Presets</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
-           <item>
-            <widget class="QComboBox" name="cbTransferFunctionPresets"/>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="gbOptions">
-          <property name="toolTip">
-           <string>Enables to tweak the rendering</string>
-          </property>
-          <property name="title">
-           <string>Options</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
-           <item>
-            <widget class="QGroupBox" name="gbOptionsCustomDetail">
-             <property name="toolTip">
-              <string>If checked then the level of detail will be determined automatically, otherwise a user provided value will be used</string>
-             </property>
-             <property name="title">
-              <string>Custom Detail</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_2">
-                <item>
-                 <widget class="QLabel" name="lblOptionsCustomDetailLevel">
-                  <property name="text">
-                   <string>Level:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSlider" name="sliderOptionsCustomDetailLevel">
-                  <property name="minimum">
-                   <number>1</number>
-                  </property>
-                  <property name="maximum">
-                   <number>5000</number>
-                  </property>
-                  <property name="value">
-                   <number>300</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="cbOptionsAutoSubsampling">
-             <property name="toolTip">
-              <string>Enables or disables rendering in low quality during manipulation with data.</string>
-             </property>
-             <property name="text">
-              <string>Automatic Subsampling</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="cbOptionsDisplayBBox">
-             <property name="toolTip">
-              <string>Enables or disables displaying the red bounding box around the rendered image.</string>
-             </property>
-             <property name="text">
-              <string>Display Bounding Box</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="rbOptionsTextureRenderer">
-             <property name="toolTip">
-              <string>Switches to rendering engine that uses the texturing algorithm</string>
-             </property>
-             <property name="text">
-              <string>Texture Based Renderer</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="rbOptionsRayCastingRenderer">
-             <property name="toolTip">
-              <string>Switches to rendering engine that uses the ray casting algorithm</string>
-             </property>
-             <property name="text">
-              <string>Ray Casting Based Renderer</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-          <zorder>verticalSpacer</zorder>
-          <zorder>cbOptionsAutoSubsampling</zorder>
-          <zorder>rbOptionsTextureRenderer</zorder>
-          <zorder>rbOptionsRayCastingRenderer</zorder>
-          <zorder>cbOptionsDisplayBBox</zorder>
-          <zorder>gbOptionsCustomDetail</zorder>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QGroupBox" name="gbTransferFunctionEditor">
+        <property name="toolTip">
+         <string>Enables or disables the use of transfer function</string>
+        </property>
+        <property name="title">
+         <string>Transfer Function</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="TransferFunctionEditor" name="transferFuncEditor" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>125</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Provides means to modify the transfer function</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QGroupBox" name="gbTransferFunctionEditor">
-      <property name="toolTip">
-       <string>Enables or disables the use of transfer function</string>
-      </property>
-      <property name="title">
-       <string>Transfer Function</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <item>
-        <widget class="TransferFunctionEditor" name="transferFuncEditor" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>125</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Provides means to modify the transfer function</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,0,0">
+      <item>
+       <widget class="QPushButton" name="pbLoadModel">
+        <property name="text">
+         <string>Load Model</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbLoadTF">
+        <property name="text">
+         <string>Load Transfer Function</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbSaveTF">
+        <property name="text">
+         <string>Save Transfer Function</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbDumpTF">
+        <property name="text">
+         <string>Dump Transfer Function</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbToggleRenderer">
+        <property name="text">
+         <string>Toggle Renderer</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="gbSampleModels">
+        <property name="title">
+         <string>Sample Models</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="QComboBox" name="cbSampleModels"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="gbTransferFunctionPresets">
+        <property name="toolTip">
+         <string>Provides a collection of ready-made transfer functions</string>
+        </property>
+        <property name="title">
+         <string>Transfer Function Presets</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QComboBox" name="cbTransferFunctionPresets"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="gbOptions">
+        <property name="toolTip">
+         <string>Enables to tweak the rendering</string>
+        </property>
+        <property name="title">
+         <string>Options</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="QGroupBox" name="gbOptionsCustomDetail">
+           <property name="toolTip">
+            <string>If checked then the level of detail will be determined automatically, otherwise a user provided value will be used</string>
+           </property>
+           <property name="title">
+            <string>Custom Detail</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QLabel" name="lblOptionsCustomDetailLevel">
+                <property name="text">
+                 <string>Level:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="sliderOptionsCustomDetailLevel">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>5000</number>
+                </property>
+                <property name="value">
+                 <number>300</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="gbOptionsShading">
+           <property name="title">
+            <string>Shading</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="lblOptionsShadingLightPosition">
+              <property name="text">
+               <string>Light Position:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="sbOptionsShadingLightPositionX">
+              <property name="minimum">
+               <double>-5.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>5.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.250000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QDoubleSpinBox" name="sbOptionsShadingLightPositionY">
+              <property name="minimum">
+               <double>-5.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>5.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.250000000000000</double>
+              </property>
+              <property name="value">
+               <double>3.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QDoubleSpinBox" name="sbOptionsShadingLightPositionZ">
+              <property name="minimum">
+               <double>-5.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>5.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.250000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="lblOptionsShadingDiffuseColor">
+              <property name="text">
+               <string>Diffuse Color:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QDoubleSpinBox" name="sbOptionsShadingDiffuseColorR">
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QDoubleSpinBox" name="sbOptionsShadingDiffuseColorG">
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QDoubleSpinBox" name="sbOptionsShadingDiffuseColorB">
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="lblOptionsShadingAmbientColor">
+              <property name="text">
+               <string>Ambient Color:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QDoubleSpinBox" name="sbOptionsShadingAmbientColorR">
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.200000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QDoubleSpinBox" name="sbOptionsShadingAmbientColorG">
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.200000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3">
+             <widget class="QDoubleSpinBox" name="sbOptionsShadingAmbientColorB">
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.200000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbOptionsAutoSubsampling">
+           <property name="toolTip">
+            <string>Enables or disables rendering in low quality during manipulation with data.</string>
+           </property>
+           <property name="text">
+            <string>Automatic Subsampling</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbOptionsDisplayBBox">
+           <property name="toolTip">
+            <string>Enables or disables displaying the red bounding box around the rendered image.</string>
+           </property>
+           <property name="text">
+            <string>Display Bounding Box</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbOptionsTextureRenderer">
+           <property name="toolTip">
+            <string>Switches to rendering engine that uses the texturing algorithm</string>
+           </property>
+           <property name="text">
+            <string>Texture Based Renderer</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbOptionsRayCastingRenderer">
+           <property name="toolTip">
+            <string>Switches to rendering engine that uses the ray casting algorithm</string>
+           </property>
+           <property name="text">
+            <string>Ray Casting Based Renderer</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+        <zorder>verticalSpacer</zorder>
+        <zorder>cbOptionsAutoSubsampling</zorder>
+        <zorder>rbOptionsTextureRenderer</zorder>
+        <zorder>rbOptionsRayCastingRenderer</zorder>
+        <zorder>cbOptionsDisplayBBox</zorder>
+        <zorder>gbOptionsCustomDetail</zorder>
+        <zorder>gbOptionsShading</zorder>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -248,7 +393,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>916</width>
+     <width>986</width>
      <height>18</height>
     </rect>
    </property>
@@ -297,6 +442,7 @@
     <slot>toggleRenderer()</slot>
     <slot>setDisplayBBox(bool)</slot>
     <slot>setUseTransferFunction(bool)</slot>
+    <slot>setUseShading(bool)</slot>
    </slots>
   </customwidget>
   <customwidget>
@@ -545,6 +691,22 @@
     <hint type="destinationlabel">
      <x>361</x>
      <y>226</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>gbOptionsShading</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>volumeViewer</receiver>
+   <slot>setUseShading(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>751</x>
+     <y>483</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>300</x>
+     <y>316</y>
     </hint>
    </hints>
   </connection>

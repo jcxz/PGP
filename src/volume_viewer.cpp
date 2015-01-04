@@ -127,6 +127,13 @@ void VolumeViewer::setUseTransferFunction(bool enabled)
 }
 
 
+void VolumeViewer::setUseShading(bool enabled)
+{
+  m_use_shading = enabled;
+  update();
+}
+
+
 void VolumeViewer::initializeGL(void)
 {
   qDebug() << __PRETTY_FUNCTION__;
@@ -171,6 +178,7 @@ void VolumeViewer::paintGL(void)
   // nastavenie properties rendereru, ktore sa mozu menit kazdy frame
   m_renderer->setRenderBBox(m_display_bbox);
   m_renderer->setUseTransferFunction(m_use_tf);
+  m_renderer->setUseLighting(m_use_shading);
 
   // nastavenie volumetrickych dat
   if (m_volume_data_changed)

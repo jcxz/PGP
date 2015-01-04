@@ -47,6 +47,7 @@ class VolumeViewer : public QOpenGLWidget
       , m_detail(0)
       , m_display_bbox(true)
       , m_use_tf(false)
+      , m_use_shading(true)
       , m_auto_subsampling(true)
       , m_logger()
     {
@@ -75,6 +76,7 @@ class VolumeViewer : public QOpenGLWidget
     void setLowQuality(void);
     void setDisplayBBox(bool enabled);
     void setUseTransferFunction(bool enabled);
+    void setUseShading(bool enabled);
 
   protected:
     virtual void initializeGL(void) override;
@@ -115,6 +117,7 @@ class VolumeViewer : public QOpenGLWidget
     int m_detail;
     bool m_display_bbox;
     bool m_use_tf;
+    bool m_use_shading;
 
     // options
     bool m_auto_subsampling;
