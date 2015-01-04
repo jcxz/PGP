@@ -1,7 +1,6 @@
 #version 330
 
-#define RAYCASTING_DIFFUSE_BACK_TO_FRONT3
-//#define RAYCASTING_DIFFUSE
+#define RAYCASTING_DIFFUSE
 //#define RAYCASTING
 //#define DISPLAY_ENTRY_POINTS
 //#define DISPLAY_EXIT_POINTS
@@ -34,11 +33,11 @@ uniform vec3 light_pos;  // pozicia svetla v scene
 
 
 
-#ifdef RAYCASTING_DIFFUSE_BACK_TO_FRONT3
+#ifdef RAYCASTING_DIFFUSE
 void main(void)
 {
-  vec3 pos = ray_coords.xyz;
-  vec3 exit_point = texture2D(tex_back_faces, (tex_coords.xy / tex_coords.w) * 0.5f + 0.5f).xyz;
+  vec3 pos = ray_coords.xyz;// * 2.0f - 1.0f;
+  vec3 exit_point = texture2D(tex_back_faces, (tex_coords.xy / tex_coords.w) * 0.5f + 0.5f).xyz;// * 2.0f - 1.0f;
   vec3 dir = (exit_point - pos);
 
   pos += dir * offset;
@@ -53,7 +52,8 @@ void main(void)
 
     // vypocet difuzneho osvetlovacieho modelu
     vec3 L = normalize(light_pos - pos);
-    vec3 N = 2.0f * tex_c.xyz - 1.0f;
+    vec3 N = 2.0f * tex_c.xyz - 1.0f;      // prevod normaly do objecty space modelu (pretoze suradnice v OpenGL texture su v rozsahu <0, 1>)
+    //vec3 N = tex_c.xyz - 0.5f;
     vec3 cd = La * c.rgb + Ld * c.rgb * max(dot(N, L), 0.0f);
 
     // korekcia opacity
@@ -64,61 +64,7 @@ void main(void)
     accum = (1.0f - accum.a) * c + accum;
 
     //break from the loop when alpha gets high enough
-    if (accum.a >= .95f) break;
-
-    pos += dir;
-
-    // vyskoc z cyklu ak je niektora zo suradnic uz mimo bounding volume
-    if (pos.x > 1.0f || pos.y > 1.0f || pos.z > 1.0f) break;
-  }
-
-  frag_color = accum;
-}
-#endif
-
-
-
-#ifdef RAYCASTING_DIFFUSE
-void main(void)
-{
-  vec3 pos = ray_coords.xyz;
-  vec3 exit_point = texture2D(tex_back_faces, (tex_coords.xy / tex_coords.w) * 0.5f + 0.5f).xyz;
-  vec3 dir = (exit_point - pos);
-
-  pos += dir * offset;
-  dir *= step;
-
-  vec4 accum = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-
-  for (float t = offset; t < 1.0f; t += step)
-  {
-    vec4 tex_c = texture3D(tex_volume_data, pos);
-    vec4 c = texture1D(tex_transfer_func, tex_c.a);
-
-    // vypocet difuzneho osvetlovacieho modelu
-#if 0
-    //vec3 L = light_pos;
-    vec3 L = normalize(light_pos - pos);
-    //vec3 L = (light_pos - pos);
-    //vec3 N = normalize(tex_c.xyz);
-    vec3 N = tex_c.xyz;
-    //vec3 cd = La * c.rgb + Ld * c.rgb * max(dot(N, L), 0.0f);
-    vec3 cd = La * c.rgb + Ld * c.rgb * dot(N, L);
-    //vec3 cd = La * c.rgb + Ld * c.rgb * dot(N, L);
-#else
-    vec3 L = normalize(light_pos - pos);
-    vec3 N = tex_c.xyz;
-    vec3 cd = La * c.rgb + Ld * c.rgb * max(dot(N, L), 0.0f);
-#endif
-
-    // korekcia opacity
-    c.a = 1.0f - pow(1.0f - c.a, alpha_correction_factor);
-
-    c.rgb = cd * c.a;
-    accum = (1.0f - accum.a) * c + accum;
-
-    //break from the loop when alpha gets high enough
-    if (accum.a >= .95f) break;
+    if (accum.a >= 0.95f) break;
 
     pos += dir;
 
