@@ -252,8 +252,6 @@ void MainWindow::handleSampleModelSwitch(void)
 
 void MainWindow::handleShadingSwitch(void)
 {
-  qDebug() << __PRETTY_FUNCTION__;
-
   if (ui->gbOptionsShading->isChecked())
   {
     ui->volumeViewer->setUseShading(true);
@@ -303,6 +301,8 @@ void MainWindow::showEvent(QShowEvent *event)
   //ui->volumeViewer->setAutoSubsampling(ui->cbOptionsAutoSubsampling->isChecked());
   //ui->volumeViewer->setDisplayBBox(ui->cbOptionsDisplayBBox->isChecked());
   ui->volumeViewer->setUseTransferFunction(ui->gbTransferFunctionEditor->isChecked());
+
+  handleShadingSwitch();
 
   return QMainWindow::showEvent(event);
 }
