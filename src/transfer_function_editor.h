@@ -72,6 +72,8 @@ class TransferFunctionEditor : public QWidget
                     (1.0f - pt.y()) * (height() - INNER_PADDING_Y) + INNER_PADDING_TOP);
     }
 
+    void setTCPColor(int idx);
+
   private:
     void drawGrid(QPainter & painter, int w, int h);
 

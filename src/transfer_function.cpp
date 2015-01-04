@@ -71,9 +71,9 @@ void TransferFunction::setTCPPosition(int idx, QPointF pos)
   //  return;
   //}
 
-  TransferControlPoint & pt_prev = getTCP(idx - 1);
-  TransferControlPoint & pt = getTCP(idx);
-  TransferControlPoint & pt_next = getTCP(idx + 1);
+  TransferControlPoint & pt_prev = tcp(idx - 1);
+  TransferControlPoint & pt = tcp(idx);
+  TransferControlPoint & pt_next = tcp(idx + 1);
 
   if (pos.y() > 1.0f) pos.setY(1.0f);
   if (pos.y() < 0.0f) pos.setY(0.0f);

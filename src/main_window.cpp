@@ -40,6 +40,16 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->sliderOptionsCustomDetailLevel, SIGNAL(sliderPressed()), ui->volumeViewer, SLOT(setLowQuality()));
   connect(ui->sliderOptionsCustomDetailLevel, SIGNAL(valueChanged(int)), ui->volumeViewer, SLOT(setDetail(int)));
   connect(ui->sliderOptionsCustomDetailLevel, SIGNAL(sliderReleased()), ui->volumeViewer, SLOT(setHighQuality()));
+
+  // create a list of transfer function presets and sample models
+  ui->cbTransferFunctionPresets->addItem(tr("Woman"), 0);
+  ui->cbTransferFunctionPresets->addItem(tr("Male"), 1);
+  connect(ui->cbTransferFunctionPresets, SIGNAL(currentIndexChanged(int)), SLOT(handleTFPresetSwitch()));
+
+  // QPoint tu pouzivam ako QPair, prve cislo je id modelu a druhe je id transfer funkcie
+  ui->cbSampleModels->addItem(tr("Woman"), QPoint(0, 0));
+  ui->cbSampleModels->addItem(tr("Male"), QPoint(1, 1));
+  connect(ui->cbSampleModels, SIGNAL(currentIndexChanged(int)), SLOT(handleSampleModelSwitch()));
 }
 
 
@@ -135,7 +145,7 @@ void MainWindow::setTransferFunctionPreset(int preset_id)
 {
   switch (preset_id)
   {
-    case 1:
+    case 0:  // Transfer Function preset for 'woman' data set
       m_transfer_func.clear();
       m_transfer_func.addTCP(QPointF(0.05859375f, 0.00f), QColor(Qt::red));
       m_transfer_func.addTCP(QPointF(0.19531250f, 0.05f), QColor(Qt::green));
@@ -144,9 +154,37 @@ void MainWindow::setTransferFunctionPreset(int preset_id)
       m_transfer_func.addTCP(QPointF(0.78125000f, 0.06f), QColor(Qt::magenta));
       m_transfer_func.addTCP(QPointF(1.00000000f, 0.50f), QColor(Qt::cyan));
       break;
+
+    case 1:  // Transfer Function preset for 'Male' data set
+      m_transfer_func.clear();
+      m_transfer_func.addTCP(QPointF(0.00000000f, 0.00f), QColor::fromRgbF(0.91f, 0.70f, 0.61f));
+      m_transfer_func.addTCP(QPointF(0.15625000f, 0.00f), QColor::fromRgbF(0.91f, 0.70f, 0.61f));
+      m_transfer_func.addTCP(QPointF(0.23437500f, 0.20f), QColor::fromRgbF(0.91f, 0.70f, 0.61f));
+      m_transfer_func.addTCP(QPointF(0.24609375f, 0.05f), QColor::fromRgbF(0.91f, 0.70f, 0.61f));
+      m_transfer_func.addTCP(QPointF(0.31250000f, 0.00f), QColor::fromRgbF(0.91f, 0.70f, 0.61f));
+      m_transfer_func.addTCP(QPointF(0.32031250f, 0.90f), QColor::fromRgbF(1.00f, 1.00f, 0.85f));
+      m_transfer_func.addTCP(QPointF(1.00000000f, 1.00f), QColor::fromRgbF(1.00f, 1.00f, 0.85f));
+      break;
   }
 
   ui->transferFuncEditor->setTransferFunction(&m_transfer_func);
+}
+
+
+void MainWindow::setSampleModel(int model_id)
+{
+  switch (model_id)
+  {
+    case 0:
+      setRawVolumeFile(":/data/head_256x256x109_8bit_1-0x1-0x1-5.raw",
+                       256, 256, 109, 8, 1.0f, 1.0f, 1.0f);
+      break;
+
+    case 1:
+      setRawVolumeFile(":/data/VisMale_128x256x256_8bit_1-57774x0-995861x1-00797.raw",
+                       128, 256, 256, 8, 1.57774f, 0.995861f, 1.00797f);
+      break;
+  }
 }
 
 
@@ -197,27 +235,31 @@ void MainWindow::handleDetailChange(void)
 }
 
 
+void MainWindow::handleTFPresetSwitch(void)
+{
+  int id = ui->cbTransferFunctionPresets->currentData().toInt();
+  setTransferFunctionPreset(id);
+}
+
+
+void MainWindow::handleSampleModelSwitch(void)
+{
+  QPoint pair = ui->cbSampleModels->currentData().toPoint();
+  setSampleModel(pair.x());
+  ui->cbTransferFunctionPresets->setCurrentIndex(pair.y());
+}
+
+
 void MainWindow::showEvent(QShowEvent *event)
 {
-#if 0
-  // nacitanie defaultnych dat
-
-  bool ret = ui->volumeViewer->openRawFile(":/data/head256x256x109_8bit_chan.raw", 256, 256, 109, 8);
-  //ui->volumeViewer->setFile(":/data/head256x256x109_8bit_chan.raw");
-
-  //bool ret = ui->volumeViewer->openFile("D:/AC601/VirtualBOXShare/Ubuntu/PGP/projekt/PGP_p4jos/data/8-bit/Foot.pvm");
-  //bool ret = ui->volumeViewer->openFile("D:/AC601/VirtualBOXShare/Ubuntu/PGP/projekt/PGP_p4jos/data/16-bit/MRI-Woman.pvm");
-  //bool ret = ui->volumeViewer->openFile("D:/AC601/VirtualBOXShare/Ubuntu/PGP/projekt/PGP_p4jos/data/16-bit/Teddy.pvm");
-
-  qDebug() << "volume file loaded: " << (ret ? "yes" : "no");
-
-  ui->transferFuncEditor->updateHistogram(ui->volumeViewer->volumeData());
-#endif
-
   // nastavenie defaultnych dat a transfer funkcie
-  setRawVolumeFile(":/data/head256x256x109_8bit_chan.raw", 256, 256, 109, 8, 1.0f, 1.0f, 1.0f);
-  setTransferFunctionPreset(1);
+  ui->cbSampleModels->setCurrentIndex(1);   // ak by tu bola 0, tak by to nefungovalo, pretoze 0 je uz na zaciatku current index
+  //setSampleModel(1);
+  //setTransferFunctionPreset(1);
 
+  // nastavenie defaultnych nastaveni zobrazovania
+  //ui->volumeViewer->setAutoSubsampling(ui->cbOptionsAutoSubsampling->isChecked());
+  //ui->volumeViewer->setDisplayBBox(ui->cbOptionsDisplayBBox->isChecked());
   ui->volumeViewer->setUseTransferFunction(ui->gbTransferFunctionEditor->isChecked());
 
   return QMainWindow::showEvent(event);

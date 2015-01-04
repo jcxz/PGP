@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>data/head256x256x109_8bit_chan.raw</file>
+        <file>data/head_256x256x109_8bit_1-0x1-0x1-5.raw</file>
+        <file>data/VisMale_128x256x256_8bit_1-57774x0-995861x1-00797.raw</file>
     </qresource>
 </RCC>

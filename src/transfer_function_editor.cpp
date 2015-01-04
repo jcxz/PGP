@@ -86,6 +86,7 @@ void TransferFunctionEditor::initTest(void)
 void TransferFunctionEditor::setTransferFunction(TransferFunction *func)
 {
   m_transfer_func = func;
+  update();
   emit transferFunctionChanged(m_transfer_func);
 }
 
@@ -303,8 +304,8 @@ void TransferFunctionEditor::mouseReleaseEvent(QMouseEvent *event)
 {
   //qDebug() << m_transfer_func;
 
-  m_cur_tcp_idx = TransferFunction::INVALID_TCP_INDEX;
-  update();
+  //m_cur_tcp_idx = TransferFunction::INVALID_TCP_INDEX;
+  //update();
 
   // treba upoznotnit widget, ktory zobrazuje volumetricke data,
   // aby sa prekreslil v plnej kvalite
@@ -327,6 +328,18 @@ void TransferFunctionEditor::mouseMoveEvent(QMouseEvent *event)
 }
 
 
+void TransferFunctionEditor::setTCPColor(int idx)
+{
+  //const TransferControlPoint & tcp = m_transfer_func->tcp(idx);
+  //QColor c(QColorDialog::getColor(tcp.color(), this));
+
+  // Podla vsetkeho je v QColorDialog bug a initial color sa nastavuje nejako cudne:
+  // https://snusmumriken.qtproject.c.bitbit.net/browse/QTBUG-43548?page=com.atlassian.jira.plugin.system.issuetabpanels:changehistory-tabpanel
+  QColor c(QColorDialog::getColor(QColor(), this));
+  if (c.isValid()) m_transfer_func->setTCPColor(idx, c);
+}
+
+
 void TransferFunctionEditor::mouseDoubleClickEvent(QMouseEvent *event)
 {
   int idx = m_transfer_func->findByPosition(toTCP(event->pos()),
@@ -334,7 +347,7 @@ void TransferFunctionEditor::mouseDoubleClickEvent(QMouseEvent *event)
                                                        POINT_SEARCH_RADIUS));
   if (idx != TransferFunction::INVALID_TCP_INDEX)
   {
-    m_transfer_func->setTCPColor(idx, QColorDialog::getColor());
+    setTCPColor(idx);
   }
   else
   {
@@ -390,7 +403,7 @@ void TransferFunctionEditor::contextMenuEvent(QContextMenuEvent *event)
   }
   else if (act == m_act_change_col)
   {
-    m_transfer_func->setTCPColor(idx, QColorDialog::getColor());
+    setTCPColor(idx);
     update();
     emit transferFunctionChanged(m_transfer_func);
   }

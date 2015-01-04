@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>914</width>
-    <height>620</height>
+    <width>916</width>
+    <height>681</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
        <widget class="VolumeViewer" name="volumeViewer" native="true"/>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,0,0">
         <item>
          <widget class="QPushButton" name="pbLoadModel">
           <property name="text">
@@ -55,6 +55,18 @@
           <property name="text">
            <string>Toggle Renderer</string>
           </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="gbSampleModels">
+          <property name="title">
+           <string>Sample Models</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QComboBox" name="cbSampleModels"/>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
@@ -236,7 +248,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>914</width>
+     <width>916</width>
      <height>18</height>
     </rect>
    </property>

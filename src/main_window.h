@@ -24,9 +24,12 @@ class MainWindow : public QMainWindow
     void handleSaveTF(void);
     void handleDumpTF(void);
     void setTransferFunctionPreset(int preset_id);
+    void setSampleModel(int model_id);
     void handleRendererSwitch(void);
     void handleAutoSubsamplingChange(void);
     void handleDetailChange(void);
+    void handleTFPresetSwitch(void);
+    void handleSampleModelSwitch(void);
 
   protected:
     virtual void showEvent(QShowEvent *event) override;

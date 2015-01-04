@@ -99,6 +99,24 @@ class TransferFunction
     const tContainer & controlPoints(void) const
     { return m_transfer_points; }
 
+    TransferControlPoint & tcp(int idx)
+    {
+      //if (idx < 0) return m_cp_left_border;
+      //if (idx >= m_transfer_points.size()) return m_cp_right_border;
+      //return m_transfer_points[idx];
+
+      if (idx < 0) return m_transfer_points.first();
+      if (idx >= m_transfer_points.size()) return m_transfer_points.last();
+      return m_transfer_points[idx];
+    }
+
+    const TransferControlPoint & tcp(int idx) const
+    {
+      if (idx < 0) return m_transfer_points.first();
+      if (idx >= m_transfer_points.size()) return m_transfer_points.last();
+      return m_transfer_points[idx];
+    }
+
     // the mouse_pos and the tolerance have to be transformed to interval [0, 1]
     int findByPosition(QPointF mouse_pos, QPointF tolerance = QPointF(0.0f, 0.0f)) const;
 
@@ -117,17 +135,6 @@ class TransferFunction
 
     //inline bool isValid(void) const { return !m_transfer_points.isEmpty(); }
     inline bool isValid(void) const { return m_transfer_points.size() >= 3; }
-
-    inline TransferControlPoint & getTCP(int idx)
-    {
-      //if (idx < 0) return m_cp_left_border;
-      //if (idx >= m_transfer_points.size()) return m_cp_right_border;
-      //return m_transfer_points[idx];
-
-      if (idx < 0) return m_transfer_points[0];
-      if (idx >= m_transfer_points.size()) return m_transfer_points.last();
-      return m_transfer_points[idx];
-    }
 
     inline TransferControlPoint & leftBorderTCP(void) { return m_transfer_points[0]; }
     inline TransferControlPoint & rightBorderTCP(void) { return m_transfer_points.last(); }
