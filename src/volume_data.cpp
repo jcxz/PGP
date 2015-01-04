@@ -320,12 +320,14 @@ GLfloat *intensityToGradients(const T *p_intensity, const int width, const int h
         sum_y = sum_y / ((GLfloat) sample_cnt);
         sum_z = sum_z / ((GLfloat) sample_cnt);
 
+        // toto je kvoli tomu, ze v pixely v OpenGL texture maju rozsah <0, 1>
         normalize(sum_x, sum_y, sum_z);
 
         int idx = k * width * height + j * width + i;
-        p_rgba[idx * 4 + 0] = sum_x;
-        p_rgba[idx * 4 + 1] = sum_y;
-        p_rgba[idx * 4 + 2] = sum_z;
+        // * 0.5f + 0.5f je kvoli tomu, ze v pixely v OpenGL texture maju rozsah <0, 1>
+        p_rgba[idx * 4 + 0] = sum_x * 0.5f + 0.5f;
+        p_rgba[idx * 4 + 1] = sum_y * 0.5f + 0.5f;
+        p_rgba[idx * 4 + 2] = sum_z * 0.5f + 0.5f;
         p_rgba[idx * 4 + 3] = p_intensity[idx] / 255.0f;
       }
     }
