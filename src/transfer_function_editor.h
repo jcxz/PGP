@@ -82,9 +82,10 @@ class TransferFunctionEditor : public QWidget
     float m_volume_data_range;
     TransferFunction *m_transfer_func;
     VolumeDataHistogram m_volume_data_hist;
-    QAction *m_act_insert_tcp;
-    QAction *m_act_remove_tcp;
-    QAction *m_act_change_col;
+    //QAction *m_act_insert_tcp;
+    //QAction *m_act_remove_tcp;
+    //QAction *m_act_change_col;
+    //QAction *m_act_enable_tcp;
     QShortcut *m_shortcut_remove_tcp;
 };
 

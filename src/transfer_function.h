@@ -11,12 +11,15 @@ class TransferControlPoint
 {
   public:
     TransferControlPoint(void)
-      : m_pos(), m_col()
+      : m_pos(), m_col(), m_enabled(true)
     { }
 
     TransferControlPoint(QPointF pos, QColor col)
-      : m_pos(pos), m_col(col)
+      : m_pos(pos), m_col(col), m_enabled(true)
     { }
+
+    bool isEnabled(void) const { return m_enabled; }
+    void setEnabled(bool enabled) { m_enabled = enabled; }
 
     float alpha(void) const { return m_pos.y(); }
 
@@ -35,6 +38,7 @@ class TransferControlPoint
   private:
     QPointF m_pos;
     QColor m_col;
+    bool m_enabled;
 };
 
 
@@ -77,6 +81,7 @@ class TransferFunction
     void removeTCP(int idx);
     void setTCPPosition(int idx, QPointF pos);
     void setTCPColor(int idx, const QColor & col);
+    void setTCPEnabled(int idx, bool enabled);
 
     void clear(void)
     {

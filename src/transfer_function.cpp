@@ -75,6 +75,9 @@ void TransferFunction::setTCPPosition(int idx, QPointF pos)
   TransferControlPoint & pt = tcp(idx);
   TransferControlPoint & pt_next = tcp(idx + 1);
 
+  // skontroluj ci je dany bod transfer funkcie povoleny
+  if (!pt.isEnabled()) return;
+
   if (pos.y() > 1.0f) pos.setY(1.0f);
   if (pos.y() < 0.0f) pos.setY(0.0f);
 
@@ -100,7 +103,17 @@ void TransferFunction::setTCPColor(int idx, const QColor & col)
 {
   if ((idx >= 0) && (idx < m_transfer_points.size()))
   {
-    m_transfer_points[idx].setColor(col);
+    TransferControlPoint & pt = m_transfer_points[idx];
+    if (pt.isEnabled()) pt.setColor(col);
+  }
+}
+
+
+void TransferFunction::setTCPEnabled(int idx, bool enabled)
+{
+  if ((idx >= 0) && (idx < m_transfer_points.size()))
+  {
+    m_transfer_points[idx].setEnabled(enabled);
   }
 }
 
@@ -156,7 +169,7 @@ float TransferFunction::calcT(float pos_x, const TransferControlPoint * & cp1, c
       break;
     }
   }
-#else
+#elif 0
   // find upper boundary
   for (int i = 1; i < m_transfer_points.size(); ++i)
   {
@@ -173,6 +186,25 @@ float TransferFunction::calcT(float pos_x, const TransferControlPoint * & cp1, c
 
   assert(cp1 != nullptr);
   assert(cp2 != nullptr);
+#else
+  // find upper boundary
+  for (int i = 1; i < m_transfer_points.size(); ++i)
+  {
+    const TransferControlPoint & pt1 = m_transfer_points[i - 1];
+    const TransferControlPoint & pt2 = m_transfer_points[i];
+    if ((pos_x >= pt1.position().x()) &&
+        (pos_x <= pt2.position().x()) &&
+        (pt1.isEnabled() && pt2.isEnabled()))
+    {
+      cp1 = &pt1;
+      cp2 = &pt2;
+      if (idx) *idx = i;
+      break;
+    }
+  }
+
+  if (cp1 == nullptr) cp1 = &m_transfer_points.first();
+  if (cp2 == nullptr) cp2 = &m_transfer_points.last();
 #endif
 
   float p1_x = cp1->position().x();
