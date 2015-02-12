@@ -32,6 +32,14 @@ object_script.*.Release
 /build/*
 .qmake.stash
 
+# ignore all the content in data directory (except of what has already been explicitely added)
+/data
+/data/*
+
+# same for screenshots directory
+/screenshots
+/screenshots/*
+
 # other stuff
 /bordel
 /border/*
